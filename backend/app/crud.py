@@ -5,7 +5,7 @@ from app.schemas import (
     UserMonthPlanCreate, UserCreate, MonthCreate, SprintCreate, ProjectCreate,
     BloggerCreate, BloggerUpdate, CompanyCreate, CompanyUpdate
 )
-from app.auth import get_password_hash
+from app.auth import get_password_hash, verify_password
 
 # Projects
 def get_projects(db: Session):
@@ -26,6 +26,17 @@ def create_project(db: Session, project: ProjectCreate):
 # Users
 def get_users(db: Session):
     return db.query(User).all()
+
+def get_user_by_email(db: Session, email: str):
+    return db.query(User).filter(User.email == email).first()
+
+def authenticate_user(db: Session, email: str, password: str):
+    user = get_user_by_email(db, email)
+    if not user:
+        return None
+    if not verify_password(password, user.hashed_password):
+        return None
+    return user
 
 def create_user(db: Session, user: UserCreate):
     hashed_password = get_password_hash(user.password)

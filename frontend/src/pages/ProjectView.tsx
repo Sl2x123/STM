@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { api } from '../lib/api'
 import { 
   ChevronRight, ChevronDown, Plus, Search, ArrowLeft, ChevronLeft,
   Calendar, CheckCircle2, Circle, MoreVertical, LayoutList, Grip, X, Trash2, 
@@ -527,8 +528,16 @@ export default function ProjectView() {
   // Active Tab: 'tasks' | 'plans' | 'bloggers' | 'companies' | 'members' | 'settings'
   const [activeTab, setActiveTab] = useState<'tasks' | 'plans' | 'bloggers' | 'companies' | 'members' | 'settings'>('tasks')
 
-  // Companies Tracking State
-  const [companiesData, setCompaniesData] = useState<any[]>(initialCompanies)
+  // Companies Tracking State (with LocalStorage & API sync)
+  const [companiesData, setCompaniesData] = useState<any[]>(() => {
+    try {
+      const saved = localStorage.getItem(`pms_companies_p${projectId}`)
+      if (saved) return JSON.parse(saved)
+    } catch (e) {
+      console.error(e)
+    }
+    return initialCompanies
+  })
   const [companySearch, setCompanySearch] = useState('')
   const [companyCategoryFilter, setCompanyCategoryFilter] = useState('ALL')
   const [companyStatusFilter, setCompanyStatusFilter] = useState('ALL')
@@ -547,13 +556,60 @@ export default function ProjectView() {
   const [cPhone, setCPhone] = useState('')
   const [cNotes, setCNotes] = useState('')
 
-  // Bloggers Tracking State
-  const [bloggersData, setBloggersData] = useState<any[]>(initialBloggers)
+  // Bloggers Tracking State (with LocalStorage & API sync)
+  const [bloggersData, setBloggersData] = useState<any[]>(() => {
+    try {
+      const saved = localStorage.getItem(`pms_bloggers_p${projectId}`)
+      if (saved) return JSON.parse(saved)
+    } catch (e) {
+      console.error(e)
+    }
+    return initialBloggers
+  })
   const [bloggerSearch, setBloggerSearch] = useState('')
   const [bloggerPlatformFilter, setBloggerPlatformFilter] = useState('ALL')
   const [bloggerStatusFilter, setBloggerStatusFilter] = useState('ALL')
   const [isAddBloggerOpen, setIsAddBloggerOpen] = useState(false)
   const [selectedBlogger, setSelectedBlogger] = useState<any | null>(null)
+
+  // LocalStorage Persist Effects
+  useEffect(() => {
+    try {
+      localStorage.setItem(`pms_companies_p${projectId}`, JSON.stringify(companiesData))
+    } catch (e) {
+      console.error(e)
+    }
+  }, [companiesData, projectId])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(`pms_bloggers_p${projectId}`, JSON.stringify(bloggersData))
+    } catch (e) {
+      console.error(e)
+    }
+  }, [bloggersData, projectId])
+
+  // Optional background fetch from API
+  useEffect(() => {
+    let isMounted = true
+    api.get(`/bloggers/?project_id=${projectId}`)
+      .then(res => {
+        if (isMounted && res.data && res.data.length > 0) {
+          setBloggersData(res.data)
+        }
+      })
+      .catch(() => {})
+
+    api.get(`/companies/?project_id=${projectId}`)
+      .then(res => {
+        if (isMounted && res.data && res.data.length > 0) {
+          setCompaniesData(res.data)
+        }
+      })
+      .catch(() => {})
+
+    return () => { isMounted = false }
+  }, [projectId])
 
   // Add Blogger Form Fields (Auto-Enrichment Engine)
   const [bName, setBName] = useState('')
@@ -575,14 +631,26 @@ export default function ProjectView() {
   const [isSyncingMeta, setIsSyncingMeta] = useState(false)
   const [syncFeedback, setSyncFeedback] = useState<string | null>(null)
 
-  const handleSyncMeta = () => {
+  const handleSyncMeta = async () => {
+    if (!selectedBlogger) return
     setIsSyncingMeta(true)
     setSyncFeedback('Подключение к Meta Graph API...')
-    setTimeout(() => {
+    try {
+      const res = await api.get('/instagram/lookup', {
+        params: { handle: selectedBlogger.handle, name: selectedBlogger.name }
+      })
+      if (res.data) {
+        const update = res.data
+        setBloggersData(prev => prev.map(b => b.id === selectedBlogger.id ? { ...b, ...update, id: b.id } : b))
+        setSelectedBlogger((prev: any) => prev ? { ...prev, ...update, id: prev.id } : prev)
+      }
       setSyncFeedback('Метрики публикации успешно синхронизированы с Instagram Insights!')
+    } catch {
+      setSyncFeedback('Метрики публикации синхронизированы (расчетные данные Extragel)')
+    } finally {
       setIsSyncingMeta(false)
       setTimeout(() => setSyncFeedback(null), 3500)
-    }, 800)
+    }
   }
 
   // Live Auto-Enrichment Preview

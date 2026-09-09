@@ -1,12 +1,41 @@
-import { useState } from 'react'
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { 
-  Menu, Search, Bell, LayoutDashboard, FolderKanban, FileText, Zap, ChevronDown
+  Menu, Search, Bell, LayoutDashboard, FolderKanban, FileText, Zap, ChevronDown, LogOut, User as UserIcon, Shield
 } from 'lucide-react'
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
+  const navigate = useNavigate()
+
+  const userData = (() => {
+    try {
+      const stored = localStorage.getItem('user_data')
+      if (stored) return JSON.parse(stored)
+    } catch {}
+    return { full_name: 'Азамат (Администратор)', email: 'admin@extragel.uz', role: 'admin' }
+  })()
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('user_data')
+    setUserMenuOpen(false)
+    navigate('/login')
+  }
+
 
   return (
     <div className="min-h-screen bg-[#F8F9FB] flex font-sans text-gray-800">
@@ -108,12 +137,59 @@ export default function Layout() {
               <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white transform translate-x-0.5 -translate-y-0.5"></span>
             </button>
             
-            <div className="flex items-center cursor-pointer hover:bg-gray-50 py-1 px-2 rounded-lg transition-colors">
-              <div className="h-9 w-9 rounded-full bg-[#e0e7ff] text-[#4f46e5] flex items-center justify-center font-bold text-sm">
-                AV
-              </div>
-              <span className="ml-3 font-medium text-gray-700 text-sm">Азамат</span>
-              <ChevronDown size={16} className="ml-2 text-gray-400" />
+            <div className="relative" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center cursor-pointer hover:bg-gray-50 py-1.5 px-2.5 rounded-xl transition-colors border border-transparent hover:border-gray-200/80"
+              >
+                <div className="h-9 w-9 rounded-xl bg-[#e0e7ff] text-[#4f46e5] flex items-center justify-center font-bold text-sm shadow-sm">
+                  {userData.full_name?.charAt(0) || 'A'}
+                </div>
+                <div className="ml-2.5 text-left hidden sm:block">
+                  <div className="font-bold text-gray-800 text-xs leading-tight">{userData.full_name || 'Азамат'}</div>
+                  <div className="text-[10px] text-gray-400 font-medium">{userData.role === 'admin' ? 'Администратор' : 'Менеджер'}</div>
+                </div>
+                <ChevronDown size={15} className={`ml-2 text-gray-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl shadow-gray-200/60 border border-gray-100 py-2 z-50">
+                  <div className="px-4 py-2.5 border-b border-gray-100">
+                    <p className="text-xs font-bold text-gray-900">{userData.full_name}</p>
+                    <p className="text-[11px] text-gray-400 font-mono mt-0.5">{userData.email}</p>
+                    <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-[#4f46e5]">
+                      <Shield size={10} />
+                      {userData.role === 'admin' ? 'Роль: Администратор' : 'Роль: Менеджер'}
+                    </span>
+                  </div>
+
+                  <div className="py-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserMenuOpen(false)
+                        navigate('/reports')
+                      }}
+                      className="w-full px-4 py-2 text-left text-xs font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <UserIcon size={14} className="text-gray-400" />
+                      Мои отчеты и активность
+                    </button>
+                  </div>
+
+                  <div className="border-t border-gray-100 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <LogOut size={14} className="text-rose-500" />
+                      Выйти из аккаунта
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>

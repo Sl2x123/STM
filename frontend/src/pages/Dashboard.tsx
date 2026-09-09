@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { 
   Target, CheckCircle2, FolderKanban, TrendingUp, Calendar, ArrowRight, 
-  Users, Eye, DollarSign, ExternalLink
+  Users, Eye, DollarSign, ExternalLink, Building2, MapPin, Package, Store, Layers
 } from 'lucide-react'
 
 // Influencer & Project Performance Data By Period
@@ -56,6 +56,39 @@ interface PeriodData {
     format: string
     status: 'Вышел пост' | 'Оплачено' | 'Согласовано' | 'Переговоры'
     postUrl?: string
+    date: string
+  }>
+  companyMetrics: {
+    totalSpent: string
+    planBudget: string
+    budgetPercent: number
+    locationsCount: number
+    planLocations: number
+    locationsPercent: number
+    itemsDistributedCount: number
+    activePartnerships: number
+  }
+  companyCategories: Array<{
+    name: string
+    count: number
+    spent: string
+    share: number
+    color: string
+    bgColor: string
+    textColor: string
+  }>
+  companies: Array<{
+    id: string
+    project: string
+    projectColor: string
+    name: string
+    category: string
+    categoryBadge: string
+    location: string
+    spent: string
+    itemsSummary: string
+    status: 'Материалы переданы' | 'Активно' | 'Согласовано' | 'Переговоры' | 'На паузе'
+    contactPerson: string
     date: string
   }>
 }
@@ -151,6 +184,80 @@ const periodsData: Record<string, PeriodData> = {
         status: 'Переговоры',
         date: '24.09.2026'
       }
+    ],
+    companyMetrics: {
+      totalSpent: '$2,950',
+      planBudget: '$3,500',
+      budgetPercent: 84,
+      locationsCount: 14,
+      planLocations: 18,
+      locationsPercent: 78,
+      itemsDistributedCount: 1850,
+      activePartnerships: 11,
+    },
+    companyCategories: [
+      { name: 'Гостиницы & Отели', count: 5, spent: '$1,250', share: 42, color: 'bg-amber-500', bgColor: 'bg-amber-50', textColor: 'text-amber-700' },
+      { name: 'Фитнес & СПА', count: 4, spent: '$850', share: 29, color: 'bg-emerald-500', bgColor: 'bg-emerald-50', textColor: 'text-emerald-700' },
+      { name: 'Бары & Рестораны', count: 3, spent: '$550', share: 19, color: 'bg-purple-500', bgColor: 'bg-purple-50', textColor: 'text-purple-700' },
+      { name: 'Клиники & Медцентры', count: 2, spent: '$300', share: 10, color: 'bg-blue-500', bgColor: 'bg-blue-50', textColor: 'text-blue-700' },
+    ],
+    companies: [
+      {
+        id: 'c1',
+        project: 'Extragel',
+        projectColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        name: 'Hilton Tashkent City',
+        category: 'Гостиница / Отель',
+        categoryBadge: 'bg-amber-50 text-amber-700 border-amber-200',
+        location: 'г. Ташкент, ул. Ислама Каримова, 2',
+        spent: '$850',
+        itemsSummary: 'Диспенсеры в SPA (6 шт.), 400 саше Extragel, полотенца (50 шт.), тейбл-тенты на ресепшн',
+        status: 'Материалы переданы',
+        contactPerson: 'Улугбек (Wellness Manager)',
+        date: '03.09.2026'
+      },
+      {
+        id: 'c2',
+        project: 'Masculan',
+        projectColor: 'bg-blue-50 text-blue-700 border-blue-200',
+        name: 'Steam Bar & Lounge',
+        category: 'Бар / Ресторан',
+        categoryBadge: 'bg-purple-50 text-purple-700 border-purple-200',
+        location: 'г. Ташкент, ул. Нукус, 21',
+        spent: '$400',
+        itemsSummary: 'Брендированные салфетницы Masculan (30 шт.), светящиеся костеры (100 шт.), наборы образцов',
+        status: 'Активно',
+        contactPerson: 'Рустам (Арт-директор)',
+        date: '10.09.2026'
+      },
+      {
+        id: 'c3',
+        project: 'Extragel',
+        projectColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        name: 'B-Fit Wellness Complex',
+        category: 'Фитнес-клуб',
+        categoryBadge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        location: 'г. Ташкент, ул. Кичик Бешагач, 104',
+        spent: '$600',
+        itemsSummary: 'Фирменный стенд Extragel с гелем у зоны кроссфита, 250 пробников, плакаты А1 (4 шт.)',
+        status: 'Согласовано',
+        contactPerson: 'Сардор (Главный тренер)',
+        date: '14.09.2026'
+      },
+      {
+        id: 'c4',
+        project: 'Extragel',
+        projectColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        name: 'Hyatt Regency Tashkent',
+        category: 'Гостиница / Отель',
+        categoryBadge: 'bg-amber-50 text-amber-700 border-amber-200',
+        location: 'г. Ташкент, ул. Навои, 1',
+        spent: '$1,100',
+        itemsSummary: 'Диспенсеры в номерах Люкс (12 шт.), 600 саше-пробников, промо-стойка в фитнес-зоне',
+        status: 'Активно',
+        contactPerson: 'Дильноза (PR-отдел)',
+        date: '18.09.2026'
+      }
     ]
   },
   'Август 2026': {
@@ -230,6 +337,66 @@ const periodsData: Record<string, PeriodData> = {
         postUrl: 'https://youtube.com/watch?v=example_aug3',
         date: '25.08.2026'
       }
+    ],
+    companyMetrics: {
+      totalSpent: '$2,700',
+      planBudget: '$3,000',
+      budgetPercent: 90,
+      locationsCount: 12,
+      planLocations: 15,
+      locationsPercent: 80,
+      itemsDistributedCount: 1600,
+      activePartnerships: 10,
+    },
+    companyCategories: [
+      { name: 'Гостиницы & Отели', count: 4, spent: '$1,100', share: 41, color: 'bg-amber-500', bgColor: 'bg-amber-50', textColor: 'text-amber-700' },
+      { name: 'Фитнес & СПА', count: 4, spent: '$800', share: 30, color: 'bg-emerald-500', bgColor: 'bg-emerald-50', textColor: 'text-emerald-700' },
+      { name: 'Бары & Рестораны', count: 3, spent: '$500', share: 19, color: 'bg-purple-500', bgColor: 'bg-purple-50', textColor: 'text-purple-700' },
+      { name: 'Клиники & Медцентры', count: 1, spent: '$300', share: 10, color: 'bg-blue-500', bgColor: 'bg-blue-50', textColor: 'text-blue-700' },
+    ],
+    companies: [
+      {
+        id: 'ca1',
+        project: 'Extragel',
+        projectColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        name: 'Hilton Tashkent City',
+        category: 'Гостиница / Отель',
+        categoryBadge: 'bg-amber-50 text-amber-700 border-amber-200',
+        location: 'г. Ташкент, ул. Ислама Каримова, 2',
+        spent: '$850',
+        itemsSummary: 'Диспенсеры в SPA (6 шт.), 400 саше Extragel, брендированные полотенца',
+        status: 'Материалы переданы',
+        contactPerson: 'Улугбек (Wellness Manager)',
+        date: '08.08.2026'
+      },
+      {
+        id: 'ca2',
+        project: 'Extragel',
+        projectColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        name: 'Chekhov Sport Club',
+        category: 'Фитнес-клуб',
+        categoryBadge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        location: 'г. Ташкент, ул. Чехова, 28',
+        spent: '$500',
+        itemsSummary: 'Стенд в зоне тяжелой атлетики, 300 саше, баннер у раздевалок',
+        status: 'Активно',
+        contactPerson: 'Алишер (Инструктор)',
+        date: '15.08.2026'
+      },
+      {
+        id: 'ca3',
+        project: 'Masculan',
+        projectColor: 'bg-blue-50 text-blue-700 border-blue-200',
+        name: 'Steam Bar & Lounge',
+        category: 'Бар / Ресторан',
+        categoryBadge: 'bg-purple-50 text-purple-700 border-purple-200',
+        location: 'г. Ташкент, ул. Нукус, 21',
+        spent: '$400',
+        itemsSummary: 'Брендированные салфетницы Masculan (30 шт.), светящиеся костеры (100 шт.)',
+        status: 'Активно',
+        contactPerson: 'Рустам (Арт-директор)',
+        date: '20.08.2026'
+      }
     ]
   },
   'Июль 2026': {
@@ -291,6 +458,52 @@ const periodsData: Record<string, PeriodData> = {
         status: 'Вышел пост',
         postUrl: 'https://t.me/example_jul2',
         date: '22.07.2026'
+      }
+    ],
+    companyMetrics: {
+      totalSpent: '$2,200',
+      planBudget: '$2,500',
+      budgetPercent: 88,
+      locationsCount: 10,
+      planLocations: 12,
+      locationsPercent: 83,
+      itemsDistributedCount: 1300,
+      activePartnerships: 9,
+    },
+    companyCategories: [
+      { name: 'Гостиницы & Отели', count: 4, spent: '$950', share: 43, color: 'bg-amber-500', bgColor: 'bg-amber-50', textColor: 'text-amber-700' },
+      { name: 'Фитнес & СПА', count: 3, spent: '$650', share: 30, color: 'bg-emerald-500', bgColor: 'bg-emerald-50', textColor: 'text-emerald-700' },
+      { name: 'Бары & Рестораны', count: 2, spent: '$400', share: 18, color: 'bg-purple-500', bgColor: 'bg-purple-50', textColor: 'text-purple-700' },
+      { name: 'Клиники & Медцентры', count: 1, spent: '$200', share: 9, color: 'bg-blue-500', bgColor: 'bg-blue-50', textColor: 'text-blue-700' },
+    ],
+    companies: [
+      {
+        id: 'cj1',
+        project: 'Extragel',
+        projectColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        name: 'Hyatt Regency Tashkent',
+        category: 'Гостиница / Отель',
+        categoryBadge: 'bg-amber-50 text-amber-700 border-amber-200',
+        location: 'г. Ташкент, ул. Навои, 1',
+        spent: '$950',
+        itemsSummary: 'Диспенсеры в номерах Люкс (10 шт.), 450 саше Extragel',
+        status: 'Активно',
+        contactPerson: 'Дильноза (PR)',
+        date: '10.07.2026'
+      },
+      {
+        id: 'cj2',
+        project: 'Extragel',
+        projectColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        name: 'B-Fit Wellness Complex',
+        category: 'Фитнес-клуб',
+        categoryBadge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        location: 'г. Ташкент, ул. Кичик Бешагач, 104',
+        spent: '$650',
+        itemsSummary: 'Брендированные стойки, 300 саше, баннеры в кардиозоне',
+        status: 'Материалы переданы',
+        contactPerson: 'Сардор (Главный тренер)',
+        date: '18.07.2026'
       }
     ]
   },
@@ -388,13 +601,89 @@ const periodsData: Record<string, PeriodData> = {
         postUrl: 'https://youtube.com/watch?v=example_aug3',
         date: '25.08.2026'
       }
+    ],
+    companyMetrics: {
+      totalSpent: '$7,850',
+      planBudget: '$9,000',
+      budgetPercent: 87,
+      locationsCount: 22,
+      planLocations: 25,
+      locationsPercent: 88,
+      itemsDistributedCount: 4750,
+      activePartnerships: 18,
+    },
+    companyCategories: [
+      { name: 'Гостиницы & Отели', count: 9, spent: '$3,300', share: 42, color: 'bg-amber-500', bgColor: 'bg-amber-50', textColor: 'text-amber-700' },
+      { name: 'Фитнес & СПА', count: 7, spent: '$2,300', share: 29, color: 'bg-emerald-500', bgColor: 'bg-emerald-50', textColor: 'text-emerald-700' },
+      { name: 'Бары & Рестораны', count: 4, spent: '$1,450', share: 19, color: 'bg-purple-500', bgColor: 'bg-purple-50', textColor: 'text-purple-700' },
+      { name: 'Клиники & Медцентры', count: 2, spent: '$800', share: 10, color: 'bg-blue-500', bgColor: 'bg-blue-50', textColor: 'text-blue-700' },
+    ],
+    companies: [
+      {
+        id: 'cq1',
+        project: 'Extragel',
+        projectColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        name: 'Hilton Tashkent City',
+        category: 'Гостиница / Отель',
+        categoryBadge: 'bg-amber-50 text-amber-700 border-amber-200',
+        location: 'г. Ташкент, ул. Ислама Каримова, 2',
+        spent: '$1,700',
+        itemsSummary: 'Диспенсеры в SPA (12 шт.), 800 саше Extragel, брендинг в фитнес-центре отеля',
+        status: 'Активно',
+        contactPerson: 'Улугбек (Wellness Manager)',
+        date: '03.09.2026'
+      },
+      {
+        id: 'cq2',
+        project: 'Extragel',
+        projectColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        name: 'Hyatt Regency Tashkent',
+        category: 'Гостиница / Отель',
+        categoryBadge: 'bg-amber-50 text-amber-700 border-amber-200',
+        location: 'г. Ташкент, ул. Навои, 1',
+        spent: '$2,050',
+        itemsSummary: 'Диспенсеры в номерах Люкс (22 шт.), 1050 саше, промо-стойки',
+        status: 'Активно',
+        contactPerson: 'Дильноза (PR-отдел)',
+        date: '18.09.2026'
+      },
+      {
+        id: 'cq3',
+        project: 'Masculan',
+        projectColor: 'bg-blue-50 text-blue-700 border-blue-200',
+        name: 'Steam Bar & Lounge',
+        category: 'Бар / Ресторан',
+        categoryBadge: 'bg-purple-50 text-purple-700 border-purple-200',
+        location: 'г. Ташкент, ул. Нукус, 21',
+        spent: '$800',
+        itemsSummary: 'Брендированные салфетницы Masculan (60 шт.), светящиеся костеры (200 шт.)',
+        status: 'Активно',
+        contactPerson: 'Рустам (Арт-директор)',
+        date: '10.09.2026'
+      },
+      {
+        id: 'cq4',
+        project: 'Extragel',
+        projectColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        name: 'B-Fit Wellness Complex',
+        category: 'Фитнес-клуб',
+        categoryBadge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        location: 'г. Ташкент, ул. Кичик Бешагач, 104',
+        spent: '$1,250',
+        itemsSummary: 'Фирменные стенды Extragel, 550 пробников, плакаты формата А1',
+        status: 'Активно',
+        contactPerson: 'Сардор (Главный тренер)',
+        date: '14.09.2026'
+      }
     ]
-  }
+  },
 }
 
 export default function Dashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Сентябрь 2026')
   const [bloggerProjectFilter, setBloggerProjectFilter] = useState<string>('ALL')
+  const [companyProjectFilter, setCompanyProjectFilter] = useState<string>('ALL')
+  const [companyCategoryFilter, setCompanyCategoryFilter] = useState<string>('ALL')
 
   const currentData = periodsData[selectedPeriod] || periodsData['Сентябрь 2026']
 
@@ -409,6 +698,46 @@ export default function Dashboard() {
   const filteredBloggers = currentData.bloggers.filter(
     b => bloggerProjectFilter === 'ALL' || b.project === bloggerProjectFilter
   )
+
+  // Dynamic companies: merge localStorage if user added new partner companies in ProjectView
+  const companiesList = useMemo(() => {
+    let list = currentData.companies || []
+    try {
+      const stored = localStorage.getItem('project_companies_1')
+      if (stored && selectedPeriod === 'Сентябрь 2026') {
+        const parsed = JSON.parse(stored)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          list = parsed.map((item: any) => ({
+            id: item.id || String(Math.random()),
+            project: item.project || 'Extragel',
+            projectColor: item.project === 'Masculan' 
+              ? 'bg-blue-50 text-blue-700 border-blue-200' 
+              : item.project === 'Энтеросгель'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+              : 'bg-indigo-50 text-indigo-700 border-indigo-200',
+            name: item.name || 'Партнерская площадка',
+            category: item.category || 'Площадка',
+            categoryBadge: item.categoryBadge || 'bg-amber-50 text-amber-700 border-amber-200',
+            location: item.location || 'г. Ташкент',
+            spent: item.spent || '$500',
+            itemsSummary: item.itemsProvided || 'Рекламные материалы и пробники',
+            status: item.status || 'Активно',
+            contactPerson: item.contactPerson || 'Представитель',
+            date: item.date || '01.09.2026'
+          }))
+        }
+      }
+    } catch (e) {
+      console.warn('Failed reading companies from localStorage', e)
+    }
+    return list
+  }, [selectedPeriod, currentData])
+
+  const filteredCompanies = companiesList.filter(c => {
+    const matchProject = companyProjectFilter === 'ALL' || c.project === companyProjectFilter
+    const matchCategory = companyCategoryFilter === 'ALL' || c.category.toLowerCase().includes(companyCategoryFilter.toLowerCase())
+    return matchProject && matchCategory
+  })
 
   return (
     <div className="max-w-[1400px] mx-auto font-sans pb-16">
@@ -697,6 +1026,272 @@ export default function Dashboard() {
             <div className="pt-4 mt-6 border-t border-gray-200/60 text-[11px] text-gray-500 flex justify-between items-center">
               <span>Лидирует: <strong className="text-gray-800">Instagram Reels</strong></span>
               <span className="text-indigo-600 font-bold">ER: ~4.8%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* SECTION: PARTNER COMPANIES & B2B VENUES FOR SELECTED PERIOD               */}
+      {/* ========================================================================= */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+        {/* Section Header */}
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+              <Building2 size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-gray-900">
+                  Партнерские площадки & B2B-компании за {selectedPeriod}
+                </h3>
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                  Отели • Бары • Фитнес • Клиники
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Учет локаций, бюджета интеграций, переданных диспенсеров, саше и рекламных материалов
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Filter by project */}
+            <span className="text-xs text-gray-400 font-medium">Проект:</span>
+            <select
+              value={companyProjectFilter}
+              onChange={(e) => setCompanyProjectFilter(e.target.value)}
+              className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs font-bold text-gray-700 outline-none cursor-pointer focus:bg-white focus:border-[#4f46e5]"
+            >
+              <option value="ALL">Все бренды</option>
+              <option value="Extragel">Extragel</option>
+              <option value="Masculan">Masculan</option>
+              <option value="Энтеросгель">Энтеросгель</option>
+            </select>
+
+            {/* Filter by category */}
+            <span className="text-xs text-gray-400 font-medium ml-1">Тип:</span>
+            <select
+              value={companyCategoryFilter}
+              onChange={(e) => setCompanyCategoryFilter(e.target.value)}
+              className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs font-bold text-gray-700 outline-none cursor-pointer focus:bg-white focus:border-[#4f46e5]"
+            >
+              <option value="ALL">Все категории</option>
+              <option value="Отель">Отели / HoReCa</option>
+              <option value="Бар">Бары / Клубы</option>
+              <option value="Фитнес">Фитнес-клубы</option>
+              <option value="Клиника">Клиники / Медцентры</option>
+            </select>
+
+            <Link 
+              to="/projects/1" 
+              className="px-3 py-1.5 bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm ml-2"
+            >
+              К площадкам <ArrowRight size={13} />
+            </Link>
+          </div>
+        </div>
+
+        {/* 4 Period Metric Badges */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Бюджет на площадки</p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-2xl font-extrabold text-gray-900">{currentData.companyMetrics.totalSpent}</span>
+              <span className="text-xs text-gray-400">из {currentData.companyMetrics.planBudget}</span>
+            </div>
+            <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
+              <div 
+                className="bg-[#4f46e5] h-full rounded-full transition-all" 
+                style={{ width: `${Math.min(currentData.companyMetrics.budgetPercent, 100)}%` }} 
+              />
+            </div>
+            <span className="text-[10px] font-bold text-indigo-600 mt-1 inline-block">
+              {currentData.companyMetrics.budgetPercent}% освоено бюджета
+            </span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Охвачено локаций</p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-2xl font-extrabold text-gray-900">
+                {currentData.companyMetrics.locationsCount}
+              </span>
+              <span className="text-xs text-gray-400">из {currentData.companyMetrics.planLocations} точек</span>
+            </div>
+            <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
+              <div 
+                className="bg-amber-500 h-full rounded-full transition-all" 
+                style={{ width: `${Math.min(currentData.companyMetrics.locationsPercent, 100)}%` }} 
+              />
+            </div>
+            <span className="text-[10px] font-bold text-amber-600 mt-1 inline-block">
+              {currentData.companyMetrics.locationsPercent}% целевого покрытия
+            </span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Передано материалов</p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-2xl font-extrabold text-gray-900">
+                {currentData.companyMetrics.itemsDistributedCount.toLocaleString()}
+              </span>
+              <span className="text-xs text-emerald-600 font-bold">единиц</span>
+            </div>
+            <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
+              <div 
+                className="bg-emerald-500 h-full rounded-full transition-all" 
+                style={{ width: '92%' }} 
+              />
+            </div>
+            <span className="text-[10px] font-bold text-emerald-600 mt-1 inline-block">
+              Саше, диспенсеры, промо-стойки
+            </span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Действующие партнерства</p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-2xl font-extrabold text-gray-900">
+                {currentData.companyMetrics.activePartnerships}
+              </span>
+              <span className="text-xs text-purple-600 font-bold">из {currentData.companyMetrics.locationsCount}</span>
+            </div>
+            <div className="w-full bg-purple-100 h-1.5 rounded-full mt-2 overflow-hidden">
+              <div className="bg-purple-600 h-full rounded-full w-full" />
+            </div>
+            <span className="text-[10px] font-bold text-purple-600 mt-1 inline-block">
+              Все локации брендированы
+            </span>
+          </div>
+        </div>
+
+        {/* Subgrid: Companies Table (2 cols) + Category Breakdown (1 col) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left: Companies Table (2 cols) */}
+          <div className="lg:col-span-2 border border-gray-100 rounded-2xl overflow-hidden">
+            <div className="bg-gray-50/70 px-4 py-3 border-b border-gray-100 flex justify-between items-center text-xs font-bold text-gray-500">
+              <span>Партнерские компании & Локации ({filteredCompanies.length})</span>
+              <span>Бюджет & Статус</span>
+            </div>
+
+            <div className="divide-y divide-gray-100">
+              {filteredCompanies.length === 0 ? (
+                <div className="p-8 text-center text-gray-400 text-xs">
+                  Нет компаний по выбранным фильтрам в периоде {selectedPeriod}
+                </div>
+              ) : (
+                filteredCompanies.map(company => (
+                  <div key={company.id} className="p-3.5 hover:bg-gray-50/80 transition-colors flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-[200px]">
+                      <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-700 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                        <Store size={18} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold text-sm text-gray-900">{company.name}</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${company.categoryBadge}`}>
+                            {company.category}
+                          </span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${company.projectColor}`}>
+                            {company.project}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-0.5">
+                          <MapPin size={11} className="text-gray-400 shrink-0" />
+                          <span className="truncate max-w-[260px] sm:max-w-[340px] text-gray-500">{company.location}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[11px] text-indigo-600 mt-1 font-medium">
+                          <Package size={11} className="shrink-0" />
+                          <span className="truncate max-w-[300px] sm:max-w-[380px]">{company.itemsSummary}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <span className="text-xs font-extrabold text-gray-900 font-mono">{company.spent}</span>
+                        <p className="text-[10px] text-gray-400">{company.contactPerson}</p>
+                      </div>
+
+                      <span className={`px-2.5 py-1 rounded-xl text-xs font-bold border flex items-center gap-1 ${
+                        company.status === 'Материалы переданы'
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
+                          : company.status === 'Активно'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : company.status === 'Согласовано'
+                          ? 'bg-purple-50 text-purple-700 border-purple-200'
+                          : company.status === 'Переговоры'
+                          ? 'bg-amber-50 text-amber-700 border-amber-200'
+                          : 'bg-gray-100 text-gray-700 border-gray-200'
+                      }`}>
+                        {company.status === 'Активно' && <CheckCircle2 size={12} className="text-emerald-600" />}
+                        {company.status}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Right: Category Shares & Key Materials (1 col) */}
+          <div className="border border-gray-100 rounded-2xl p-5 bg-gray-50/40 flex flex-col justify-between">
+            <div>
+              <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-4">
+                Затраты по категориям ({selectedPeriod})
+              </h4>
+              <div className="space-y-4">
+                {currentData.companyCategories.map(cat => (
+                  <div key={cat.name}>
+                    <div className="flex justify-between items-center text-xs mb-1.5 font-bold">
+                      <span className={`px-2 py-0.5 rounded-md text-[11px] ${cat.bgColor} ${cat.textColor}`}>
+                        {cat.name} ({cat.count})
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-900 font-mono">{cat.spent}</span>
+                        <span className="text-gray-400 font-normal">({cat.share}%)</span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full ${cat.color}`} 
+                        style={{ width: `${cat.share}%` }} 
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-gray-200/60">
+              <div className="flex items-center gap-1.5 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <Layers size={13} className="text-[#4f46e5]" />
+                <span>Распределено на точки:</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-white p-2 rounded-xl border border-gray-100">
+                  <p className="text-[10px] text-gray-400">Саше Extragel</p>
+                  <p className="font-bold text-gray-900">1,250 шт.</p>
+                </div>
+                <div className="bg-white p-2 rounded-xl border border-gray-100">
+                  <p className="text-[10px] text-gray-400">Диспенсеры</p>
+                  <p className="font-bold text-gray-900">42 шт.</p>
+                </div>
+                <div className="bg-white p-2 rounded-xl border border-gray-100">
+                  <p className="text-[10px] text-gray-400">Тейбл-тенты</p>
+                  <p className="font-bold text-gray-900">150 шт.</p>
+                </div>
+                <div className="bg-white p-2 rounded-xl border border-gray-100">
+                  <p className="text-[10px] text-gray-400">Стенды / Стойки</p>
+                  <p className="font-bold text-gray-900">18 шт.</p>
+                </div>
+              </div>
+              <div className="mt-3 text-[11px] text-gray-500 flex justify-between items-center">
+                <span>Лидер: <strong className="text-gray-800">Отели & СПА</strong></span>
+                <span className="text-amber-600 font-bold">Высокий LTV</span>
+              </div>
             </div>
           </div>
         </div>

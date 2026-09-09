@@ -33,6 +33,15 @@ class UserResponse(UserBase):
     class Config:
         from_attributes = True
 
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
+
 class TeamBase(BaseModel):
     name: str
 
