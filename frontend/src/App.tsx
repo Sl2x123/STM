@@ -1,0 +1,21 @@
+import { Routes, Route } from 'react-router-dom'
+import Layout from './components/Layout'
+import Dashboard from './pages/Dashboard'
+import ProjectsList from './pages/ProjectsList'
+import ProjectView from './pages/ProjectView'
+import Reports from './pages/Reports'
+
+function App() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/projects" element={<ProjectsList />} />
+        <Route path="/project/:id" element={<ProjectView />} />
+        <Route path="/reports" element={<Reports />} />
+      </Route>
+    </Routes>
+  )
+}
+
+export default App
