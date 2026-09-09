@@ -100,3 +100,52 @@ class SprintPlanItem(Base):
     plan_item = relationship("PlanItem", back_populates="sprint_items")
     sprint = relationship("Sprint")
 
+
+class Blogger(Base):
+    __tablename__ = "bloggers"
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    name = Column(String, index=True)
+    handle = Column(String, index=True)
+    platform = Column(String, default="Instagram")
+    followers = Column(String, default="100K")
+    reach = Column(String, default="20K")
+    views = Column(Integer, default=0)
+    format = Column(String, default="Reels + 2 Stories")
+    price = Column(String, default="$250")
+    status = Column(String, default="Переговоры")
+    publish_date = Column(String, nullable=True)
+    sprint = Column(String, default="Спринт 2")
+    profile_url = Column(String, nullable=True)
+    post_url = Column(String, nullable=True)
+    manager_contact = Column(String, nullable=True)
+    notes = Column(String, nullable=True)
+    likes = Column(Integer, default=0)
+    comments = Column(Integer, default=0)
+    shares = Column(Integer, default=0)
+    saves = Column(Integer, default=0)
+    profile_visits = Column(Integer, default=0)
+    link_clicks = Column(Integer, default=0)
+
+    project = relationship("Project")
+
+
+class Company(Base):
+    __tablename__ = "companies"
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    name = Column(String, index=True)
+    category = Column(String, default="Гостиница / Отель")
+    location = Column(String, nullable=True)
+    spent = Column(String, default="$500")
+    items_provided = Column(String, nullable=True)
+    sprint = Column(String, default="Спринт 2")
+    date = Column(String, nullable=True)
+    contact_person = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    status = Column(String, default="В процессе")
+    notes = Column(String, nullable=True)
+
+    project = relationship("Project")
+
+

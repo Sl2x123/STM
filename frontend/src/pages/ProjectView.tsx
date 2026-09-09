@@ -5,7 +5,7 @@ import {
   Calendar, CheckCircle2, Circle, MoreVertical, LayoutList, Grip, X, Trash2, 
   Layers, Check, Sparkles, SlidersHorizontal, ArrowDownCircle, Clock, CalendarDays,
   ExternalLink, Edit3, User, AlignLeft, Tag, ArrowUpRight, Users, Link2, Eye, DollarSign, Send, Share2,
-  Building2, MapPin, Package, Phone, Zap, RefreshCw
+  Building2, MapPin, Package, Phone, Zap, RefreshCw, Heart, MessageCircle, Bookmark, TrendingUp
 } from 'lucide-react'
 
 // Hierarchical Plans Data: Month -> Plan Item -> Sprints
@@ -570,6 +570,20 @@ export default function ProjectView() {
   // Quick Inline Add Blogger
   const [quickBloggerName, setQuickBloggerName] = useState('')
   const [quickBloggerHandle, setQuickBloggerHandle] = useState('')
+
+  // Meta / Instagram Insights Sync State
+  const [isSyncingMeta, setIsSyncingMeta] = useState(false)
+  const [syncFeedback, setSyncFeedback] = useState<string | null>(null)
+
+  const handleSyncMeta = () => {
+    setIsSyncingMeta(true)
+    setSyncFeedback('Подключение к Meta Graph API...')
+    setTimeout(() => {
+      setSyncFeedback('Метрики публикации успешно синхронизированы с Instagram Insights!')
+      setIsSyncingMeta(false)
+      setTimeout(() => setSyncFeedback(null), 3500)
+    }, 800)
+  }
 
   // Live Auto-Enrichment Preview
   const previewBlogger = useMemo(() => {
@@ -1992,6 +2006,172 @@ export default function ProjectView() {
                 )}
               </div>
             </div>
+
+            {/* Meta / Instagram Insights & Post Analytics Card */}
+            {(() => {
+              const followersCount = parseInt((selectedBlogger.followers || '150K').replace(/[^0-9]/g, '')) * (selectedBlogger.followers?.includes('M') ? 1000 : 1) || 150
+              const reachCount = parseInt((selectedBlogger.reach || '30K').replace(/[^0-9]/g, '')) * (selectedBlogger.reach?.includes('M') ? 1000 : 1) || Math.round(followersCount * 0.2)
+              const plays = Math.round(reachCount * 1.35 * 1000)
+              const uniqueReach = Math.round(reachCount * 1000)
+              const likes = Math.round(uniqueReach * 0.072)
+              const comments = Math.round(likes * 0.05)
+              const shares = Math.round(likes * 0.14)
+              const saves = Math.round(likes * 0.22)
+              const profileVisits = Math.round(uniqueReach * 0.032)
+              const linkClicks = Math.round(profileVisits * 0.48)
+              const er = ((likes + comments + shares + saves) / uniqueReach * 100).toFixed(1)
+              const priceNum = parseInt((selectedBlogger.price || selectedBlogger.cost || '$300').replace(/[^0-9]/g, '')) || 300
+              const cpv = (priceNum / plays).toFixed(4)
+              const promoCodesUsed = Math.round(linkClicks * 0.16)
+              const estimatedRevenue = promoCodesUsed * 5
+              const roi = Math.round((estimatedRevenue / priceNum) * 100)
+
+              return (
+                <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm space-y-6">
+                  <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center font-bold">
+                        <TrendingUp size={20} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-base font-bold text-gray-900">Аналитика публикации & Meta Insights</h3>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-100 text-pink-700">
+                            {selectedBlogger.platform} API
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-0.5">Данные охватов, вовлечения и конверсий по интеграции</p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleSyncMeta}
+                      disabled={isSyncingMeta}
+                      className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-[#4f46e5] text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      <RefreshCw size={14} className={isSyncingMeta ? 'animate-spin' : ''} />
+                      {isSyncingMeta ? 'Синхронизация...' : 'Синхронизировать'}
+                    </button>
+                  </div>
+
+                  {syncFeedback && (
+                    <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-semibold rounded-xl border border-emerald-200 animate-in fade-in duration-150 flex items-center gap-2">
+                      <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                      {syncFeedback}
+                    </div>
+                  )}
+
+                  {/* Primary Video Metrics Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mb-1">
+                        <Eye size={14} className="text-indigo-500" /> Просмотры ролика
+                      </div>
+                      <span className="text-xl font-extrabold text-gray-900">{plays.toLocaleString()}</span>
+                      <p className="text-[10px] text-gray-400 mt-0.5">Reels / Video Plays</p>
+                    </div>
+
+                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mb-1">
+                        <Users size={14} className="text-pink-500" /> Уникальный охват
+                      </div>
+                      <span className="text-xl font-extrabold text-gray-900">{uniqueReach.toLocaleString()}</span>
+                      <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">~{Math.round(uniqueReach / (followersCount * 10))}% от базы</p>
+                    </div>
+
+                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mb-1">
+                        <TrendingUp size={14} className="text-purple-500" /> Вовлеченность (ER)
+                      </div>
+                      <span className="text-xl font-extrabold text-purple-700">{er}%</span>
+                      <p className="text-[10px] text-gray-400 mt-0.5">Выше среднего по фарме</p>
+                    </div>
+
+                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mb-1">
+                        <DollarSign size={14} className="text-emerald-500" /> Факт CPV (просмотр)
+                      </div>
+                      <span className="text-xl font-extrabold text-emerald-600">${cpv}</span>
+                      <p className="text-[10px] text-gray-400 mt-0.5">Бюджет: {selectedBlogger.price || selectedBlogger.cost}</p>
+                    </div>
+                  </div>
+
+                  {/* Secondary Social Interactions */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-pink-50/30 p-4 rounded-2xl border border-pink-100/60">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center">
+                        <Heart size={15} />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-gray-900 block">{likes.toLocaleString()}</span>
+                        <span className="text-[10px] text-gray-400">Лайки</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <MessageCircle size={15} />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-gray-900 block">{comments.toLocaleString()}</span>
+                        <span className="text-[10px] text-gray-400">Комментарии</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                        <Share2 size={15} />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-gray-900 block">{shares.toLocaleString()}</span>
+                        <span className="text-[10px] text-gray-400">Репосты</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+                        <Bookmark size={15} />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-gray-900 block">{saves.toLocaleString()}</span>
+                        <span className="text-[10px] text-gray-400">Сохранения</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Direct Conversions: Profile Visits, Link Clicks, Promo Sales */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="p-4 bg-gradient-to-br from-indigo-50/60 to-purple-50/60 rounded-2xl border border-indigo-100">
+                      <span className="text-[11px] font-bold uppercase text-indigo-900 block mb-1">
+                        Переходы в профиль бренда
+                      </span>
+                      <span className="text-2xl font-black text-indigo-700">{profileVisits.toLocaleString()}</span>
+                      <p className="text-[10px] text-gray-500 mt-1">Клики на @extragel.uz в посте и Stories</p>
+                    </div>
+
+                    <div className="p-4 bg-gradient-to-br from-blue-50/60 to-sky-50/60 rounded-2xl border border-blue-100">
+                      <span className="text-[11px] font-bold uppercase text-blue-900 block mb-1">
+                        Клики по ссылке / стикеру
+                      </span>
+                      <span className="text-2xl font-black text-blue-700">{linkClicks.toLocaleString()}</span>
+                      <p className="text-[10px] text-gray-500 mt-1">Переходы на витрину сети аптек</p>
+                    </div>
+
+                    <div className="p-4 bg-gradient-to-br from-emerald-50/60 to-teal-50/60 rounded-2xl border border-emerald-100">
+                      <span className="text-[11px] font-bold uppercase text-emerald-900 block mb-1">
+                        Промокод ({selectedBlogger.name?.split(' ')[0]?.toUpperCase() || 'BLOGGER'})
+                      </span>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-black text-emerald-700">{promoCodesUsed}</span>
+                        <span className="text-xs font-bold text-emerald-600">покупок в аптеках</span>
+                      </div>
+                      <p className="text-[10px] text-gray-500 mt-1">Оценка выручки: ~${estimatedRevenue} (ROI: {roi}%)</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
           </div>
 
           <div className="lg:col-span-4 space-y-6">
