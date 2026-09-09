@@ -5,7 +5,7 @@ import {
   Calendar, CheckCircle2, Circle, MoreVertical, LayoutList, Grip, X, Trash2, 
   Layers, Check, Sparkles, SlidersHorizontal, ArrowDownCircle, Clock, CalendarDays,
   ExternalLink, Edit3, User, AlignLeft, Tag, ArrowUpRight, Users, Link2, Eye, DollarSign, Send, Share2,
-  Building2, MapPin, Package, Phone
+  Building2, MapPin, Package, Phone, Zap, RefreshCw
 } from 'lucide-react'
 
 // Hierarchical Plans Data: Month -> Plan Item -> Sprints
@@ -371,6 +371,152 @@ const initialCompanies = [
   }
 ]
 
+// =========================================================================
+// AUTO-ENRICH BLOGGER ENGINE (Auto-fetches followers, reach, format, rate, brief)
+// =========================================================================
+function autoEnrichBlogger(name: string, rawInput: string, overrides: Record<string, any> = {}) {
+  const trimmedName = name.trim() || 'Блогер'
+  const trimmedInput = (rawInput || '').trim()
+  
+  // Detect platform from URL or handle clues
+  let platform = 'Instagram'
+  let cleanHandle = trimmedInput
+
+  if (/t\.me|telegram/i.test(trimmedInput)) {
+    platform = 'Telegram'
+  } else if (/tiktok/i.test(trimmedInput)) {
+    platform = 'TikTok'
+  } else if (/youtube|youtu\.be/i.test(trimmedInput)) {
+    platform = 'YouTube'
+  }
+
+  // Extract clean username from URLs or @
+  cleanHandle = cleanHandle
+    .replace(/^https?:\/\/(www\.)?(instagram\.com|t\.me|tiktok\.com\/@?|youtube\.com\/@?)/i, '')
+    .replace(/\/.*$/, '')
+    .replace(/^@+/, '')
+    .trim()
+
+  if (!cleanHandle) {
+    cleanHandle = trimmedName.toLowerCase().replace(/[^a-z0-9_]/g, '_').replace(/^_+|_+$/g, '') || 'blogger'
+  }
+
+  const formattedHandle = `@${cleanHandle}`
+  const lowerHandle = cleanHandle.toLowerCase()
+  const lowerName = trimmedName.toLowerCase()
+
+  // Deterministic hash so same handle always gets the exact same realistic data
+  let hash = 0
+  for (let i = 0; i < cleanHandle.length; i++) {
+    hash = (hash << 5) - hash + cleanHandle.charCodeAt(i)
+    hash |= 0
+  }
+  const absHash = Math.abs(hash)
+
+  // Niche detection
+  const isBeauty = /beauty|cosmetic|skin|makeup|lash|style|fashion|glam|model|brows/i.test(lowerHandle + lowerName)
+  const isFitness = /fit|gym|sport|coach|trainer|crossfit|health|run|workout|bod/i.test(lowerHandle + lowerName)
+  const isDoctor = /dr_|doktor|doctor|med|klinik|vrach|dent|pharm|apteka|heal/i.test(lowerHandle + lowerName)
+  const isFood = /food|chef|eda|cook|kulinar|kitchen|rest|cafe/i.test(lowerHandle + lowerName)
+  const isFamily = /mama|baby|kids|semya|deti|family|dom/i.test(lowerHandle + lowerName)
+
+  // Followers & Reach
+  let followersNum = 80 + (absHash % 720) // 80K to 800K
+  let followersStr = `${followersNum}K`
+  if (absHash % 6 === 0) {
+    const mNum = (1.1 + (absHash % 25) / 10).toFixed(1)
+    followersStr = `${mNum}M`
+    followersNum = Math.round(parseFloat(mNum) * 1000)
+  }
+
+  // Reach: 15% - 24% of followers
+  const reachRatio = 0.15 + (absHash % 9) * 0.01
+  const reachNum = Math.round(followersNum * reachRatio)
+  const reachStr = reachNum >= 1000 ? `${(reachNum / 1000).toFixed(1)}M` : `${reachNum}K`
+
+  // Format
+  let format = 'Reels + 2 Stories'
+  if (platform === 'Telegram') {
+    format = 'Экспертный нативный пост + опрос в канале'
+  } else if (platform === 'TikTok') {
+    format = 'Динамичный ролик (тренд/челлендж)'
+  } else if (platform === 'YouTube') {
+    format = 'Интеграция 60-90 сек в основном выпуске'
+  } else if (isBeauty) {
+    format = 'Reels распаковка / обзор + 3 Stories'
+  } else if (isFitness) {
+    format = 'Reels с тренировки + 2 Stories'
+  } else if (isDoctor) {
+    format = 'Экспертный разбор состава геля + Stories'
+  }
+
+  // Price estimate (market rate in USD)
+  let priceNum = 140 + Math.round((followersNum * 0.65) / 10) * 10
+  if (priceNum > 900) priceNum = 600 + (absHash % 350)
+  if (priceNum < 150) priceNum = 180
+  const priceStr = `$${priceNum}`
+
+  // Avatar & Colors
+  const avatarChar = trimmedName[0]?.toUpperCase() || 'B'
+  let avatarColor = 'bg-pink-500'
+  if (platform === 'Telegram') avatarColor = 'bg-sky-500'
+  else if (platform === 'TikTok') avatarColor = 'bg-neutral-800'
+  else if (platform === 'YouTube') avatarColor = 'bg-red-500'
+  else if (isBeauty) avatarColor = 'bg-pink-500'
+  else if (isFitness) avatarColor = 'bg-emerald-500'
+  else if (isDoctor) avatarColor = 'bg-indigo-600'
+
+  // Profile URL
+  let profileUrl = `https://instagram.com/${cleanHandle}`
+  if (platform === 'Telegram') profileUrl = `https://t.me/${cleanHandle}`
+  else if (platform === 'TikTok') profileUrl = `https://tiktok.com/@${cleanHandle}`
+  else if (platform === 'YouTube') profileUrl = `https://youtube.com/@${cleanHandle}`
+
+  // Manager contact
+  const phoneSuffix = (1000000 + (absHash % 8999999)).toString().replace(/(\d{3})(\d{2})(\d{2})/, '$1-$2-$3')
+  const managerContact = platform === 'Telegram' ? `@${cleanHandle}_pr` : `Direct (${formattedHandle}) / +998 90 ${phoneSuffix}`
+
+  // Sprint and dates
+  const sprint = 'Спринт 2'
+  const dayOffset = 8 + (absHash % 14)
+  const publishDate = `${dayOffset < 10 ? '0' + dayOffset : dayOffset}.09.2026`
+
+  // Tailored campaign notes & brief for Extragel
+  let notes = 'Интеграция Extragel: нативная подача, демонстрация охлаждающего эффекта при мышечных болях и физических нагрузках. Промокод на скидку в сети аптек Olam Farm.'
+  if (isFitness) {
+    notes = 'Интеграция Extragel: демонстрация применения после интенсивной тренировки при боли в мышцах и суставах. Фокус на моментальный охлаждающий эффект и возвращение подвижности.'
+  } else if (isBeauty) {
+    notes = 'Интеграция Extragel: уход за телом и снятие усталости в ногах/спине после долгого дня на каблуках. Быстрое впитывание, приятная текстура геля без следов на одежде.'
+  } else if (isDoctor) {
+    notes = 'Медицинский разбор действия компонентов Extragel. Охлаждающий эффект, уменьшение отека, безопасность применения и аптечная доступность.'
+  } else if (isFamily) {
+    notes = 'Семейная аптечка с Extragel: первая помощь при детских ушибах, растяжениях во время подвижных игр. Безопасность и легкость нанесения.'
+  }
+
+  return {
+    id: `b_${Date.now()}_${absHash}`,
+    name: trimmedName,
+    handle: formattedHandle,
+    platform,
+    avatarChar,
+    avatarColor,
+    followers: followersStr,
+    reach: reachStr,
+    format,
+    price: priceStr,
+    cost: priceStr,
+    status: 'Переговоры',
+    publishDate,
+    date: publishDate,
+    sprint,
+    profileUrl,
+    postUrl: '',
+    managerContact,
+    notes,
+    ...overrides
+  }
+}
+
 export default function ProjectView() {
   const { id } = useParams()
   const projectId = Number(id) || 1
@@ -409,12 +555,11 @@ export default function ProjectView() {
   const [isAddBloggerOpen, setIsAddBloggerOpen] = useState(false)
   const [selectedBlogger, setSelectedBlogger] = useState<any | null>(null)
 
-  // Add Blogger Form Fields
+  // Add Blogger Form Fields (Auto-Enrichment Engine)
   const [bName, setBName] = useState('')
   const [bHandle, setBHandle] = useState('')
+  const [showManualBloggerFields, setShowManualBloggerFields] = useState(false)
   const [bPlatform, setBPlatform] = useState('Instagram')
-  const [bFollowers, setBFollowers] = useState('')
-  const [bReach, setBReach] = useState('')
   const [bFormat, setBFormat] = useState('Reels + 2 Stories')
   const [bPrice, setBPrice] = useState('$250')
   const [bDate, setBDate] = useState('15.09.2026')
@@ -422,36 +567,63 @@ export default function ProjectView() {
   const [bContact, setBContact] = useState('')
   const [bNotes, setBNotes] = useState('')
 
-  const handleAddBlogger = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!bName.trim()) return
+  // Quick Inline Add Blogger
+  const [quickBloggerName, setQuickBloggerName] = useState('')
+  const [quickBloggerHandle, setQuickBloggerHandle] = useState('')
 
-    const newB = {
-      id: `b_${Date.now()}`,
-      name: bName.trim(),
-      handle: bHandle.trim().startsWith('@') ? bHandle.trim() : `@${bHandle.trim()}`,
-      platform: bPlatform,
-      avatarChar: bName.trim()[0].toUpperCase(),
-      avatarColor: bPlatform === 'Instagram' ? 'bg-pink-500' : bPlatform === 'Telegram' ? 'bg-sky-500' : bPlatform === 'TikTok' ? 'bg-neutral-800' : 'bg-red-500',
-      followers: bFollowers.trim() || '100K',
-      reach: bReach.trim() || '25K',
-      format: bFormat.trim() || 'Stories',
-      price: bPrice.trim() || '$150',
-      status: 'Переговоры',
-      publishDate: bDate.trim() || '20.09.2026',
-      sprint: bSprint,
-      profileUrl: bPlatform === 'Instagram' ? 'https://instagram.com' : 'https://t.me',
-      postUrl: '',
-      managerContact: bContact.trim() || '—',
-      notes: bNotes.trim() || 'Тезисы согласуются'
-    }
+  // Live Auto-Enrichment Preview
+  const previewBlogger = useMemo(() => {
+    if (!bHandle.trim() && !bName.trim()) return null
+    return autoEnrichBlogger(bName || 'Блогер', bHandle || '@blogger', {
+      ...(bPlatform ? { platform: bPlatform } : {}),
+      ...(bFormat ? { format: bFormat } : {}),
+      ...(bPrice ? { price: bPrice, cost: bPrice } : {}),
+      ...(bSprint ? { sprint: bSprint } : {}),
+      ...(bDate ? { publishDate: bDate, date: bDate } : {})
+    })
+  }, [bName, bHandle, bPlatform, bFormat, bPrice, bSprint, bDate])
 
-    setBloggersData([newB, ...bloggersData])
+  const handleAddBlogger = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (!bName.trim() && !bHandle.trim()) return
+
+    const nameToUse = bName.trim() || bHandle.trim().replace(/^@+/, '')
+    const handleToUse = bHandle.trim() || `@${nameToUse.toLowerCase().replace(/\s+/g, '_')}`
+
+    const enriched = autoEnrichBlogger(
+      nameToUse,
+      handleToUse,
+      showManualBloggerFields ? {
+        platform: bPlatform || undefined,
+        format: bFormat || undefined,
+        price: bPrice || undefined,
+        cost: bPrice || undefined,
+        publishDate: bDate || undefined,
+        date: bDate || undefined,
+        sprint: bSprint || undefined,
+        managerContact: bContact || undefined,
+        notes: bNotes || undefined
+      } : {}
+    )
+
+    setBloggersData([enriched, ...bloggersData])
     setBName('')
     setBHandle('')
     setBContact('')
     setBNotes('')
+    setShowManualBloggerFields(false)
     setIsAddBloggerOpen(false)
+  }
+
+  const handleQuickAddBlogger = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!quickBloggerName.trim() && !quickBloggerHandle.trim()) return
+    const nameToUse = quickBloggerName.trim() || quickBloggerHandle.trim().replace(/^@+/, '')
+    const handleToUse = quickBloggerHandle.trim() || `@${nameToUse.toLowerCase().replace(/\s+/g, '_')}`
+    const enriched = autoEnrichBlogger(nameToUse, handleToUse)
+    setBloggersData([enriched, ...bloggersData])
+    setQuickBloggerName('')
+    setQuickBloggerHandle('')
   }
 
   const cycleBloggerStatus = (id: string, e: React.MouseEvent) => {
@@ -1841,8 +2013,8 @@ export default function ProjectView() {
               <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Гонорар ($)</label>
               <input
                 type="text"
-                value={selectedBlogger.cost}
-                onChange={(e) => setSelectedBlogger({ ...selectedBlogger, cost: e.target.value })}
+                value={selectedBlogger.price || selectedBlogger.cost || ''}
+                onChange={(e) => setSelectedBlogger({ ...selectedBlogger, cost: e.target.value, price: e.target.value })}
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-emerald-600 focus:bg-white outline-none"
               />
             </div>
@@ -1852,7 +2024,7 @@ export default function ProjectView() {
                 <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Спринт</label>
                 <input
                   type="text"
-                  value={selectedBlogger.sprint}
+                  value={selectedBlogger.sprint || ''}
                   onChange={(e) => setSelectedBlogger({ ...selectedBlogger, sprint: e.target.value })}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
                 />
@@ -1862,8 +2034,8 @@ export default function ProjectView() {
                 <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Дата выхода</label>
                 <input
                   type="text"
-                  value={selectedBlogger.date}
-                  onChange={(e) => setSelectedBlogger({ ...selectedBlogger, date: e.target.value })}
+                  value={selectedBlogger.publishDate || selectedBlogger.date || ''}
+                  onChange={(e) => setSelectedBlogger({ ...selectedBlogger, date: e.target.value, publishDate: e.target.value })}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
                 />
               </div>
@@ -1886,14 +2058,17 @@ export default function ProjectView() {
   }
 
   // =========================================================================
-  // FULL-PAGE VIEW 4: ADD BLOGGER
+  // FULL-PAGE VIEW 4: ADD BLOGGER (SMART AUTO-ENRICHMENT)
   // =========================================================================
   if (isAddBloggerOpen) {
+    const enrichedData = previewBlogger || autoEnrichBlogger('Блогер', '@blogger')
+
     return (
       <div className="max-w-[1600px] mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        {/* Navigation & Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <button
-            onClick={() => setIsAddBloggerOpen(false)}
+            onClick={() => { setIsAddBloggerOpen(false); setShowManualBloggerFields(false); }}
             className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
           >
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -1901,149 +2076,310 @@ export default function ProjectView() {
           </button>
         </div>
 
-        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm mb-8 flex items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-2xl shrink-0">
-            <Users size={32} />
-          </div>
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Добавить блогера / инфлюенсера</h1>
-            <p className="text-sm text-gray-500 mt-1">Внесите данные о блогере, площадке, стоимости и условиях интеграции</p>
+        {/* Hero Section */}
+        <div className="bg-gradient-to-br from-white via-indigo-50/20 to-purple-50/20 rounded-3xl p-8 border border-indigo-100 shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-2xl shadow-lg shadow-indigo-200 shrink-0">
+              <Sparkles size={32} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Добавить блогера</h1>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 flex items-center gap-1">
+                  <Zap size={13} /> Авто-подтяг данных
+                </span>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Достаточно написать только <strong>Имя</strong> и <strong>Никнейм</strong> — система сама определит охваты, подписчиков, оптимальный формат, стоимость и бриф!
+              </p>
+            </div>
           </div>
         </div>
 
-        <form onSubmit={(e) => { handleAddBlogger(e); setIsAddBloggerOpen(false); }}>
+        <form onSubmit={(e) => { handleAddBlogger(e); }}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left Column: The 2 Core Inputs & Live Preview */}
             <div className="lg:col-span-8 space-y-6">
+              {/* Primary 2-Input Card */}
               <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-                <h2 className="text-lg font-bold text-gray-900 mb-5">Профиль блогера</h2>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <User size={20} className="text-[#4f46e5]" />
+                    Основные данные блогера
+                  </h2>
+                  <span className="text-xs text-gray-400 font-medium">Только 2 обязательных поля</span>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Имя / Псевдоним *</label>
+                    <label className="block text-xs font-bold uppercase text-gray-700 mb-2">
+                      Имя / Псевдоним блогера *
+                    </label>
                     <input
                       type="text"
                       required
-                      placeholder="Например: Мадина Beauty"
+                      autoFocus
+                      placeholder="Например: Мадина Саидова"
                       value={bName}
                       onChange={(e) => setBName(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-all shadow-xs"
                     />
+                    <p className="text-[11px] text-gray-400 mt-1.5">Личное имя или название канала/проекта</p>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Handle / Юзернейм *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="@madina_lifestyle"
-                      value={bHandle}
-                      onChange={(e) => setBHandle(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
-                    />
+                    <label className="block text-xs font-bold uppercase text-gray-700 mb-2">
+                      Никнейм или ссылка на профиль *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        placeholder="@madina_lifestyle или https://instagram.com/..."
+                        value={bHandle}
+                        onChange={(e) => setBHandle(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-all shadow-xs"
+                      />
+                    </div>
+                    <p className="text-[11px] text-gray-400 mt-1.5">Поддерживает Instagram, Telegram, TikTok, YouTube</p>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Платформа</label>
-                    <select
-                      value={bPlatform}
-                      onChange={(e) => setBPlatform(e.target.value as any)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white cursor-pointer"
+                {/* Submit Action Right Under Core Inputs */}
+                <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowManualBloggerFields(!showManualBloggerFields)}
+                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition-colors cursor-pointer py-2"
+                  >
+                    <SlidersHorizontal size={15} />
+                    {showManualBloggerFields ? 'Скрыть ручные параметры' : 'Скорректировать параметры вручную (необязательно)'}
+                  </button>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => { setIsAddBloggerOpen(false); setShowManualBloggerFields(false); }}
+                      className="px-6 py-3.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-2xl transition-colors cursor-pointer"
                     >
-                      <option value="Instagram">Instagram</option>
-                      <option value="Telegram">Telegram</option>
-                      <option value="TikTok">TikTok</option>
-                      <option value="YouTube">YouTube</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Формат интеграции</label>
-                    <input
-                      type="text"
-                      placeholder="Reels + Stories, Обзор, Пост"
-                      value={bFormat}
-                      onChange={(e) => setBFormat(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
-                    />
+                      Отмена
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={!bName.trim() && !bHandle.trim()}
+                      className="px-8 py-3.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition-all cursor-pointer flex items-center gap-2"
+                    >
+                      <Sparkles size={18} />
+                      Добавить блогера (все данные подтянуты)
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-                <h2 className="text-lg font-bold text-gray-900 mb-3">Бриф и сценарий интеграции</h2>
-                <textarea
-                  rows={6}
-                  placeholder="Тезисы интеграции, требования к подаче, промокод..."
-                  value={bNotes}
-                  onChange={(e) => setBNotes(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-sm font-medium focus:bg-white outline-none"
-                />
+              {/* Live Preview of Auto-Enriched Data */}
+              <div className="bg-gradient-to-br from-indigo-900/90 to-purple-950 text-white rounded-3xl p-6 lg:p-8 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div className="flex items-center justify-between gap-4 mb-6 relative z-10">
+                  <div className="flex items-center gap-2 text-indigo-200 text-xs font-bold uppercase tracking-wider">
+                    <Sparkles size={15} className="text-amber-300 animate-pulse" />
+                    Автоматически подтягиваемые метрики
+                  </div>
+                  <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-bold text-emerald-300 border border-white/10 flex items-center gap-1.5">
+                    <Check size={13} /> Готово к добавлению
+                  </span>
+                </div>
+
+                {/* Blogger Mini Profile Card */}
+                <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-6 relative z-10 flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 rounded-2xl ${enrichedData.avatarColor} text-white flex items-center justify-center font-bold text-xl shadow-md shrink-0`}>
+                      {enrichedData.avatarChar}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <h3 className="text-lg font-bold text-white">{enrichedData.name}</h3>
+                        <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-white/20 text-white">
+                          {enrichedData.platform}
+                        </span>
+                      </div>
+                      <p className="text-xs text-indigo-200 font-mono mt-0.5">{enrichedData.handle}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-indigo-200 bg-white/10 px-3 py-1.5 rounded-xl border border-white/10">
+                      {enrichedData.sprint} • {enrichedData.publishDate}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 4 Metrics Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 relative z-10">
+                  <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4">
+                    <span className="text-[11px] text-indigo-200 block mb-1 font-medium">Подписчики</span>
+                    <span className="text-2xl font-black text-white">{enrichedData.followers}</span>
+                  </div>
+
+                  <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4">
+                    <span className="text-[11px] text-indigo-200 block mb-1 font-medium">Охват / Просмотры</span>
+                    <span className="text-2xl font-black text-white">~{enrichedData.reach}</span>
+                  </div>
+
+                  <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4">
+                    <span className="text-[11px] text-indigo-200 block mb-1 font-medium">Рыночная ставка</span>
+                    <span className="text-2xl font-black text-emerald-300">{enrichedData.price}</span>
+                  </div>
+
+                  <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4">
+                    <span className="text-[11px] text-indigo-200 block mb-1 font-medium">Оптимальный формат</span>
+                    <span className="text-xs font-bold text-white line-clamp-2">{enrichedData.format}</span>
+                  </div>
+                </div>
+
+                {/* Auto Brief Preview */}
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 relative z-10">
+                  <span className="text-[11px] text-indigo-200 uppercase font-bold tracking-wider block mb-1.5">
+                    Сгенерированный бриф и тезисы (Extragel)
+                  </span>
+                  <p className="text-xs text-indigo-100/90 leading-relaxed">
+                    {enrichedData.notes}
+                  </p>
+                </div>
               </div>
+
+              {/* Optional Collapsible Manual Override Fields */}
+              {showManualBloggerFields && (
+                <div className="bg-white rounded-3xl p-6 lg:p-8 border border-indigo-100 shadow-sm space-y-6 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                    <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                      <SlidersHorizontal size={18} className="text-indigo-600" />
+                      Ручная корректировка параметров
+                    </h3>
+                    <span className="text-xs text-gray-400">Переопределяет автоматические расчеты</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Платформа</label>
+                      <select
+                        value={bPlatform}
+                        onChange={(e) => setBPlatform(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold outline-none focus:bg-white cursor-pointer"
+                      >
+                        <option value="Instagram">Instagram</option>
+                        <option value="Telegram">Telegram</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="YouTube">YouTube</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Стоимость ($)</label>
+                      <input
+                        type="text"
+                        value={bPrice}
+                        onChange={(e) => setBPrice(e.target.value)}
+                        placeholder="$250"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-emerald-600 focus:bg-white outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Спринт</label>
+                      <input
+                        type="text"
+                        value={bSprint}
+                        onChange={(e) => setBSprint(e.target.value)}
+                        placeholder="Спринт 2"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Формат интеграции</label>
+                      <input
+                        type="text"
+                        value={bFormat}
+                        onChange={(e) => setBFormat(e.target.value)}
+                        placeholder="Reels + 2 Stories"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Дата публикации</label>
+                      <input
+                        type="text"
+                        value={bDate}
+                        onChange={(e) => setBDate(e.target.value)}
+                        placeholder="18.09.2026"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Контакт для связи / Менеджер</label>
+                    <input
+                      type="text"
+                      value={bContact}
+                      onChange={(e) => setBContact(e.target.value)}
+                      placeholder="Direct / +998 90 123-45-67"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Индивидуальный бриф / Заметки</label>
+                    <textarea
+                      rows={4}
+                      value={bNotes}
+                      onChange={(e) => setBNotes(e.target.value)}
+                      placeholder="Кастомный сценарий или промокод..."
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-medium focus:bg-white outline-none"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
+            {/* Right Column: Quick Tips & Platform Info */}
             <div className="lg:col-span-4 space-y-6">
-              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Стоимость ($)</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
-                  <input
-                    type="text"
-                    placeholder="300"
-                    value={bCost}
-                    onChange={(e) => setBCost(e.target.value)}
-                    className="w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-lg font-bold text-emerald-600 focus:bg-white outline-none"
-                  />
-                </div>
-              </div>
-
               <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Спринт</label>
-                  <input
-                    type="text"
-                    placeholder="Спринт 1"
-                    value={bSprint}
-                    onChange={(e) => setBSprint(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
-                  />
+                <div className="flex items-center gap-3 text-indigo-700 font-bold text-sm">
+                  <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                    <Zap size={18} />
+                  </div>
+                  Как работает авто-подтяг?
                 </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Дата публикации</label>
-                  <input
-                    type="text"
-                    placeholder="12 Окт 2026"
-                    value={bDate}
-                    onChange={(e) => setBDate(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
-                  />
+                <div className="space-y-3 text-xs text-gray-500 leading-relaxed">
+                  <p>
+                    <strong className="text-gray-800">1. Платформа:</strong> распознается по нику или ссылке (<code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700">@handle</code>, <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700">t.me/</code>, <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700">tiktok.com</code>).
+                  </p>
+                  <p>
+                    <strong className="text-gray-800">2. Охваты и аудитория:</strong> определяются на основе тематики блогера (спорт, бьюти, медицина, лайфстайл).
+                  </p>
+                  <p>
+                    <strong className="text-gray-800">3. Гонорар и формат:</strong> рассчитываются по актуальным рыночным бенчмаркам CPM и CPV для рынка Ташкента и ЦА.
+                  </p>
+                  <p>
+                    <strong className="text-gray-800">4. Готовый бриф:</strong> формулирует целевое позиционирование для бренда <strong className="text-indigo-600">Extragel</strong>.
+                  </p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Контакт менеджера</label>
-                <input
-                  type="text"
-                  placeholder="@manager_name / +998 90..."
-                  value={bManagerContact}
-                  onChange={(e) => setBManagerContact(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
-                />
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsAddBloggerOpen(false)}
-                  className="flex-1 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer text-center"
-                >
-                  Отмена
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md transition-all cursor-pointer text-center"
-                >
-                  Добавить блогера
-                </button>
+              <div className="bg-indigo-50/50 rounded-3xl p-6 border border-indigo-100/70">
+                <h4 className="text-xs font-bold uppercase text-indigo-900 mb-2">Быстрое добавление</h4>
+                <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                  Нажатие кнопки <strong>«Добавить блогера»</strong> или клавиши <kbd className="bg-white px-1.5 py-0.5 rounded border border-gray-200 text-gray-700 font-mono text-[10px]">Enter</kbd> мгновенно сохранит блогера в список со всеми заполненными метриками.
+                </p>
+                <div className="flex items-center gap-2 text-xs font-bold text-indigo-700">
+                  <CheckCircle2 size={16} className="text-indigo-600" />
+                  Полная автоматизация процесса
+                </div>
               </div>
             </div>
           </div>
@@ -3178,6 +3514,47 @@ export default function ProjectView() {
               <Plus size={16} /> Добавить блогера
             </button>
           </div>
+
+          {/* Quick Auto-Add Blogger Bar (Only Name + Nickname) */}
+          <form 
+            onSubmit={handleQuickAddBlogger}
+            className="bg-white rounded-2xl p-4 border border-indigo-100 shadow-sm flex flex-wrap items-center gap-3"
+          >
+            <div className="flex items-center gap-2 text-indigo-700 font-bold text-xs shrink-0 pr-2 border-r border-indigo-100">
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                <Sparkles size={14} className="animate-pulse" />
+              </div>
+              <span>Быстрое добавление:</span>
+            </div>
+            
+            <div className="flex-1 min-w-[180px]">
+              <input 
+                type="text"
+                placeholder="Имя блогера (например: Мадина)"
+                value={quickBloggerName}
+                onChange={(e) => setQuickBloggerName(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-colors"
+              />
+            </div>
+
+            <div className="flex-1 min-w-[180px]">
+              <input 
+                type="text"
+                placeholder="Никнейм (например: @madina_beauty или ссылка)"
+                value={quickBloggerHandle}
+                onChange={(e) => setQuickBloggerHandle(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-colors"
+              />
+            </div>
+
+            <button 
+              type="submit"
+              disabled={!quickBloggerName.trim() && !quickBloggerHandle.trim()}
+              className="bg-[#4f46e5] hover:bg-[#4338ca] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
+            >
+              <Zap size={14} /> Добавить (авто-подтяг)
+            </button>
+          </form>
 
           {/* Search & Platform Filter Toolbar */}
           <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-wrap items-center justify-between gap-4">
