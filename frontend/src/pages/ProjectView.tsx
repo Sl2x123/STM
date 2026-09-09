@@ -466,8 +466,8 @@ export default function ProjectView() {
     }))
   }
 
-  const deleteBlogger = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation()
+  const deleteBlogger = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation()
     setBloggersData(data => data.filter(b => b.id !== id))
   }
 
@@ -550,8 +550,8 @@ export default function ProjectView() {
     }))
   }
 
-  const deleteCompany = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation()
+  const deleteCompany = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation()
     setCompaniesData(data => data.filter(c => c.id !== id))
   }
 
@@ -1202,6 +1202,1363 @@ export default function ProjectView() {
       })
     })
   })
+
+  // =========================================================================
+  // FULL-PAGE VIEW 1: COMPANY / PARTNER DETAILS
+  // =========================================================================
+  if (selectedCompany) {
+    return (
+      <div className="max-w-[1600px] mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        {/* Navigation & Action Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <button
+            onClick={() => setSelectedCompany(null)}
+            className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
+          >
+            <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+            Назад к списку компаний и партнеров
+          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                deleteCompany(selectedCompany.id)
+                setSelectedCompany(null)
+              }}
+              className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-4 py-2.5 rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
+            >
+              <Trash2 size={15} /> Удалить компанию
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedCompany(null)}
+              className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+            >
+              Закрыть
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleSaveCompany(selectedCompany)
+                setSelectedCompany(null)
+              }}
+              className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center gap-2"
+            >
+              <CheckCircle2 size={16} /> Сохранить изменения
+            </button>
+          </div>
+        </div>
+
+        {/* Hero Header */}
+        <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-2xl shadow-sm shrink-0">
+              <Building2 size={32} />
+            </div>
+            <div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">
+                  {selectedCompany.name}
+                </h1>
+                <span className="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700">
+                  {selectedCompany.category}
+                </span>
+                <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${
+                  selectedCompany.status === 'Завершено'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : selectedCompany.status === 'Предоставлено'
+                    ? 'bg-blue-50 text-blue-700 border-blue-200'
+                    : selectedCompany.status === 'В процессе'
+                    ? 'bg-purple-50 text-purple-700 border-purple-200'
+                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                }`}>
+                  {selectedCompany.status}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-500 mt-2 font-medium">
+                <MapPin size={16} className="text-gray-400 shrink-0" />
+                <span>{selectedCompany.location || 'Адрес не указан'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6 bg-gray-50 px-6 py-4 rounded-2xl border border-gray-100">
+            <div>
+              <span className="text-xs text-gray-400 font-bold uppercase block mb-0.5">Бюджет / Расходы</span>
+              <span className="text-2xl font-black text-emerald-600">{selectedCompany.spent}</span>
+            </div>
+            <div className="w-px h-10 bg-gray-200"></div>
+            <div>
+              <span className="text-xs text-gray-400 font-bold uppercase block mb-0.5">Спринт</span>
+              <span className="text-base font-bold text-indigo-700">{selectedCompany.sprint}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 2-Column Responsive Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Main Column (8 Cols) */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* Card: Basic Information */}
+            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
+                <Building2 size={20} className="text-indigo-600" /> Основные данные компании
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                    Название компании *
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedCompany.name}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, name: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                    Категория / Сфера бизнеса *
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedCompany.category}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, category: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-all"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                    Локация / Физический адрес объекта
+                  </label>
+                  <div className="relative">
+                    <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      value={selectedCompany.location || ''}
+                      onChange={(e) => setSelectedCompany({ ...selectedCompany, location: e.target.value })}
+                      placeholder="г. Ташкент, ул. ..."
+                      className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card: Provided Materials & Items (Prominent full space) */}
+            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-indigo-100 shadow-sm bg-gradient-to-b from-indigo-50/20 to-white">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <Package size={20} className="text-indigo-600" /> Предоставленные предметы и промо-материалы
+                </h2>
+                <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-lg">
+                  Учет переданных ТМЦ
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+                Укажите подробный список всех предоставленных предметов: диспенсеры, брендированная полиграфия, тестеры, подарки персоналу, образцы продукции с указанием количества.
+              </p>
+
+              <textarea
+                rows={5}
+                value={selectedCompany.itemsProvided || ''}
+                onChange={(e) => setSelectedCompany({ ...selectedCompany, itemsProvided: e.target.value })}
+                placeholder="Например: Диспенсеры в SPA и фитнес-зону (6 шт.), 400 саше Extragel, брендированные полотенца (50 шт.), тейбл-тенты на ресепшн"
+                className="w-full bg-white border border-indigo-200 rounded-2xl p-4 text-base font-medium text-gray-800 focus:ring-2 focus:ring-indigo-200 focus:border-[#4f46e5] outline-none leading-relaxed transition-all shadow-inner"
+              />
+            </div>
+
+            {/* Card: Terms & Conditions */}
+            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 mb-3">
+                Условия размещения, договоренности и примечания
+              </h2>
+              <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+                Фиксируйте сценарий интеграции, зоны размещения (стойка ресепшн, гостевые санузлы, раздевалки), график пополнения материалов и договоренности с руководством.
+              </p>
+
+              <textarea
+                rows={6}
+                value={selectedCompany.notes || ''}
+                onChange={(e) => setSelectedCompany({ ...selectedCompany, notes: e.target.value })}
+                placeholder="Размещение продукции в премиум-зоне СПА и тренажерном зале отеля. Персонал проинструктирован по свойствам охлаждающего геля."
+                className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-sm font-medium text-gray-800 focus:bg-white focus:border-[#4f46e5] outline-none leading-relaxed transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Sidebar Column (4 Cols) */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* Status Card */}
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-3">
+                Статус интеграции
+              </label>
+              <select
+                value={selectedCompany.status}
+                onChange={(e) => setSelectedCompany({ ...selectedCompany, status: e.target.value })}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 outline-none focus:bg-white focus:border-[#4f46e5] cursor-pointer mb-3"
+              >
+                <option value="Договорились">Договорились</option>
+                <option value="Предоставлено">Предоставлено</option>
+                <option value="В процессе">В процессе</option>
+                <option value="Завершено">Завершено</option>
+              </select>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Изменяйте статус по мере продвижения: от первичной договоренности до полной передачи материалов и завершения кампании.
+              </p>
+            </div>
+
+            {/* Financials */}
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                Потрачено расходов ($ / сум)
+              </label>
+              <div className="relative mb-3">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                <input
+                  type="text"
+                  value={selectedCompany.spent}
+                  onChange={(e) => setSelectedCompany({ ...selectedCompany, spent: e.target.value })}
+                  className="w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-lg font-bold text-emerald-600 focus:bg-white focus:border-[#4f46e5] outline-none transition-all"
+                />
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Сумма учитывается в общих аналитических расчетах по проекту.
+              </p>
+            </div>
+
+            {/* Sprint & Date */}
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                  Спринт
+                </label>
+                <input
+                  type="text"
+                  value={selectedCompany.sprint}
+                  onChange={(e) => setSelectedCompany({ ...selectedCompany, sprint: e.target.value })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                  Дата договоренности / поставки
+                </label>
+                <div className="relative">
+                  <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    value={selectedCompany.date}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, date: e.target.value })}
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Contacts Card */}
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                <Phone size={16} className="text-indigo-600" /> Контактное лицо и связь
+              </h3>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                  ФИО / Должность
+                </label>
+                <input
+                  type="text"
+                  value={selectedCompany.contactPerson || ''}
+                  onChange={(e) => setSelectedCompany({ ...selectedCompany, contactPerson: e.target.value })}
+                  placeholder="Улугбек (Wellness & SPA Manager)"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                  Телефон / Telegram
+                </label>
+                <div className="relative">
+                  <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    value={selectedCompany.phone || ''}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, phone: e.target.value })}
+                    placeholder="+998 71 210 88 88"
+                    className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // =========================================================================
+  // FULL-PAGE VIEW 2: ADD COMPANY / PARTNER
+  // =========================================================================
+  if (isAddCompanyOpen) {
+    return (
+      <div className="max-w-[1600px] mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <button
+            onClick={() => setIsAddCompanyOpen(false)}
+            className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
+          >
+            <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+            Назад к списку компаний и партнеров
+          </button>
+        </div>
+
+        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm mb-8 flex items-center gap-5">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-2xl shrink-0">
+            <Building2 size={32} />
+          </div>
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Добавить компанию / партнера</h1>
+            <p className="text-sm text-gray-500 mt-1">Внесите данные об организации, локации, бюджете и переданных материалах</p>
+          </div>
+        </div>
+
+        <form onSubmit={(e) => { handleAddCompany(e); setIsAddCompanyOpen(false); }}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-8 space-y-6">
+              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+                <h2 className="text-lg font-bold text-gray-900 mb-5">Основные сведения</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                      Название компании *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Например: Hilton Tashkent City"
+                      value={cName}
+                      onChange={(e) => setCName(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                      Категория / Тип заведения *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Гостиница, Бар, Фитнес, Клиника..."
+                      value={cCategory}
+                      onChange={(e) => setCCategory(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                      Локация / Адрес объекта
+                    </label>
+                    <div className="relative">
+                      <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="ул. Амира Темура, 4"
+                        value={cLocation}
+                        onChange={(e) => setCLocation(e.target.value)}
+                        className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-indigo-100 shadow-sm bg-gradient-to-b from-indigo-50/20 to-white">
+                <h2 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <Package size={20} className="text-indigo-600" /> Предоставленные предметы / промо-материалы
+                </h2>
+                <p className="text-xs text-gray-500 mb-4">
+                  Перечислите все переданные ТМЦ: диспенсеры, фирменные салфетки, тестеры крема, сувениры.
+                </p>
+                <textarea
+                  rows={4}
+                  placeholder="Например: Диспенсеры антисептика (6 шт), салфетки (500 уп), пробники (200 шт)"
+                  value={cItemsProvided}
+                  onChange={(e) => setCItemsProvided(e.target.value)}
+                  className="w-full bg-white border border-indigo-200 rounded-2xl p-4 text-base font-medium focus:border-[#4f46e5] outline-none shadow-inner"
+                />
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+                <h2 className="text-lg font-bold text-gray-900 mb-2">Условия сотрудничества и примечания</h2>
+                <textarea
+                  rows={4}
+                  placeholder="Размещение на стойке ресепшн, брендинг в санитарных зонах, график пополнения..."
+                  value={cNotes}
+                  onChange={(e) => setCNotes(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 space-y-6">
+              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                  Потрачено средств ($)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                  <input
+                    type="text"
+                    placeholder="250"
+                    value={cSpent}
+                    onChange={(e) => setCSpent(e.target.value)}
+                    className="w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-lg font-bold text-emerald-600 focus:bg-white focus:border-[#4f46e5] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                    Спринт
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Спринт 1"
+                    value={cSprint}
+                    onChange={(e) => setCSprint(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                    Дата договоренности / поставки
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="15 Окт 2026"
+                    value={cDate}
+                    onChange={(e) => setCDate(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                  <Phone size={16} className="text-indigo-600" /> Контактное лицо
+                </h3>
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                    ФИО / Должность
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Фарход (Управляющий)"
+                    value={cContactPerson}
+                    onChange={(e) => setCContactPerson(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                    Телефон / Мессенджер
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="+998 90 123-45-67"
+                    value={cPhone}
+                    onChange={(e) => setCPhone(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsAddCompanyOpen(false)}
+                  className="flex-1 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer text-center"
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md transition-all cursor-pointer text-center"
+                >
+                  Добавить компанию
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    )
+  }
+
+  // =========================================================================
+  // FULL-PAGE VIEW 3: BLOGGER DETAILS
+  // =========================================================================
+  if (selectedBlogger) {
+    return (
+      <div className="max-w-[1600px] mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <button
+            onClick={() => setSelectedBlogger(null)}
+            className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
+          >
+            <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+            Назад к списку блогеров
+          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                deleteBlogger(selectedBlogger.id)
+                setSelectedBlogger(null)
+              }}
+              className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-4 py-2.5 rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
+            >
+              <Trash2 size={15} /> Удалить блогера
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedBlogger(null)}
+              className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+            >
+              Закрыть
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleSaveBlogger(selectedBlogger)
+                setSelectedBlogger(null)
+              }}
+              className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center gap-2"
+            >
+              <CheckCircle2 size={16} /> Сохранить изменения
+            </button>
+          </div>
+        </div>
+
+        {/* Header */}
+        <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
+          <div className="flex items-center gap-5">
+            <div className={`w-16 h-16 rounded-2xl ${selectedBlogger.avatarColor} text-white flex items-center justify-center font-bold text-2xl shadow-sm shrink-0`}>
+              {selectedBlogger.avatarChar}
+            </div>
+            <div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">{selectedBlogger.name}</h1>
+                <span className="px-3 py-1 rounded-lg text-xs font-bold bg-pink-50 text-pink-700">
+                  {selectedBlogger.platform}
+                </span>
+                <span className="font-mono text-sm text-gray-500">{selectedBlogger.handle}</span>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Формат интеграции: <strong>{selectedBlogger.format}</strong></p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6 bg-gray-50 px-6 py-4 rounded-2xl border border-gray-100">
+            <div>
+              <span className="text-xs text-gray-400 font-bold uppercase block mb-0.5">Гонорар</span>
+              <span className="text-2xl font-black text-emerald-600">{selectedBlogger.cost}</span>
+            </div>
+            <div className="w-px h-10 bg-gray-200"></div>
+            <div>
+              <span className="text-xs text-gray-400 font-bold uppercase block mb-0.5">Статус</span>
+              <span className="text-base font-bold text-indigo-700">{selectedBlogger.status}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 2 Columns */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8 space-y-6">
+            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 mb-5">Бриф и тезисы интеграции</h2>
+              <textarea
+                rows={8}
+                value={selectedBlogger.notes || ''}
+                onChange={(e) => setSelectedBlogger({ ...selectedBlogger, notes: e.target.value })}
+                placeholder="Сценарий интеграции, ключевые посылы бренда, ограничения, призыв к действию..."
+                className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-base font-medium focus:bg-white focus:border-[#4f46e5] outline-none leading-relaxed transition-all"
+              />
+            </div>
+
+            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 mb-2">Ссылка на вышедший пост / видео</h2>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={selectedBlogger.postUrl || ''}
+                  onChange={(e) => setSelectedBlogger({ ...selectedBlogger, postUrl: e.target.value })}
+                  placeholder="https://instagram.com/p/... или https://t.me/..."
+                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono focus:bg-white outline-none"
+                />
+                {selectedBlogger.postUrl && (
+                  <a
+                    href={selectedBlogger.postUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-sm flex items-center gap-2 transition-colors"
+                  >
+                    <ExternalLink size={16} /> Открыть
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-4 space-y-6">
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-3">Статус публикации</label>
+              <select
+                value={selectedBlogger.status}
+                onChange={(e) => setSelectedBlogger({ ...selectedBlogger, status: e.target.value })}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 outline-none focus:bg-white cursor-pointer"
+              >
+                <option value="Договорились">Договорились</option>
+                <option value="Согласовано">Согласовано</option>
+                <option value="Оплачено">Оплачено</option>
+                <option value="Вышел пост">Вышел пост</option>
+              </select>
+            </div>
+
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Гонорар ($)</label>
+              <input
+                type="text"
+                value={selectedBlogger.cost}
+                onChange={(e) => setSelectedBlogger({ ...selectedBlogger, cost: e.target.value })}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-emerald-600 focus:bg-white outline-none"
+              />
+            </div>
+
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Спринт</label>
+                <input
+                  type="text"
+                  value={selectedBlogger.sprint}
+                  onChange={(e) => setSelectedBlogger({ ...selectedBlogger, sprint: e.target.value })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Дата выхода</label>
+                <input
+                  type="text"
+                  value={selectedBlogger.date}
+                  onChange={(e) => setSelectedBlogger({ ...selectedBlogger, date: e.target.value })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Контакт менеджера</label>
+              <input
+                type="text"
+                value={selectedBlogger.managerContact || ''}
+                onChange={(e) => setSelectedBlogger({ ...selectedBlogger, managerContact: e.target.value })}
+                placeholder="Telegram / Телефон"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // =========================================================================
+  // FULL-PAGE VIEW 4: ADD BLOGGER
+  // =========================================================================
+  if (isAddBloggerOpen) {
+    return (
+      <div className="max-w-[1600px] mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <button
+            onClick={() => setIsAddBloggerOpen(false)}
+            className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
+          >
+            <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+            Назад к списку блогеров
+          </button>
+        </div>
+
+        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm mb-8 flex items-center gap-5">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-2xl shrink-0">
+            <Users size={32} />
+          </div>
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Добавить блогера / инфлюенсера</h1>
+            <p className="text-sm text-gray-500 mt-1">Внесите данные о блогере, площадке, стоимости и условиях интеграции</p>
+          </div>
+        </div>
+
+        <form onSubmit={(e) => { handleAddBlogger(e); setIsAddBloggerOpen(false); }}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-8 space-y-6">
+              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+                <h2 className="text-lg font-bold text-gray-900 mb-5">Профиль блогера</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Имя / Псевдоним *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Например: Мадина Beauty"
+                      value={bName}
+                      onChange={(e) => setBName(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Handle / Юзернейм *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="@madina_lifestyle"
+                      value={bHandle}
+                      onChange={(e) => setBHandle(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Платформа</label>
+                    <select
+                      value={bPlatform}
+                      onChange={(e) => setBPlatform(e.target.value as any)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white cursor-pointer"
+                    >
+                      <option value="Instagram">Instagram</option>
+                      <option value="Telegram">Telegram</option>
+                      <option value="TikTok">TikTok</option>
+                      <option value="YouTube">YouTube</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Формат интеграции</label>
+                    <input
+                      type="text"
+                      placeholder="Reels + Stories, Обзор, Пост"
+                      value={bFormat}
+                      onChange={(e) => setBFormat(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+                <h2 className="text-lg font-bold text-gray-900 mb-3">Бриф и сценарий интеграции</h2>
+                <textarea
+                  rows={6}
+                  placeholder="Тезисы интеграции, требования к подаче, промокод..."
+                  value={bNotes}
+                  onChange={(e) => setBNotes(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-sm font-medium focus:bg-white outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 space-y-6">
+              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Стоимость ($)</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                  <input
+                    type="text"
+                    placeholder="300"
+                    value={bCost}
+                    onChange={(e) => setBCost(e.target.value)}
+                    className="w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-lg font-bold text-emerald-600 focus:bg-white outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Спринт</label>
+                  <input
+                    type="text"
+                    placeholder="Спринт 1"
+                    value={bSprint}
+                    onChange={(e) => setBSprint(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Дата публикации</label>
+                  <input
+                    type="text"
+                    placeholder="12 Окт 2026"
+                    value={bDate}
+                    onChange={(e) => setBDate(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Контакт менеджера</label>
+                <input
+                  type="text"
+                  placeholder="@manager_name / +998 90..."
+                  value={bManagerContact}
+                  onChange={(e) => setBManagerContact(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsAddBloggerOpen(false)}
+                  className="flex-1 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer text-center"
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md transition-all cursor-pointer text-center"
+                >
+                  Добавить блогера
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    )
+  }
+
+  // =========================================================================
+  // FULL-PAGE VIEW 5: TASK / PLAN / ITEM DETAILS
+  // =========================================================================
+  if (selectedDetailItem) {
+    return (
+      <div className="max-w-[1600px] mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <button
+            onClick={() => setSelectedDetailItem(null)}
+            className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
+          >
+            <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+            Назад к задачам и планам проекта
+          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedDetailItem(null)}
+              className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+            >
+              Закрыть
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleSaveDetail(selectedDetailItem)
+                setSelectedDetailItem(null)
+              }}
+              className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center gap-2"
+            >
+              <CheckCircle2 size={16} /> Сохранить изменения
+            </button>
+          </div>
+        </div>
+
+        {/* Hero Header */}
+        <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-2xl shrink-0">
+              {renderBadge(selectedDetailItem.type)}
+            </div>
+            <div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">{selectedDetailItem.name}</h1>
+                <span className="text-xs text-gray-400 font-mono">ID: {selectedDetailItem.id}</span>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Тип элемента: <strong>{selectedDetailItem.type}</strong></p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-gray-400 font-bold uppercase">Статус:</span>
+            <select
+              value={selectedDetailItem.status || 'Not Done'}
+              onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, status: e.target.value })}
+              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 outline-none focus:bg-white cursor-pointer"
+            >
+              <option value="Not Done">Not Done</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8 space-y-6">
+            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Название</label>
+              <input
+                type="text"
+                value={selectedDetailItem.name}
+                onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, name: e.target.value })}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-900 focus:bg-white outline-none"
+              />
+            </div>
+
+            {selectedDetailItem.type === 'MONTH' && (
+              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Период месяца</label>
+                <input
+                  type="text"
+                  value={selectedDetailItem.period || ''}
+                  onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, period: e.target.value })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                />
+              </div>
+            )}
+
+            {selectedDetailItem.type === 'PLAN_ITEM' && (
+              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Целевой план на месяц</label>
+                  <input
+                    type="number"
+                    value={selectedDetailItem.monthPlan || 0}
+                    onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, monthPlan: Number(e.target.value) })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Единица измерения</label>
+                  <input
+                    type="text"
+                    value={selectedDetailItem.unit || 'шт'}
+                    onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, unit: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
+            {selectedDetailItem.type === 'SPRINT' && selectedDetailItem.plan !== undefined && (
+              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">План спринта</label>
+                <input
+                  type="number"
+                  value={selectedDetailItem.plan || 0}
+                  onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, plan: Number(e.target.value) })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                />
+              </div>
+            )}
+
+            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Подробное описание и инструкции</label>
+              <textarea
+                rows={8}
+                value={selectedDetailItem.description || ''}
+                onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, description: e.target.value })}
+                placeholder="Опишите требования, шаги выполнения, критерии приемки..."
+                className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-base font-medium focus:bg-white outline-none leading-relaxed"
+              />
+            </div>
+
+            {selectedDetailItem.children && selectedDetailItem.children.length > 0 && (
+              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+                <h3 className="text-base font-bold text-gray-900 mb-4">
+                  Вложенные элементы ({selectedDetailItem.children.length})
+                </h3>
+                <div className="space-y-2">
+                  {selectedDetailItem.children.map((child: any) => (
+                    <div key={child.id} className="p-3 bg-gray-50 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {renderBadge(child.type)}
+                        <span className="text-sm font-semibold text-gray-800">{child.name}</span>
+                      </div>
+                      <span className="text-xs font-bold px-2.5 py-1 bg-white rounded-lg border border-gray-200 text-gray-700">
+                        {child.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="lg:col-span-4 space-y-6">
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-gray-900">Метаданные</h3>
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Создатель / Ответственный</label>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="w-7 h-7 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">
+                    {selectedDetailItem.creatorInitial || 'A'}
+                  </div>
+                  <span className="text-sm font-semibold text-gray-800">{selectedDetailItem.creator || 'Азамат'}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Дата создания</label>
+                <span className="text-sm font-medium text-gray-600">{selectedDetailItem.date || '01.09.2026'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // =========================================================================
+  // FULL-PAGE VIEW 6: CREATE TASK / DAILY / SPRINT / EPIC
+  // =========================================================================
+  if (isModalOpen) {
+    return (
+      <div className="max-w-4xl mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        <button
+          onClick={() => setIsModalOpen(false)}
+          className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold mb-6 transition-colors cursor-pointer group"
+        >
+          <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+          Назад к задачам проекта
+        </button>
+
+        <div className="bg-white rounded-3xl p-8 lg:p-10 border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-5 mb-8 pb-6 border-b border-gray-100">
+            <div className="w-16 h-16 bg-indigo-50 text-[#4f46e5] rounded-2xl flex items-center justify-center font-bold text-2xl shrink-0">
+              <Plus size={32} />
+            </div>
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Создать элемент проекта</h1>
+              <p className="text-sm text-gray-500 mt-1">Выберите тип сущности (Epic, Sprint, Daily или Task) и укажите параметры</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleCreateTaskItem} className="space-y-6">
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Тип элемента</label>
+              <div className="grid grid-cols-4 gap-3">
+                {(['EPIC', 'SPRINT', 'DAILY', 'TASK'] as const).map(type => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setModalType(type)}
+                    className={`py-3 text-sm font-bold rounded-xl border transition-all cursor-pointer ${
+                      modalType === type 
+                        ? 'bg-[#4f46e5] text-white border-[#4f46e5] shadow-md' 
+                        : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {modalType === 'SPRINT' && (
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">В какой Epic добавить?</label>
+                <select
+                  value={modalParentId}
+                  onChange={(e) => setModalParentId(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white cursor-pointer"
+                >
+                  <option value="">Выберите Epic...</option>
+                  {availableEpics.map((e: any) => (
+                    <option key={e.id} value={e.id}>{e.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {modalType === 'DAILY' && (
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">В какой Sprint добавить?</label>
+                <select
+                  value={modalParentId}
+                  onChange={(e) => setModalParentId(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white cursor-pointer"
+                >
+                  <option value="">Выберите Sprint...</option>
+                  {availableSprints.map((s: any) => (
+                    <option key={s.id} value={s.id}>{s.epicName} ➔ {s.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {modalType === 'TASK' && (
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">В какой Daily план добавить?</label>
+                <select
+                  value={modalParentId}
+                  onChange={(e) => setModalParentId(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white cursor-pointer"
+                >
+                  <option value="">Выберите Daily...</option>
+                  {availableDailies.map((d: any) => (
+                    <option key={d.id} value={d.id}>{d.epicName} ➔ {d.sprintName} ➔ {d.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Название *</label>
+              <input
+                type="text"
+                required
+                placeholder="Введите название элемента"
+                value={modalName}
+                onChange={(e) => setModalName(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Описание</label>
+              <textarea
+                rows={5}
+                placeholder="Подробное описание задачи или направления..."
+                value={modalDesc}
+                onChange={(e) => setModalDesc(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-sm font-medium focus:bg-white outline-none"
+              />
+            </div>
+
+            <div className="flex justify-between items-center pt-6 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="px-6 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+              >
+                Отмена
+              </button>
+              <button
+                type="submit"
+                className="px-8 py-3 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md transition-all cursor-pointer"
+              >
+                Создать элемент
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
+  // =========================================================================
+  // FULL-PAGE VIEW 7: ADD MONTH IN PLANS
+  // =========================================================================
+  if (isAddMonthOpen) {
+    return (
+      <div className="max-w-2xl mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        <button
+          onClick={() => setIsAddMonthOpen(false)}
+          className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold mb-6 transition-colors cursor-pointer group"
+        >
+          <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+          Назад к планам
+        </button>
+
+        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+          <h1 className="text-2xl font-extrabold text-gray-900 mb-6">Добавить месяц в расписание</h1>
+          <form onSubmit={handleAddMonth} className="space-y-5">
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Название месяца</label>
+              <input
+                type="text"
+                required
+                placeholder="Октябрь 2026"
+                value={newMonthName}
+                onChange={(e) => setNewMonthName(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Период дат</label>
+              <input
+                type="text"
+                placeholder="01.10.2026 — 31.10.2026"
+                value={newMonthPeriod}
+                onChange={(e) => setNewMonthPeriod(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+              />
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setIsAddMonthOpen(false)}
+                className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+              >
+                Отмена
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md cursor-pointer"
+              >
+                Добавить месяц
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
+  // =========================================================================
+  // FULL-PAGE VIEW 8: ADD PLAN ITEM
+  // =========================================================================
+  if (isAddPlanItemOpen) {
+    return (
+      <div className="max-w-2xl mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        <button
+          onClick={() => setIsAddPlanItemOpen(false)}
+          className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold mb-6 transition-colors cursor-pointer group"
+        >
+          <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+          Назад к планам
+        </button>
+
+        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+          <h1 className="text-2xl font-extrabold text-gray-900 mb-6">Добавить целевой план / показатель</h1>
+          <form onSubmit={handleAddPlanItem} className="space-y-5">
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Название показателя</label>
+              <input
+                type="text"
+                required
+                placeholder="Например: Визиты к врачам-урологам"
+                value={newPlanItemName}
+                onChange={(e) => setNewPlanItemName(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">План на месяц (число)</label>
+                <input
+                  type="number"
+                  required
+                  value={newPlanItemTarget}
+                  onChange={(e) => setNewPlanItemTarget(Number(e.target.value))}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Единица измерения</label>
+                <input
+                  type="text"
+                  placeholder="визитов, аптек, продаж, постов"
+                  value={newPlanItemUnit}
+                  onChange={(e) => setNewPlanItemUnit(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setIsAddPlanItemOpen(false)}
+                className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+              >
+                Отмена
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md cursor-pointer"
+              >
+                Добавить план
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
+  // =========================================================================
+  // FULL-PAGE VIEW 9: ADD SPRINT
+  // =========================================================================
+  if (isAddSprintOpen) {
+    return (
+      <div className="max-w-2xl mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        <button
+          onClick={() => setIsAddSprintOpen(false)}
+          className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold mb-6 transition-colors cursor-pointer group"
+        >
+          <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+          Назад к планам
+        </button>
+
+        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+          <h1 className="text-2xl font-extrabold text-gray-900 mb-6">Добавить спринт в план</h1>
+          <form onSubmit={handleAddSprint} className="space-y-5">
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Название спринта</label>
+              <input
+                type="text"
+                required
+                placeholder="Спринт 1 (1–7 число)"
+                value={newSprintName}
+                onChange={(e) => setNewSprintName(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Плановое значение на спринт</label>
+              <input
+                type="number"
+                required
+                value={newSprintPlan}
+                onChange={(e) => setNewSprintPlan(Number(e.target.value))}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+              />
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setIsAddSprintOpen(false)}
+                className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+              >
+                Отмена
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md cursor-pointer"
+              >
+                Добавить спринт
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-[1400px] mx-auto font-sans pb-12">
@@ -2237,1357 +3594,6 @@ export default function ProjectView() {
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* DETAIL MODAL (Opens for EPIC, SPRINT, DAILY, TASK to write details)       */}
-      {/* ========================================================================= */}
-      {selectedDetailItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-7 animate-in fade-in zoom-in-95 duration-150">
-            {/* Modal Header */}
-            <div className="flex justify-between items-start mb-6 pb-4 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                {renderBadge(selectedDetailItem.type)}
-                <span className="text-xs text-gray-400 font-mono">ID: {selectedDetailItem.id}</span>
-              </div>
-              <button 
-                onClick={() => setSelectedDetailItem(null)} 
-                className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Modal Form */}
-            <div className="space-y-6">
-              {/* Title & Rename Field */}
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider flex items-center justify-between">
-                  <span>Название ({selectedDetailItem.type})</span>
-                  <span className="text-[11px] text-[#4f46e5] font-semibold flex items-center">
-                    <Edit3 size={11} className="mr-1" /> Редактируемое поле
-                  </span>
-                </label>
-                <input 
-                  type="text" 
-                  value={selectedDetailItem.name}
-                  onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, name: e.target.value })}
-                  placeholder="Введите новое название..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-base font-bold text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5]"
-                />
-              </div>
-
-              {/* MONTH specific fields */}
-              {selectedDetailItem.type === 'MONTH' && (
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">
-                    Период дат
-                  </label>
-                  <input 
-                    type="text" 
-                    value={selectedDetailItem.period || ''}
-                    onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, period: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-800 focus:bg-white outline-none"
-                  />
-                </div>
-              )}
-
-              {/* PLAN_ITEM specific fields */}
-              {selectedDetailItem.type === 'PLAN_ITEM' && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">
-                      План на месяц
-                    </label>
-                    <input 
-                      type="number" 
-                      value={selectedDetailItem.monthPlan || 0}
-                      onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, monthPlan: Number(e.target.value) })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-[#4f46e5] focus:bg-white outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">
-                      Единица измерения
-                    </label>
-                    <input 
-                      type="text" 
-                      value={selectedDetailItem.unit || 'шт'}
-                      onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, unit: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-800 focus:bg-white outline-none"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* SPRINT (Plans) with target plan */}
-              {selectedDetailItem.type === 'SPRINT' && selectedDetailItem.plan !== undefined && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">
-                      План на спринт
-                    </label>
-                    <input 
-                      type="number" 
-                      value={selectedDetailItem.plan || 0}
-                      onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, plan: Number(e.target.value) })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-[#4f46e5] focus:bg-white outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">
-                      Статус
-                    </label>
-                    <select 
-                      value={selectedDetailItem.status || 'Not Done'}
-                      onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, status: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-gray-800 focus:bg-white outline-none cursor-pointer"
-                    >
-                      <option value="Not Done">Not Done</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Done">Done</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {/* Tasks Tab items (EPIC, SPRINT, DAILY, TASK) status & assignee */}
-              {(selectedDetailItem.type === 'EPIC' || selectedDetailItem.type === 'DAILY' || selectedDetailItem.type === 'TASK' || (selectedDetailItem.type === 'SPRINT' && selectedDetailItem.plan === undefined)) && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">
-                      Статус
-                    </label>
-                    <select 
-                      value={selectedDetailItem.status || 'Not Done'}
-                      onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, status: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-gray-800 focus:bg-white outline-none cursor-pointer"
-                    >
-                      <option value="Not Done">Not Done</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Done">Done</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">
-                      Создатель / Ответственный
-                    </label>
-                    <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-sm font-medium text-gray-800">
-                      <div className={`w-6 h-6 rounded-full ${selectedDetailItem.creatorColor || 'bg-indigo-400'} text-white flex items-center justify-center text-xs font-bold mr-2`}>
-                        {selectedDetailItem.creatorInitial || 'A'}
-                      </div>
-                      <span>{selectedDetailItem.creator || 'Азамат'}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider">
-                      Дата создания
-                    </label>
-                    <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-gray-600">
-                      <Calendar size={16} className="mr-2 text-gray-400" />
-                      <span>{selectedDetailItem.date || '01.09.2026'}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Detailed Description */}
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5 tracking-wider flex items-center gap-1.5">
-                  <AlignLeft size={14} /> Подробное описание, требования и заметки
-                </label>
-                <textarea 
-                  rows={5}
-                  placeholder="Опишите подробно задачи, цели, требования, чек-лист или ссылки..." 
-                  value={selectedDetailItem.description || ''}
-                  onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, description: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm font-medium text-gray-800 leading-relaxed focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5]"
-                />
-              </div>
-
-              {/* Sub-items summary if has children */}
-              {selectedDetailItem.children && (
-                <div className="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
-                  <h4 className="text-xs font-bold uppercase text-gray-500 mb-2">
-                    Вложенных элементов: {selectedDetailItem.children.length}
-                  </h4>
-                  <div className="space-y-1.5 max-h-36 overflow-y-auto">
-                    {selectedDetailItem.children.map((child: any) => (
-                      <div key={child.id} className="flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-gray-100">
-                        <div className="flex items-center">
-                          {renderBadge(child.type)}
-                          <span className="font-semibold text-gray-800">{child.name}</span>
-                        </div>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          child.status === 'Done' ? 'bg-emerald-50 text-emerald-600' :
-                          child.status === 'In Progress' ? 'bg-blue-50 text-blue-600' :
-                          'bg-gray-100 text-gray-500'
-                        }`}>
-                          {child.status}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Footer */}
-              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setSelectedDetailItem(null)}
-                  className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
-                >
-                  Закрыть
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSaveDetail(selectedDetailItem)}
-                  className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-sm transition-all flex items-center"
-                >
-                  <Check size={16} className="mr-1.5" /> Сохранить изменения
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* MODAL: Create Task / Daily / Sprint / Epic                                */}
-      {/* ========================================================================= */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">Создать элемент проекта</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateTaskItem} className="space-y-4">
-              {/* Type Switcher */}
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Тип элемента
-                </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {(['EPIC', 'SPRINT', 'DAILY', 'TASK'] as const).map(type => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setModalType(type)}
-                      className={`py-2 text-xs font-bold rounded-xl border transition-all ${
-                        modalType === type 
-                          ? 'bg-[#4f46e5] text-white border-[#4f46e5] shadow-sm' 
-                          : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* SPRINT parent selector: choose EPIC */}
-              {modalType === 'SPRINT' && (
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    В какой Epic добавить?
-                  </label>
-                  <select 
-                    value={modalParentId}
-                    onChange={(e) => setModalParentId(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none cursor-pointer"
-                  >
-                    <option value="">-- Выберите Epic --</option>
-                    {availableEpics.map(e => (
-                      <option key={e.id} value={e.id}>{e.name}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* DAILY parent selector: choose SPRINT */}
-              {modalType === 'DAILY' && (
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    В какой Спринт добавить?
-                  </label>
-                  <select 
-                    value={modalParentId}
-                    onChange={(e) => setModalParentId(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none cursor-pointer"
-                  >
-                    <option value="">-- Выберите Спринт --</option>
-                    {availableSprints.map(s => (
-                      <option key={s.id} value={s.id}>{s.name} ({s.epicName})</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* TASK parent selector: choose DAILY */}
-              {modalType === 'TASK' && (
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    В какой Делик добавить?
-                  </label>
-                  <select 
-                    value={modalParentId}
-                    onChange={(e) => setModalParentId(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none cursor-pointer"
-                  >
-                    <option value="">-- Выберите Делик --</option>
-                    {availableDailies.map(d => (
-                      <option key={d.id} value={d.id}>{d.name} ({d.sprintName})</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Название *
-                </label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder={
-                    modalType === 'EPIC' ? 'Например: Продвижение в Q4' : 
-                    modalType === 'SPRINT' ? 'Спринт 3: Запуск' : 
-                    modalType === 'DAILY' ? 'Делик 12.09: Подготовка баннеров' :
-                    'Написать текст для промо-поста'
-                  } 
-                  value={modalName}
-                  onChange={(e) => setModalName(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Подробное описание
-                </label>
-                <textarea 
-                  rows={3}
-                  placeholder="Детали, критерии завершения, инструкции..." 
-                  value={modalDesc}
-                  onChange={(e) => setModalDesc(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Статус
-                </label>
-                <select 
-                  value={modalStatus}
-                  onChange={(e) => setModalStatus(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none cursor-pointer"
-                >
-                  <option value="Not Done">Not Done</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Done">Done</option>
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl"
-                >
-                  Отмена
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl"
-                >
-                  Создать
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* MODALS FOR PLANS TAB (Month, Plan Item, Sprint)                           */}
-      {/* ========================================================================= */}
-      {isAddMonthOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">Добавить месяц планирования</h3>
-              <button onClick={() => setIsAddMonthOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddMonth} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Название месяца *
-                </label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="Например: Ноябрь 2026" 
-                  value={newMonthName}
-                  onChange={(e) => setNewMonthName(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Период дат
-                </label>
-                <input 
-                  type="text" 
-                  placeholder="01.11.2026 — 30.11.2026" 
-                  value={newMonthPeriod}
-                  onChange={(e) => setNewMonthPeriod(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setIsAddMonthOpen(false)}
-                  className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl"
-                >
-                  Отмена
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl"
-                >
-                  Создать месяц
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {isAddPlanItemOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">Добавить показатель в план месяца</h3>
-              <button onClick={() => setIsAddPlanItemOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddPlanItem} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Показатель / Задача *
-                </label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="Например: Фармкружки Ташкент" 
-                  value={newPlanItemName}
-                  onChange={(e) => setNewPlanItemName(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Единица измерения
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="визитов, шт, точек" 
-                    value={newPlanItemUnit}
-                    onChange={(e) => setNewPlanItemUnit(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    План на месяц *
-                  </label>
-                  <input 
-                    type="number" 
-                    required
-                    value={newPlanItemTarget}
-                    onChange={(e) => setNewPlanItemTarget(Number(e.target.value))}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-[#4f46e5] focus:bg-white outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setIsAddPlanItemOpen(false)}
-                  className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl"
-                >
-                  Отмена
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl"
-                >
-                  Добавить показатель
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {isAddSprintOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">Добавить спринт к показателю</h3>
-              <button onClick={() => setIsAddSprintOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddSprint} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Название спринта *
-                </label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="Например: Спринт 5 (Финальный рывок)" 
-                  value={newSprintName}
-                  onChange={(e) => setNewSprintName(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  План на этот спринт *
-                </label>
-                <input 
-                  type="number" 
-                  required
-                  value={newSprintPlan}
-                  onChange={(e) => setNewSprintPlan(Number(e.target.value))}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-[#4f46e5] focus:bg-white outline-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setIsAddSprintOpen(false)}
-                  className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl"
-                >
-                  Отмена
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl"
-                >
-                  Создать спринт
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* MODAL: ADD BLOGGER                                                        */}
-      {/* ========================================================================= */}
-      {isAddBloggerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-100">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center">
-                  <Users size={20} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-lg">Добавить блогера / инфлюенсера</h3>
-                  <p className="text-xs text-gray-400">Проект: {projectName}</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setIsAddBloggerOpen(false)} 
-                className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddBlogger} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Имя блогера *
-                  </label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="Например: Дилноза Кубаева" 
-                    value={bName}
-                    onChange={(e) => setBName(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Никнейм / Handle *
-                  </label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="@username" 
-                    value={bHandle}
-                    onChange={(e) => setBHandle(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Платформа
-                  </label>
-                  <select
-                    value={bPlatform}
-                    onChange={(e) => setBPlatform(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  >
-                    <option value="Instagram">Instagram</option>
-                    <option value="Telegram">Telegram</option>
-                    <option value="TikTok">TikTok</option>
-                    <option value="YouTube">YouTube</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Подписчики
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="500K" 
-                    value={bFollowers}
-                    onChange={(e) => setBFollowers(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Прогноз охвата
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="60K" 
-                    value={bReach}
-                    onChange={(e) => setBReach(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Формат интеграции
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="Reels + Stories" 
-                    value={bFormat}
-                    onChange={(e) => setBFormat(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Стоимость / Бюджет
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="$300" 
-                    value={bPrice}
-                    onChange={(e) => setBPrice(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-emerald-600 focus:bg-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Спринт
-                  </label>
-                  <select
-                    value={bSprint}
-                    onChange={(e) => setBSprint(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  >
-                    <option value="Спринт 1">Спринт 1</option>
-                    <option value="Спринт 2">Спринт 2</option>
-                    <option value="Спринт 3">Спринт 3</option>
-                    <option value="Спринт 4">Спринт 4</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Планируемая дата выхода
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="15.09.2026" 
-                    value={bDate}
-                    onChange={(e) => setBDate(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Контакт менеджера
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="+998 90 000 00 00 или @manager" 
-                    value={bContact}
-                    onChange={(e) => setBContact(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Тезисы ТЗ / Заметки
-                </label>
-                <textarea 
-                  rows={3}
-                  placeholder="Основные требования, продукт для интеграции, акценты в сценарии..."
-                  value={bNotes}
-                  onChange={(e) => setBNotes(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-medium focus:bg-white outline-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setIsAddBloggerOpen(false)}
-                  className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl"
-                >
-                  Отмена
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-sm"
-                >
-                  Добавить в базу
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* MODAL: VIEW / EDIT BLOGGER DETAILS & LINK                                 */}
-      {/* ========================================================================= */}
-      {selectedBlogger && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95 duration-150">
-            {/* Header */}
-            <div className="flex justify-between items-start mb-6 pb-4 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-2xl ${selectedBlogger.avatarColor} text-white flex items-center justify-center font-bold text-lg shadow-sm`}>
-                  {selectedBlogger.avatarChar}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-gray-900 text-xl">{selectedBlogger.name}</h3>
-                    <span className="text-xs px-2.5 py-0.5 rounded-md font-semibold bg-gray-100 text-gray-700">
-                      {selectedBlogger.platform}
-                    </span>
-                  </div>
-                  <p className="text-xs text-indigo-600 font-mono mt-0.5">{selectedBlogger.handle}</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setSelectedBlogger(null)} 
-                className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Quick Metrics Bar */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-              <div className="bg-gray-50 p-3 rounded-xl">
-                <p className="text-[11px] font-bold text-gray-400 uppercase">Подписчики</p>
-                <p className="text-base font-bold text-gray-900 mt-0.5">{selectedBlogger.followers}</p>
-              </div>
-              <div className="bg-gray-50 p-3 rounded-xl">
-                <p className="text-[11px] font-bold text-gray-400 uppercase">Охват публикации</p>
-                <p className="text-base font-bold text-emerald-600 mt-0.5">{selectedBlogger.reach}</p>
-              </div>
-              <div className="bg-gray-50 p-3 rounded-xl">
-                <p className="text-[11px] font-bold text-gray-400 uppercase">Бюджет</p>
-                <p className="text-base font-bold text-gray-900 mt-0.5">{selectedBlogger.price}</p>
-              </div>
-              <div className="bg-gray-50 p-3 rounded-xl">
-                <p className="text-[11px] font-bold text-gray-400 uppercase">Спринт</p>
-                <p className="text-base font-bold text-indigo-600 mt-0.5">{selectedBlogger.sprint}</p>
-              </div>
-            </div>
-
-            {/* Editable Details Form */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Статус размещения
-                  </label>
-                  <select
-                    value={selectedBlogger.status}
-                    onChange={(e) => setSelectedBlogger({ ...selectedBlogger, status: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-bold text-gray-800 outline-none focus:bg-white cursor-pointer"
-                  >
-                    <option value="Переговоры">⏳ Переговоры</option>
-                    <option value="Согласовано">🤝 Согласовано</option>
-                    <option value="Оплачено">💳 Оплачено</option>
-                    <option value="Вышел пост">✅ Вышел пост</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Дата выхода
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedBlogger.publishDate}
-                    onChange={(e) => setSelectedBlogger({ ...selectedBlogger, publishDate: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Live Post Link Tracking */}
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <Link2 size={14} className="text-[#4f46e5]" /> Ссылка на вышедший пост / Stories
-                  </span>
-                  {selectedBlogger.postUrl && (
-                    <a 
-                      href={selectedBlogger.postUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-[#4f46e5] hover:underline flex items-center gap-1 text-[11px] lowercase"
-                    >
-                      перейти по ссылке <ExternalLink size={12} />
-                    </a>
-                  )}
-                </label>
-                <div className="relative">
-                  <input 
-                    type="text" 
-                    placeholder="https://instagram.com/p/... или https://t.me/..." 
-                    value={selectedBlogger.postUrl || ''}
-                    onChange={(e) => setSelectedBlogger({ ...selectedBlogger, postUrl: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono text-gray-800 focus:bg-white focus:border-[#4f46e5] outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Contacts */}
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Контакт менеджера / телефон / Telegram
-                </label>
-                <input 
-                  type="text" 
-                  value={selectedBlogger.managerContact || ''}
-                  onChange={(e) => setSelectedBlogger({ ...selectedBlogger, managerContact: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                />
-              </div>
-
-              {/* Notes & Brief */}
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Тезисы интеграции, сценарий и комментарии
-                </label>
-                <textarea 
-                  rows={4}
-                  value={selectedBlogger.notes || ''}
-                  onChange={(e) => setSelectedBlogger({ ...selectedBlogger, notes: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-sm font-medium focus:bg-white outline-none leading-relaxed"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    deleteBlogger(selectedBlogger.id, e)
-                    setSelectedBlogger(null)
-                  }}
-                  className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
-                >
-                  <Trash2 size={14} /> Удалить блогера
-                </button>
-
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedBlogger(null)}
-                    className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
-                  >
-                    Закрыть
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSaveBlogger(selectedBlogger)}
-                    className="px-5 py-2 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-sm cursor-pointer"
-                  >
-                    Сохранить изменения
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* MODAL: ADD COMPANY / PARTNER                                              */}
-      {/* ========================================================================= */}
-      {isAddCompanyOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center">
-                  <Building2 size={20} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">Добавить компанию / партнера</h3>
-                  <p className="text-xs text-gray-500">Учет расходов, предоставленных предметов и локации</p>
-                </div>
-              </div>
-              <button 
-                type="button" 
-                onClick={() => setIsAddCompanyOpen(false)}
-                className="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddCompany} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                    Название компании *
-                  </label>
-                  <input 
-                    type="text" 
-                    required 
-                    placeholder="Например: Hilton Tashkent City" 
-                    value={cName}
-                    onChange={(e) => setCName(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                    Категория / Тип бизнеса *
-                  </label>
-                  <input 
-                    type="text" 
-                    required 
-                    placeholder="Гостиница, Бар, Фитнес, Клиника..." 
-                    value={cCategory}
-                    onChange={(e) => setCCategory(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                    Локация / Адрес
-                  </label>
-                  <div className="relative">
-                    <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input 
-                      type="text" 
-                      placeholder="ул. Амира Темура, 4" 
-                      value={cLocation}
-                      onChange={(e) => setCLocation(e.target.value)}
-                      className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                    Потрачено средств ($)
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
-                    <input 
-                      type="text" 
-                      placeholder="250" 
-                      value={cSpent}
-                      onChange={(e) => setCSpent(e.target.value)}
-                      className="w-full pl-8 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                  Предоставленные предметы / материалы
-                </label>
-                <textarea 
-                  rows={2}
-                  placeholder="Например: Диспенсеры антисептика (6 шт), фирменные салфетки (500 уп), тестеры крема (200 шт)" 
-                  value={cItemsProvided}
-                  onChange={(e) => setCItemsProvided(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                    Спринт
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="Спринт 1" 
-                    value={cSprint}
-                    onChange={(e) => setCSprint(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                    Дата договоренности / поставки
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="15 Окт 2026" 
-                    value={cDate}
-                    onChange={(e) => setCDate(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                    Контактное лицо
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="Фарход (Управляющий)" 
-                    value={cContactPerson}
-                    onChange={(e) => setCContactPerson(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                    Телефон / Мессенджер
-                  </label>
-                  <div className="relative">
-                    <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input 
-                      type="text" 
-                      placeholder="+998 90 123-45-67" 
-                      value={cPhone}
-                      onChange={(e) => setCPhone(e.target.value)}
-                      className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                  Условия сотрудничества / Примечания
-                </label>
-                <textarea 
-                  rows={2}
-                  placeholder="Размещение на стойке ресепшн, брендинг в санитарных зонах, периодичность пополнения..." 
-                  value={cNotes}
-                  onChange={(e) => setCNotes(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-medium focus:bg-white outline-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setIsAddCompanyOpen(false)}
-                  className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
-                >
-                  Отмена
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-sm transition-colors cursor-pointer"
-                >
-                  Добавить компанию
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* MODAL: COMPANY DETAILS & EDIT                                             */}
-      {/* ========================================================================= */}
-      {selectedCompany && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex justify-between items-start mb-6 pb-4 border-b border-gray-100">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
-                  <Building2 size={24} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xl font-bold text-gray-900">{selectedCompany.name}</h3>
-                    <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700">
-                      {selectedCompany.category}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
-                    <MapPin size={13} className="text-gray-400" />
-                    <span>{selectedCompany.location || 'Локация не указана'}</span>
-                  </div>
-                </div>
-              </div>
-              <button 
-                type="button" 
-                onClick={() => setSelectedCompany(null)}
-                className="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Content & Edit Form */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Название компании
-                  </label>
-                  <input 
-                    type="text" 
-                    value={selectedCompany.name}
-                    onChange={(e) => setSelectedCompany({ ...selectedCompany, name: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:bg-white focus:border-[#4f46e5] outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Категория / Тип
-                  </label>
-                  <input 
-                    type="text" 
-                    value={selectedCompany.category}
-                    onChange={(e) => setSelectedCompany({ ...selectedCompany, category: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:bg-white focus:border-[#4f46e5] outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Статус
-                  </label>
-                  <select 
-                    value={selectedCompany.status}
-                    onChange={(e) => setSelectedCompany({ ...selectedCompany, status: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-700 outline-none focus:bg-white cursor-pointer"
-                  >
-                    <option value="Договорились">Договорились</option>
-                    <option value="Предоставлено">Предоставлено</option>
-                    <option value="В процессе">В процессе</option>
-                    <option value="Завершено">Завершено</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Потрачено расходов
-                  </label>
-                  <input 
-                    type="text" 
-                    value={selectedCompany.spent}
-                    onChange={(e) => setSelectedCompany({ ...selectedCompany, spent: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-emerald-600 focus:bg-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Спринт
-                  </label>
-                  <input 
-                    type="text" 
-                    value={selectedCompany.sprint}
-                    onChange={(e) => setSelectedCompany({ ...selectedCompany, sprint: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Location & Address */}
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Локация / Адрес объекта
-                </label>
-                <div className="relative">
-                  <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input 
-                    type="text" 
-                    value={selectedCompany.location || ''}
-                    onChange={(e) => setSelectedCompany({ ...selectedCompany, location: e.target.value })}
-                    className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Items / Materials Provided - Highlighted */}
-              <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
-                <label className="flex items-center gap-2 text-xs font-bold uppercase text-indigo-900 mb-1.5">
-                  <Package size={14} className="text-indigo-600" /> Предоставленные предметы / промо-материалы
-                </label>
-                <textarea 
-                  rows={3}
-                  value={selectedCompany.itemsProvided || ''}
-                  onChange={(e) => setSelectedCompany({ ...selectedCompany, itemsProvided: e.target.value })}
-                  placeholder="Какие предметы и в каком количестве были предоставлены..."
-                  className="w-full bg-white border border-indigo-200 rounded-xl p-3 text-sm font-medium text-gray-800 focus:border-[#4f46e5] outline-none"
-                />
-              </div>
-
-              {/* Contacts */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Контактное лицо
-                  </label>
-                  <input 
-                    type="text" 
-                    value={selectedCompany.contactPerson || ''}
-                    onChange={(e) => setSelectedCompany({ ...selectedCompany, contactPerson: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                    Телефон / Связь
-                  </label>
-                  <div className="relative">
-                    <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input 
-                      type="text" 
-                      value={selectedCompany.phone || ''}
-                      onChange={(e) => setSelectedCompany({ ...selectedCompany, phone: e.target.value })}
-                      className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Условия размещения и примечания
-                </label>
-                <textarea 
-                  rows={3}
-                  value={selectedCompany.notes || ''}
-                  onChange={(e) => setSelectedCompany({ ...selectedCompany, notes: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-sm font-medium focus:bg-white outline-none leading-relaxed"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    deleteCompany(selectedCompany.id, e)
-                    setSelectedCompany(null)
-                  }}
-                  className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
-                >
-                  <Trash2 size={14} /> Удалить компанию
-                </button>
-
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCompany(null)}
-                    className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
-                  >
-                    Закрыть
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSaveCompany(selectedCompany)}
-                    className="px-5 py-2 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-sm cursor-pointer"
-                  >
-                    Сохранить изменения
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   )

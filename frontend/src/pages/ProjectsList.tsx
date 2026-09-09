@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FolderKanban, MoreVertical, Users, Plus, Calendar, X, ArrowUpRight } from 'lucide-react'
+import { FolderKanban, MoreVertical, Users, Plus, Calendar, X, ArrowUpRight, ArrowLeft } from 'lucide-react'
 
 const initialProjects = [
   { 
@@ -66,6 +66,92 @@ export default function ProjectsList() {
     setIsModalOpen(false)
   }
 
+  // Full-Page View for Creating a Project
+  if (isModalOpen) {
+    return (
+      <div className="max-w-4xl mx-auto font-sans pb-16 animate-in fade-in duration-150">
+        {/* Breadcrumb / Back */}
+        <button 
+          onClick={() => setIsModalOpen(false)} 
+          className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold mb-6 transition-colors cursor-pointer group"
+        >
+          <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" /> Назад к проектам
+        </button>
+
+        <div className="bg-white rounded-3xl p-8 lg:p-10 border border-gray-100 shadow-sm">
+          {/* Header */}
+          <div className="flex items-center gap-5 mb-8 pb-6 border-b border-gray-100">
+            <div className="w-16 h-16 bg-indigo-50 text-[#4f46e5] rounded-2xl flex items-center justify-center font-bold text-2xl shrink-0">
+              <FolderKanban size={32} />
+            </div>
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Создание нового проекта</h1>
+              <p className="text-sm text-gray-500 mt-1">Задайте название, фокус, цели и параметры для вашей маркетинговой или бизнес-кампании</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleCreateProject} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                  Название проекта *
+                </label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="Например: Фитосепт, Extragel, Нурофен" 
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                  Период кампании
+                </label>
+                <input 
+                  type="text" 
+                  placeholder="01.10.2026 — 31.10.2026" 
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                Описание / Стратегическая цель проекта
+              </label>
+              <textarea 
+                rows={5}
+                placeholder="Подробно опишите цели проекта, целевую аудиторию, ключевые каналы продвижения, задачи для команды..." 
+                value={newProjectDesc}
+                onChange={(e) => setNewProjectDesc(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] leading-relaxed transition-all"
+              />
+            </div>
+
+            <div className="flex justify-between items-center pt-6 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="px-6 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+              >
+                Отмена
+              </button>
+              <button
+                type="submit"
+                className="px-8 py-3 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
+              >
+                Создать проект
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-[1400px] mx-auto font-sans pb-12">
       {/* Header */}
@@ -78,138 +164,86 @@ export default function ProjectsList() {
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-[#5b52f6] hover:bg-[#4f46e5] text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center transition-all shadow-sm"
+          className="bg-[#5b52f6] hover:bg-[#4f46e5] text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center transition-all shadow-sm cursor-pointer"
         >
           <Plus size={18} className="mr-2" />
           Создать проект
         </button>
       </div>
 
-      {/* Projects Grid */}
+      {/* Grid of Projects */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map(project => (
+        {projects.map((project) => (
           <Link 
-            key={project.id} 
             to={`/project/${project.id}`} 
-            className="block group"
+            key={project.id}
+            className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all hover:border-indigo-100 flex flex-col justify-between group"
           >
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-indigo-100 transition-all flex flex-col justify-between h-full">
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <div className={`w-12 h-12 rounded-xl ${project.color} flex items-center justify-center font-bold text-xl transition-transform group-hover:scale-105`}>
-                    {project.avatarChar}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-gray-400 group-hover:text-[#4f46e5] transition-colors p-1.5 rounded-lg hover:bg-gray-50">
-                      <ArrowUpRight size={18} />
-                    </span>
-                  </div>
+            <div>
+              {/* Project Card Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className={`w-12 h-12 rounded-xl ${project.color} flex items-center justify-center font-bold text-lg group-hover:scale-105 transition-transform`}>
+                  {project.avatarChar}
                 </div>
-
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#4f46e5] transition-colors">
-                  {project.name}
-                </h3>
-                <p className="text-sm text-gray-500 mb-5 line-clamp-2 leading-relaxed font-medium">
-                  {project.description}
-                </p>
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                  }}
+                  className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <MoreVertical size={18} />
+                </button>
               </div>
 
-              <div>
-                <div className="flex items-center text-xs text-gray-400 font-medium mb-4">
-                  <Calendar size={14} className="mr-1.5" />
-                  <span>{project.period}</span>
-                </div>
+              {/* Title & Desc */}
+              <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#4f46e5] transition-colors mb-1.5 flex items-center">
+                {project.name}
+                <ArrowUpRight size={16} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1" />
+              </h3>
+              <p className="text-gray-500 text-xs line-clamp-2 mb-4 leading-relaxed">
+                {project.description}
+              </p>
+            </div>
 
+            <div>
+              {/* Timeline */}
+              <div className="flex items-center text-xs text-gray-400 mb-4 bg-gray-50/70 p-2 rounded-xl">
+                <Calendar size={14} className="mr-2 text-gray-400" />
+                <span>{project.period}</span>
+              </div>
+
+              {/* Progress & Meta */}
+              <div className="space-y-3 pt-3 border-t border-gray-50">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-400 font-medium">Прогресс выполнения</span>
+                  <span className="font-bold text-gray-800">{project.progress}%</span>
+                </div>
                 {/* Progress Bar */}
-                <div className="mb-5">
-                  <div className="flex justify-between items-center text-xs font-semibold text-gray-700 mb-1.5">
-                    <span>Прогресс</span>
-                    <span>{project.progress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="bg-[#4f46e5] h-2 rounded-full transition-all duration-500" 
-                      style={{ width: `${project.progress}%` }}
-                    ></div>
-                  </div>
+                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-[#4f46e5] rounded-full transition-all duration-300"
+                    style={{ width: `${project.progress}%` }}
+                  ></div>
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-gray-500 border-t border-gray-50 pt-4 font-medium">
+                {/* Footer info: Members & Tasks */}
+                <div className="flex justify-between items-center pt-2 text-xs text-gray-500">
                   <div className="flex items-center">
-                    <Users size={15} className="mr-1.5 text-gray-400" />
-                    <span>{project.members} участников</span>
+                    <Users size={14} className="mr-1.5 text-gray-400" />
+                    <span className="font-semibold text-gray-700">{project.members}</span>
+                    <span className="text-gray-400 ml-1">участников</span>
                   </div>
-                  <span className="bg-gray-50 px-2.5 py-1 rounded-md text-gray-600 font-semibold">
-                    {project.tasksCount} задач
-                  </span>
+                  <div>
+                    <span className="font-semibold text-gray-700">{project.tasksCount}</span>
+                    <span className="text-gray-400 ml-1">направлений</span>
+                  </div>
                 </div>
               </div>
             </div>
           </Link>
         ))}
       </div>
-
-      {/* Modal: Create Project */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">Новый проект</h3>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateProject} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Название проекта *
-                </label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="Например: Фитосепт или Нурофен" 
-                  value={newProjectName}
-                  onChange={(e) => setNewProjectName(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
-                  Описание / Цель проекта
-                </label>
-                <textarea 
-                  rows={3}
-                  placeholder="Краткое описание направления, фокуса и ответственных..." 
-                  value={newProjectDesc}
-                  onChange={(e) => setNewProjectDesc(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5]"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
-                >
-                  Отмена
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-sm transition-all"
-                >
-                  Создать
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
