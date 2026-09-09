@@ -4,7 +4,8 @@ import {
   ChevronRight, ChevronDown, Plus, Search, ArrowLeft, ChevronLeft,
   Calendar, CheckCircle2, Circle, MoreVertical, LayoutList, Grip, X, Trash2, 
   Layers, Check, Sparkles, SlidersHorizontal, ArrowDownCircle, Clock, CalendarDays,
-  ExternalLink, Edit3, User, AlignLeft, Tag, ArrowUpRight, Users, Link2, Eye, DollarSign, Send, Share2
+  ExternalLink, Edit3, User, AlignLeft, Tag, ArrowUpRight, Users, Link2, Eye, DollarSign, Send, Share2,
+  Building2, MapPin, Package, Phone
 } from 'lucide-react'
 
 // Hierarchical Plans Data: Month -> Plan Item -> Sprints
@@ -306,6 +307,70 @@ const initialBloggers = [
   }
 ]
 
+// Initial Partner Companies Dataset (Hotels, Bars, Fitness, Clinics, etc.)
+const initialCompanies = [
+  {
+    id: 'c1',
+    name: 'Hilton Tashkent City',
+    category: 'Гостиница / Отель',
+    categoryBadge: 'bg-amber-50 text-amber-700 border-amber-100',
+    location: 'г. Ташкент, Шайхантахурский р-н, ул. Ислама Каримова, 2',
+    spent: '$850',
+    itemsProvided: 'Диспенсеры в SPA и фитнес-зону (6 шт.), 400 саше Extragel, брендированные полотенца (50 шт.), тейбл-тенты на ресепшн',
+    sprint: 'Спринт 1',
+    date: '03.09.2026',
+    contactPerson: 'Улугбек (Wellness & SPA Manager)',
+    phone: '+998 71 210 88 88',
+    status: 'Материалы переданы',
+    notes: 'Размещение продукции в премиум-зоне СПА и тренажерном зале отеля. Персонал проинструктирован по свойствам охлаждающего геля.'
+  },
+  {
+    id: 'c2',
+    name: 'Steam Bar & Lounge',
+    category: 'Бар / Ресторан',
+    categoryBadge: 'bg-purple-50 text-purple-700 border-purple-100',
+    location: 'г. Ташкент, Мирабадский р-н, ул. Нукус, 21',
+    spent: '$400',
+    itemsProvided: 'Брендированные салфетницы Masculan (30 шт.), светящиеся костеры (100 шт.), наборы образцов продукции для закрытого мужского ивента',
+    sprint: 'Спринт 2',
+    date: '10.09.2026',
+    contactPerson: 'Рустам (Арт-директор)',
+    phone: '+998 90 999 11 22',
+    status: 'Активно',
+    notes: 'Спонсорское партнерство в рамках мужского ивента в пятницу. Фотозона с логотипом бренда, брендинг в VIP-залах.'
+  },
+  {
+    id: 'c3',
+    name: 'B-Fit Wellness Complex',
+    category: 'Фитнес-клуб',
+    categoryBadge: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    location: 'г. Ташкент, Яккасарайский р-н, ул. Кичик Бешагач, 104',
+    spent: '$600',
+    itemsProvided: 'Фирменный брендированный стенд Extragel с гелем у ринга и зоны кроссфита, 250 пробников, плакаты формата А1 (4 шт.)',
+    sprint: 'Спринт 2',
+    date: '14.09.2026',
+    contactPerson: 'Сардор (Главный тренер)',
+    phone: '+998 97 123 45 67',
+    status: 'Согласовано',
+    notes: 'Интеграция с тренерским составом: тренеры рекомендуют гель посетителям при спортивных травмах, растяжениях и ушибах.'
+  },
+  {
+    id: 'c4',
+    name: 'Hyatt Regency Tashkent',
+    category: 'Гостиница / Отель',
+    categoryBadge: 'bg-amber-50 text-amber-700 border-amber-100',
+    location: 'г. Ташкент, Юнусабадский р-н, ул. Навои, 1',
+    spent: '$1,100',
+    itemsProvided: 'Welcome-наборы для VIP-гостей (200 шт.), саше в ванные комнаты премиум-люксов, навигационные воблеры',
+    sprint: 'Спринт 3',
+    date: '20.09.2026',
+    contactPerson: 'Нодира (Guest Relations Director)',
+    phone: '+998 71 207 12 34',
+    status: 'Переговоры',
+    notes: 'Согласовываем дизайн и сертификаты кастомных упаковок под стандарты международной пятизвездочной сети.'
+  }
+]
+
 export default function ProjectView() {
   const { id } = useParams()
   const projectId = Number(id) || 1
@@ -313,8 +378,28 @@ export default function ProjectView() {
   const projectName = projectId === 1 ? 'Extragel' : projectId === 2 ? 'Masculan' : 'Энтеросгель'
   const projectInitial = projectName[0]
 
-  // Active Tab: 'tasks' | 'plans' | 'bloggers' | 'members' | 'settings'
-  const [activeTab, setActiveTab] = useState<'tasks' | 'plans' | 'bloggers' | 'members' | 'settings'>('tasks')
+  // Active Tab: 'tasks' | 'plans' | 'bloggers' | 'companies' | 'members' | 'settings'
+  const [activeTab, setActiveTab] = useState<'tasks' | 'plans' | 'bloggers' | 'companies' | 'members' | 'settings'>('tasks')
+
+  // Companies Tracking State
+  const [companiesData, setCompaniesData] = useState<any[]>(initialCompanies)
+  const [companySearch, setCompanySearch] = useState('')
+  const [companyCategoryFilter, setCompanyCategoryFilter] = useState('ALL')
+  const [companyStatusFilter, setCompanyStatusFilter] = useState('ALL')
+  const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false)
+  const [selectedCompany, setSelectedCompany] = useState<any | null>(null)
+
+  // Add Company Form Fields
+  const [cName, setCName] = useState('')
+  const [cCategory, setCCategory] = useState('Гостиница / Отель')
+  const [cLocation, setCLocation] = useState('')
+  const [cSpent, setCSpent] = useState('$500')
+  const [cItemsProvided, setCItemsProvided] = useState('')
+  const [cSprint, setCSprint] = useState('Спринт 2')
+  const [cDate, setCDate] = useState('15.09.2026')
+  const [cContactPerson, setCContactPerson] = useState('')
+  const [cPhone, setCPhone] = useState('')
+  const [cNotes, setCNotes] = useState('')
 
   // Bloggers Tracking State
   const [bloggersData, setBloggersData] = useState<any[]>(initialBloggers)
@@ -415,6 +500,91 @@ export default function ProjectView() {
   const publishedBloggersCount = useMemo(() => {
     return bloggersData.filter(b => b.status === 'Вышел пост').length
   }, [bloggersData])
+
+  // Company Handlers
+  const handleAddCompany = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!cName.trim()) return
+
+    const newCompany = {
+      id: `c_${Date.now()}`,
+      name: cName.trim(),
+      category: cCategory.trim() || 'Компания / Партнер',
+      categoryBadge: cCategory.includes('Отель') || cCategory.includes('Гостиница')
+        ? 'bg-amber-50 text-amber-700 border-amber-100'
+        : cCategory.includes('Бар') || cCategory.includes('Ресторан')
+        ? 'bg-purple-50 text-purple-700 border-purple-100'
+        : cCategory.includes('Фитнес') || cCategory.includes('Спорт')
+        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+        : 'bg-blue-50 text-blue-700 border-blue-100',
+      location: cLocation.trim() || 'г. Ташкент',
+      spent: cSpent.trim() || '$0',
+      itemsProvided: cItemsProvided.trim() || 'Материалы согласовываются',
+      sprint: cSprint,
+      date: cDate.trim() || '20.09.2026',
+      contactPerson: cContactPerson.trim() || '—',
+      phone: cPhone.trim() || '—',
+      status: 'Переговоры',
+      notes: cNotes.trim() || 'Новый партнер бренда'
+    }
+
+    setCompaniesData([newCompany, ...companiesData])
+    setCName('')
+    setCLocation('')
+    setCItemsProvided('')
+    setCContactPerson('')
+    setCPhone('')
+    setCNotes('')
+    setIsAddCompanyOpen(false)
+  }
+
+  const cycleCompanyStatus = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    const statuses = ['Переговоры', 'Согласовано', 'Материалы переданы', 'Активно', 'Завершено']
+    setCompaniesData(data => data.map(c => {
+      if (c.id === id) {
+        const nextIdx = (statuses.indexOf(c.status) + 1) % statuses.length
+        return { ...c, status: statuses[nextIdx] }
+      }
+      return c
+    }))
+  }
+
+  const deleteCompany = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCompaniesData(data => data.filter(c => c.id !== id))
+  }
+
+  const handleSaveCompany = (updated: any) => {
+    setCompaniesData(data => data.map(c => c.id === updated.id ? updated : c))
+    setSelectedCompany(null)
+  }
+
+  const filteredCompanies = useMemo(() => {
+    return companiesData.filter(c => {
+      const q = companySearch.toLowerCase().trim()
+      const matchesSearch = !q || 
+        c.name.toLowerCase().includes(q) || 
+        c.category.toLowerCase().includes(q) ||
+        c.location.toLowerCase().includes(q) ||
+        c.itemsProvided.toLowerCase().includes(q) ||
+        (c.notes && c.notes.toLowerCase().includes(q))
+      const matchesCategory = companyCategoryFilter === 'ALL' || c.category === companyCategoryFilter
+      const matchesStatus = companyStatusFilter === 'ALL' || c.status === companyStatusFilter
+      return matchesSearch && matchesCategory && matchesStatus
+    })
+  }, [companiesData, companySearch, companyCategoryFilter, companyStatusFilter])
+
+  const totalCompaniesSpent = useMemo(() => {
+    return companiesData.reduce((sum, c) => {
+      const num = parseInt(c.spent.replace(/[^0-9]/g, '')) || 0
+      return sum + num
+    }, 0)
+  }, [companiesData])
+
+  const companyCategories = useMemo(() => {
+    return Array.from(new Set(companiesData.map(c => c.category).filter(Boolean)))
+  }, [companiesData])
 
   // Plans Hierarchy State
   const [plansData, setPlansData] = useState<any[]>(initialPlansTree)
@@ -1117,6 +1287,20 @@ export default function ProjectView() {
         </button>
 
         <button 
+          onClick={() => setActiveTab('companies')}
+          className={`flex items-center font-bold pb-4 border-b-2 px-2 mr-8 transition-colors ${
+            activeTab === 'companies' ? 'text-[#4f46e5] border-[#4f46e5]' : 'text-gray-500 border-transparent hover:text-gray-800'
+          }`}
+        >
+          <Building2 size={18} className="mr-2" /> Компании и Партнеры
+          <span className={`ml-2 px-2 py-0.5 text-xs rounded-full font-semibold ${
+            activeTab === 'companies' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'
+          }`}>
+            {companiesData.length}
+          </span>
+        </button>
+
+        <button 
           onClick={() => setActiveTab('members')}
           className={`flex items-center font-medium pb-4 border-b-2 px-2 mr-8 transition-colors ${
             activeTab === 'members' ? 'text-[#4f46e5] border-[#4f46e5]' : 'text-gray-500 border-transparent hover:text-gray-800'
@@ -1806,6 +1990,234 @@ export default function ProjectView() {
           <div className="flex justify-between items-center text-xs text-gray-400 px-2 pt-2">
             <span>Всего в списке: <strong className="text-gray-700">{filteredBloggers.length}</strong> блогеров</span>
             <span>Кликните на строку для открытия брифа, тезисов и контактов</span>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB: COMPANIES & PARTNERS                                                 */}
+      {/* ========================================================================= */}
+      {activeTab === 'companies' && (
+        <div className="space-y-6">
+          {/* Top Summary / KPI Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                <Building2 size={24} />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 font-medium">Всего компаний / партнеров</p>
+                <h3 className="text-2xl font-bold text-gray-900">{companiesData.length}</h3>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <DollarSign size={24} />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 font-medium">Потрачено на партнеров</p>
+                <h3 className="text-2xl font-bold text-emerald-600">${totalCompaniesSpent.toLocaleString()}</h3>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <CheckCircle2 size={24} />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 font-medium">Активных сотрудничеств</p>
+                <h3 className="text-2xl font-bold text-blue-600">
+                  {companiesData.filter(c => c.status === 'В процессе' || c.status === 'Договорились').length}
+                </h3>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <Package size={24} />
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 font-medium">Категорий бизнеса</p>
+                <h3 className="text-2xl font-bold text-amber-600">
+                  {companyCategories.length}
+                </h3>
+              </div>
+            </div>
+          </div>
+
+          {/* Action & Filter Toolbar */}
+          <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex flex-wrap items-center gap-3 flex-1 min-w-[300px]">
+              {/* Search */}
+              <div className="relative flex-1 min-w-[200px]">
+                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Поиск по названию, локации, предметам, категории..."
+                  value={companySearch}
+                  onChange={(e) => setCompanySearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium focus:bg-white focus:border-[#4f46e5] outline-none transition-colors"
+                />
+              </div>
+
+              {/* Category Filter */}
+              <div className="relative">
+                <select
+                  value={companyCategoryFilter}
+                  onChange={(e) => setCompanyCategoryFilter(e.target.value)}
+                  className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 pr-8 text-xs font-semibold text-gray-700 outline-none hover:bg-gray-100 cursor-pointer"
+                >
+                  <option value="ALL">Все категории</option>
+                  {companyCategories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              </div>
+
+              {/* Status Filter */}
+              <div className="relative">
+                <select
+                  value={companyStatusFilter}
+                  onChange={(e) => setCompanyStatusFilter(e.target.value)}
+                  className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 pr-8 text-xs font-semibold text-gray-700 outline-none hover:bg-gray-100 cursor-pointer"
+                >
+                  <option value="ALL">Все статусы</option>
+                  <option value="Договорились">Договорились</option>
+                  <option value="Предоставлено">Предоставлено</option>
+                  <option value="В процессе">В процессе</option>
+                  <option value="Завершено">Завершено</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsAddCompanyOpen(true)}
+              className="px-4 py-2 bg-[#4f46e5] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-[#4338ca] transition-colors shrink-0 cursor-pointer"
+            >
+              <Plus size={16} /> Добавить компанию
+            </button>
+          </div>
+
+          {/* Companies List */}
+          <div className="space-y-3">
+            {filteredCompanies.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
+                <Building2 size={36} className="mx-auto mb-2 text-gray-300 stroke-[1.5]" />
+                <p className="font-semibold text-gray-600">Компании не найдены</p>
+                <p className="text-xs text-gray-400 mt-1">Попробуйте изменить поисковый запрос или добавьте нового партнера</p>
+              </div>
+            ) : (
+              filteredCompanies.map((company) => {
+                const isCompleted = company.status === 'Завершено'
+                const isProvided = company.status === 'Предоставлено'
+                const isInProgress = company.status === 'В процессе'
+                const isAgreed = company.status === 'Договорились'
+
+                return (
+                  <div
+                    key={company.id}
+                    onClick={() => setSelectedCompany(company)}
+                    className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer flex flex-wrap items-center justify-between gap-4 group"
+                  >
+                    {/* Left: Identity & Category & Location */}
+                    <div className="flex items-center gap-4 min-w-[280px] max-w-sm">
+                      <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-base shadow-sm shrink-0">
+                        <Building2 size={22} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-gray-900 text-base group-hover:text-[#4f46e5] transition-colors">
+                            {company.name}
+                          </h4>
+                          <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 text-indigo-700">
+                            {company.category}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
+                          <MapPin size={13} className="text-gray-400 shrink-0" />
+                          <span className="truncate">{company.location}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Middle: Items & Materials Provided */}
+                    <div className="flex-1 min-w-[240px] max-w-md">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-400 font-bold uppercase mb-1">
+                        <Package size={13} className="text-indigo-500" />
+                        <span>Предоставленные материалы / предметы:</span>
+                      </div>
+                      <p className="text-xs text-gray-700 font-medium line-clamp-2 bg-gray-50 rounded-xl p-2 border border-gray-100">
+                        {company.itemsProvided || 'Не указано'}
+                      </p>
+                    </div>
+
+                    {/* Sprint & Date */}
+                    <div className="flex items-center gap-3 text-xs">
+                      <div className="bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-lg">
+                        {company.sprint}
+                      </div>
+                      <div className="text-gray-500 flex items-center gap-1">
+                        <Calendar size={13} className="text-gray-400" />
+                        <span>{company.date}</span>
+                      </div>
+                    </div>
+
+                    {/* Right: Spent & Status & Action */}
+                    <div className="flex items-center gap-3">
+                      {/* Spent Amount */}
+                      <div className="text-right min-w-[90px]">
+                        <div className="text-sm font-extrabold text-emerald-600">
+                          {company.spent}
+                        </div>
+                        <div className="text-[10px] text-gray-400 font-medium">
+                          расходы
+                        </div>
+                      </div>
+
+                      {/* Interactive Status Badge */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          cycleCompanyStatus(company.id)
+                        }}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors flex items-center gap-1.5 cursor-pointer ${
+                          isCompleted
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                            : isProvided
+                            ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                            : isInProgress
+                            ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'
+                            : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                        }`}
+                        title="Нажмите для быстрой смены статуса"
+                      >
+                        {isCompleted && <CheckCircle2 size={13} className="text-emerald-600" />}
+                        {company.status}
+                      </button>
+
+                      {/* More Details Action Button */}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCompany(company)}
+                        className="px-3 py-1.5 bg-gray-50 hover:bg-indigo-50 hover:text-[#4f46e5] text-gray-600 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors"
+                      >
+                        Подробнее <ChevronRight size={14} />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+
+          {/* Simple Footer Counter */}
+          <div className="flex justify-between items-center text-xs text-gray-400 px-2 pt-2">
+            <span>Всего в списке: <strong className="text-gray-700">{filteredCompanies.length}</strong> партнеров</span>
+            <span>Кликните на карточку компании для просмотра деталей, расходов и предоставленных предметов</span>
           </div>
         </div>
       )}
@@ -2759,6 +3171,413 @@ export default function ProjectView() {
                   <button
                     type="button"
                     onClick={() => handleSaveBlogger(selectedBlogger)}
+                    className="px-5 py-2 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-sm cursor-pointer"
+                  >
+                    Сохранить изменения
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: ADD COMPANY / PARTNER                                              */}
+      {/* ========================================================================= */}
+      {isAddCompanyOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center">
+                  <Building2 size={20} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">Добавить компанию / партнера</h3>
+                  <p className="text-xs text-gray-500">Учет расходов, предоставленных предметов и локации</p>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsAddCompanyOpen(false)}
+                className="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddCompany} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+                    Название компании *
+                  </label>
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="Например: Hilton Tashkent City" 
+                    value={cName}
+                    onChange={(e) => setCName(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+                    Категория / Тип бизнеса *
+                  </label>
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="Гостиница, Бар, Фитнес, Клиника..." 
+                    value={cCategory}
+                    onChange={(e) => setCCategory(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+                    Локация / Адрес
+                  </label>
+                  <div className="relative">
+                    <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input 
+                      type="text" 
+                      placeholder="ул. Амира Темура, 4" 
+                      value={cLocation}
+                      onChange={(e) => setCLocation(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+                    Потрачено средств ($)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                    <input 
+                      type="text" 
+                      placeholder="250" 
+                      value={cSpent}
+                      onChange={(e) => setCSpent(e.target.value)}
+                      className="w-full pl-8 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+                  Предоставленные предметы / материалы
+                </label>
+                <textarea 
+                  rows={2}
+                  placeholder="Например: Диспенсеры антисептика (6 шт), фирменные салфетки (500 уп), тестеры крема (200 шт)" 
+                  value={cItemsProvided}
+                  onChange={(e) => setCItemsProvided(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+                    Спринт
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="Спринт 1" 
+                    value={cSprint}
+                    onChange={(e) => setCSprint(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+                    Дата договоренности / поставки
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="15 Окт 2026" 
+                    value={cDate}
+                    onChange={(e) => setCDate(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+                    Контактное лицо
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="Фарход (Управляющий)" 
+                    value={cContactPerson}
+                    onChange={(e) => setCContactPerson(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+                    Телефон / Мессенджер
+                  </label>
+                  <div className="relative">
+                    <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input 
+                      type="text" 
+                      placeholder="+998 90 123-45-67" 
+                      value={cPhone}
+                      onChange={(e) => setCPhone(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">
+                  Условия сотрудничества / Примечания
+                </label>
+                <textarea 
+                  rows={2}
+                  placeholder="Размещение на стойке ресепшн, брендинг в санитарных зонах, периодичность пополнения..." 
+                  value={cNotes}
+                  onChange={(e) => setCNotes(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-medium focus:bg-white outline-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAddCompanyOpen(false)}
+                  className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-sm transition-colors cursor-pointer"
+                >
+                  Добавить компанию
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: COMPANY DETAILS & EDIT                                             */}
+      {/* ========================================================================= */}
+      {selectedCompany && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex justify-between items-start mb-6 pb-4 border-b border-gray-100">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+                  <Building2 size={24} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-gray-900">{selectedCompany.name}</h3>
+                    <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700">
+                      {selectedCompany.category}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
+                    <MapPin size={13} className="text-gray-400" />
+                    <span>{selectedCompany.location || 'Локация не указана'}</span>
+                  </div>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setSelectedCompany(null)}
+                className="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Content & Edit Form */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                    Название компании
+                  </label>
+                  <input 
+                    type="text" 
+                    value={selectedCompany.name}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, name: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:bg-white focus:border-[#4f46e5] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                    Категория / Тип
+                  </label>
+                  <input 
+                    type="text" 
+                    value={selectedCompany.category}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, category: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:bg-white focus:border-[#4f46e5] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                    Статус
+                  </label>
+                  <select 
+                    value={selectedCompany.status}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, status: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-700 outline-none focus:bg-white cursor-pointer"
+                  >
+                    <option value="Договорились">Договорились</option>
+                    <option value="Предоставлено">Предоставлено</option>
+                    <option value="В процессе">В процессе</option>
+                    <option value="Завершено">Завершено</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                    Потрачено расходов
+                  </label>
+                  <input 
+                    type="text" 
+                    value={selectedCompany.spent}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, spent: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-emerald-600 focus:bg-white outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                    Спринт
+                  </label>
+                  <input 
+                    type="text" 
+                    value={selectedCompany.sprint}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, sprint: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Location & Address */}
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                  Локация / Адрес объекта
+                </label>
+                <div className="relative">
+                  <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input 
+                    type="text" 
+                    value={selectedCompany.location || ''}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, location: e.target.value })}
+                    className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Items / Materials Provided - Highlighted */}
+              <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
+                <label className="flex items-center gap-2 text-xs font-bold uppercase text-indigo-900 mb-1.5">
+                  <Package size={14} className="text-indigo-600" /> Предоставленные предметы / промо-материалы
+                </label>
+                <textarea 
+                  rows={3}
+                  value={selectedCompany.itemsProvided || ''}
+                  onChange={(e) => setSelectedCompany({ ...selectedCompany, itemsProvided: e.target.value })}
+                  placeholder="Какие предметы и в каком количестве были предоставлены..."
+                  className="w-full bg-white border border-indigo-200 rounded-xl p-3 text-sm font-medium text-gray-800 focus:border-[#4f46e5] outline-none"
+                />
+              </div>
+
+              {/* Contacts */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                    Контактное лицо
+                  </label>
+                  <input 
+                    type="text" 
+                    value={selectedCompany.contactPerson || ''}
+                    onChange={(e) => setSelectedCompany({ ...selectedCompany, contactPerson: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                    Телефон / Связь
+                  </label>
+                  <div className="relative">
+                    <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input 
+                      type="text" 
+                      value={selectedCompany.phone || ''}
+                      onChange={(e) => setSelectedCompany({ ...selectedCompany, phone: e.target.value })}
+                      className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                  Условия размещения и примечания
+                </label>
+                <textarea 
+                  rows={3}
+                  value={selectedCompany.notes || ''}
+                  onChange={(e) => setSelectedCompany({ ...selectedCompany, notes: e.target.value })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-sm font-medium focus:bg-white outline-none leading-relaxed"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    deleteCompany(selectedCompany.id, e)
+                    setSelectedCompany(null)
+                  }}
+                  className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
+                >
+                  <Trash2 size={14} /> Удалить компанию
+                </button>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCompany(null)}
+                    className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+                  >
+                    Закрыть
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSaveCompany(selectedCompany)}
                     className="px-5 py-2 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-sm cursor-pointer"
                   >
                     Сохранить изменения
