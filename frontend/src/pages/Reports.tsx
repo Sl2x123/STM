@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import React, { useState, useRef, useMemo } from 'react'
 import { 
   FileText, Download, Filter, CheckCircle2, 
   Users, Building2, Package,
@@ -191,20 +191,80 @@ export default function Reports() {
   const [rnpData, setRnpData] = useState<RnpItem[]>(initialRnpData)
   const [rnpSectionFilter, setRnpSectionFilter] = useState<string>('ALL')
   const [rnpSearch, setRnpSearch] = useState<string>('')
+  const [rnpViewMode, setRnpViewMode] = useState<'grouped' | 'table'>('grouped')
   const [uploadFeedback, setUploadFeedback] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Filtered RNP items
-  const filteredRnp = rnpData.filter(item => {
-    const matchSection = rnpSectionFilter === 'ALL' || item.section === rnpSectionFilter
-    const searchLower = rnpSearch.toLowerCase()
-    const matchSearch = !rnpSearch || 
-      item.indicator.toLowerCase().includes(searchLower) ||
-      (item.person && item.person.toLowerCase().includes(searchLower)) ||
-      (item.role && item.role.toLowerCase().includes(searchLower)) ||
-      item.sectionName.toLowerCase().includes(searchLower)
-    return matchSection && matchSearch
-  })
+  const filteredRnp = useMemo(() => {
+    return rnpData.filter(item => {
+      const matchSection = rnpSectionFilter === 'ALL' || item.section === rnpSectionFilter
+      const searchLower = rnpSearch.toLowerCase()
+      const matchSearch = !rnpSearch || 
+        item.indicator.toLowerCase().includes(searchLower) ||
+        (item.person && item.person.toLowerCase().includes(searchLower)) ||
+        (item.role && item.role.toLowerCase().includes(searchLower)) ||
+        item.sectionName.toLowerCase().includes(searchLower)
+      return matchSection && matchSearch
+    })
+  }, [rnpData, rnpSectionFilter, rnpSearch])
+
+  // Grouped items by section / employee for crystal-clear readability
+  const rnpGroups = useMemo(() => {
+    const groups: Array<{
+      key: string
+      sectionName: string
+      person?: string
+      role?: string
+      items: RnpItem[]
+    }> = []
+
+    filteredRnp.forEach(item => {
+      const key = item.person ? `${item.sectionName}__${item.person}` : item.sectionName
+      let existing = groups.find(g => g.key === key)
+      if (!existing) {
+        existing = {
+          key,
+          sectionName: item.sectionName,
+          person: item.person,
+          role: item.role,
+          items: []
+        }
+        groups.push(existing)
+      }
+      existing.items.push(item)
+    })
+
+    return groups
+  }, [filteredRnp])
+
+  // Clean weekly cell renderer: eliminates 0/0 clutter and highlights achievements
+  const renderWeekCell = (w: { plan: string; fact: string }) => {
+    const planTrim = (w.plan || '').trim()
+    const factTrim = (w.fact || '').trim()
+    const isZero = (!planTrim || planTrim === '0' || planTrim === '-') && 
+                   (!factTrim || factTrim === '0' || factTrim === '-')
+    if (isZero) {
+      return <span className="text-slate-300 font-sans text-xs select-none">—</span>
+    }
+    const planVal = parseFloat(planTrim.replace(/,/g, '')) || 0
+    const factVal = parseFloat(factTrim.replace(/,/g, '')) || 0
+    const isSuccess = factVal >= planVal && factVal > 0
+
+    return (
+      <div className="inline-flex items-center justify-center gap-1 font-sans text-xs">
+        <span className="text-slate-400 font-normal">{planTrim || '0'}</span>
+        <span className="text-slate-300 font-light">/</span>
+        <span className={`font-bold tabular-nums ${
+          isSuccess 
+            ? 'text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60' 
+            : 'text-slate-900'
+        }`}>
+          {factTrim || '0'}
+        </span>
+      </div>
+    )
+  }
 
   // Filtered operational tasks
   const filteredProjects = operationalReportData.filter(p => selectedProject === 'ALL' || p.project === selectedProject)
@@ -584,101 +644,240 @@ export default function Reports() {
           </div>
 
           {/* RNP Data Table */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex flex-wrap justify-between items-center bg-gray-50/50 gap-2">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center bg-slate-50/70 gap-3">
               <div>
-                <h3 className="font-bold text-gray-900 text-base">
-                  Регулярный план-факт (РНП) — Июнь 2026
-                </h3>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  Отображено {filteredRnp.length} показателей • Реальные данные команды и продаж
+                <div className="flex items-center gap-2.5">
+                  <h3 className="font-bold text-slate-900 text-base">
+                    Регулярный план-факт (РНП) — Июнь 2026
+                  </h3>
+                  <span className="text-xs font-semibold px-2 py-0.5 bg-slate-200/60 text-slate-700 rounded-md">
+                    {filteredRnp.length} показателей
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Реальные данные команды, полевых визитов и продаж из таблицы РНП
                 </p>
               </div>
-              <div className="text-xs font-semibold text-gray-500 flex items-center gap-2">
-                <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span> 100%+ факт
-                <span className="inline-block w-2.5 h-2.5 rounded-full bg-indigo-500 ml-2"></span> 70-99%
-                <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 ml-2"></span> &lt;70%
+
+              <div className="flex items-center gap-4 flex-wrap">
+                {/* View Mode Toggle */}
+                <div className="bg-slate-200/70 p-0.5 rounded-xl flex items-center gap-0.5 text-xs font-semibold text-slate-600">
+                  <button
+                    type="button"
+                    onClick={() => setRnpViewMode('grouped')}
+                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      rnpViewMode === 'grouped' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    По разделам ({rnpGroups.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRnpViewMode('table')}
+                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      rnpViewMode === 'table' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Сплошная таблица
+                  </button>
+                </div>
+
+                {/* Legend */}
+                <div className="text-xs font-semibold text-slate-500 flex items-center gap-3 bg-white px-3 py-1.5 rounded-xl border border-slate-200">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> 100%+ факт
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> 70-99%
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> &lt;70%
+                  </span>
+                </div>
               </div>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left border-collapse">
-                <thead className="text-[11px] uppercase font-bold text-gray-400 bg-white border-b border-gray-100 sticky top-0">
-                  <tr>
-                    <th className="px-5 py-3.5">Раздел / Сотрудник</th>
-                    <th className="px-5 py-3.5">Показатель</th>
-                    <th className="px-4 py-3.5 text-right">Прошлый факт</th>
-                    <th className="px-4 py-3.5 text-right">План месяц</th>
-                    <th className="px-4 py-3.5 text-right">Факт месяц</th>
-                    <th className="px-5 py-3.5 text-center">% Выполнения</th>
-                    <th className="px-4 py-3.5 text-right">Прогноз</th>
-                    <th className="px-3 py-3.5 text-center bg-gray-50/60">1 нед (П/Ф)</th>
-                    <th className="px-3 py-3.5 text-center bg-gray-50/60">2 нед (П/Ф)</th>
-                    <th className="px-3 py-3.5 text-center bg-gray-50/60">3 нед (П/Ф)</th>
-                    <th className="px-3 py-3.5 text-center bg-gray-50/60">4 нед (П/Ф)</th>
-                    <th className="px-3 py-3.5 text-center bg-gray-50/60">5 нед (П/Ф)</th>
+              <table className="w-full text-sm text-left border-collapse font-sans">
+                <thead className="text-[11px] font-bold uppercase text-slate-500 bg-slate-50/95 border-b border-slate-200 sticky top-0 z-10 shadow-2xs">
+                  {/* Super Header Row */}
+                  <tr className="border-b border-slate-200/80 text-[10px] text-slate-400 tracking-wider">
+                    <th colSpan={rnpViewMode === 'table' ? 2 : 1} className="px-4 py-2 text-left bg-slate-50 border-r border-slate-200">
+                      ПОКАЗАТЕЛЬ И ОТВЕТСТВЕННЫЙ
+                    </th>
+                    <th colSpan={5} className="px-4 py-2 text-center bg-slate-100/60 border-r border-slate-200">
+                      ИТОГИ ЗА МЕСЯЦ (ПЛАН / ФАКТ)
+                    </th>
+                    <th colSpan={5} className="px-4 py-2 text-center bg-indigo-50/40">
+                      ДИНАМИКА ПО НЕДЕЛЯМ (ПЛАН / ФАКТ)
+                    </th>
+                  </tr>
+                  {/* Detailed Columns */}
+                  <tr className="divide-x divide-slate-200 text-slate-600">
+                    {rnpViewMode === 'table' && (
+                      <th className="px-4 py-3 text-left w-48 font-bold bg-slate-50">Раздел / Сотрудник</th>
+                    )}
+                    <th className="px-5 py-3 text-left min-w-[240px] font-bold bg-slate-50">Показатель</th>
+                    <th className="px-3.5 py-3 text-right w-24 font-bold bg-slate-50">Прошл. факт</th>
+                    <th className="px-3.5 py-3 text-right w-24 font-bold bg-slate-50">План месяц</th>
+                    <th className="px-3.5 py-3 text-right w-24 font-bold bg-slate-50">Факт месяц</th>
+                    <th className="px-4 py-3 text-center w-28 font-bold bg-slate-50">% Выполн.</th>
+                    <th className="px-3.5 py-3 text-right w-24 font-bold bg-slate-50 border-r border-slate-200">Прогноз</th>
+                    <th className="px-3 py-3 text-center w-24 font-bold bg-indigo-50/20">1 нед</th>
+                    <th className="px-3 py-3 text-center w-24 font-bold bg-indigo-50/20">2 нед</th>
+                    <th className="px-3 py-3 text-center w-24 font-bold bg-indigo-50/20">3 нед</th>
+                    <th className="px-3 py-3 text-center w-24 font-bold bg-indigo-50/20">4 нед</th>
+                    <th className="px-3 py-3 text-center w-24 font-bold bg-indigo-50/20">5 нед</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50 font-sans">
+                <tbody className="divide-y divide-slate-100 font-sans">
                   {filteredRnp.length === 0 ? (
                     <tr>
-                      <td colSpan={12} className="px-6 py-12 text-center text-gray-400 text-xs">
+                      <td colSpan={12} className="px-6 py-12 text-center text-slate-400 text-xs">
                         Показатели не найдены по текущему фильтру или поисковому запросу.
                       </td>
                     </tr>
+                  ) : rnpViewMode === 'grouped' ? (
+                    rnpGroups.map(group => (
+                      <React.Fragment key={`grp_${group.key}`}>
+                        {/* Section Header Row */}
+                        <tr className="bg-slate-100/95 border-y border-slate-200 sticky top-[73px] z-5">
+                          <td colSpan={11} className="px-5 py-2.5">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2.5">
+                                <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
+                                <span className="font-extrabold text-slate-900 text-xs tracking-wide uppercase">
+                                  {group.sectionName}
+                                </span>
+                                {group.person && (
+                                  <span className="text-xs font-bold text-indigo-700 bg-white border border-indigo-200/80 px-2.5 py-0.5 rounded-lg shadow-2xs">
+                                    {group.person} {group.role ? `• ${group.role}` : ''}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[11px] text-slate-500 font-semibold bg-white/80 px-2 py-0.5 rounded border border-slate-200/60">
+                                {group.items.length} {group.items.length === 1 ? 'показатель' : 'показателей'}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                        {/* Rows in this section */}
+                        {group.items.map((item, rowIdx) => (
+                          <tr 
+                            key={item.id} 
+                            className={`divide-x divide-slate-100 transition-colors hover:bg-indigo-50/30 ${
+                              rowIdx % 2 === 1 ? 'bg-slate-50/40' : 'bg-white'
+                            }`}
+                          >
+                            <td className="px-5 py-2.5">
+                              <div className="font-semibold text-slate-900 text-xs">{item.indicator}</div>
+                              {item.person && !group.person && (
+                                <div className="text-[10px] text-indigo-600 font-medium mt-0.5">{item.person}</div>
+                              )}
+                            </td>
+                            <td className="px-3.5 py-2.5 text-right text-xs text-slate-500 tabular-nums">
+                              {item.prevFact} <span className="text-[10px] text-slate-400">({item.prevPercent})</span>
+                            </td>
+                            <td className="px-3.5 py-2.5 text-right text-xs font-semibold text-slate-700 tabular-nums">
+                              {item.planMonth}
+                            </td>
+                            <td className="px-3.5 py-2.5 text-right text-xs font-bold text-slate-900 tabular-nums">
+                              {item.factMonth}
+                            </td>
+                            <td className="px-4 py-2.5 text-center">
+                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold tabular-nums inline-block border ${
+                                item.percentMonth >= 100
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                  : item.percentMonth >= 70
+                                  ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                                  : item.percentMonth > 0
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                  : 'bg-slate-100 text-slate-500 border-slate-200'
+                              }`}>
+                                {item.percentMonth}%
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-2.5 text-right text-xs font-bold text-indigo-700 tabular-nums border-r border-slate-200">
+                              {item.forecast}
+                            </td>
+                            <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20">
+                              {renderWeekCell(item.w1)}
+                            </td>
+                            <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20">
+                              {renderWeekCell(item.w2)}
+                            </td>
+                            <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20">
+                              {renderWeekCell(item.w3)}
+                            </td>
+                            <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20">
+                              {renderWeekCell(item.w4)}
+                            </td>
+                            <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20">
+                              {renderWeekCell(item.w5)}
+                            </td>
+                          </tr>
+                        ))}
+                      </React.Fragment>
+                    ))
                   ) : (
-                    filteredRnp.map(item => (
-                      <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="px-5 py-3">
-                          <div className="font-bold text-gray-900 text-xs">{item.sectionName}</div>
+                    filteredRnp.map((item, rowIdx) => (
+                      <tr 
+                        key={item.id} 
+                        className={`divide-x divide-slate-100 transition-colors hover:bg-indigo-50/30 ${
+                          rowIdx % 2 === 1 ? 'bg-slate-50/40' : 'bg-white'
+                        }`}
+                      >
+                        <td className="px-4 py-2.5">
+                          <div className="font-bold text-slate-800 text-xs">{item.sectionName}</div>
                           {item.person && (
-                            <div className="text-[11px] text-indigo-600 font-medium mt-0.5">
+                            <div className="text-[11px] text-indigo-600 font-semibold mt-0.5">
                               {item.person} {item.role ? `(${item.role})` : ''}
                             </div>
                           )}
                         </td>
-                        <td className="px-5 py-3 font-semibold text-gray-800 text-xs max-w-xs">
-                          {item.indicator}
+                        <td className="px-5 py-2.5">
+                          <div className="font-semibold text-slate-900 text-xs">{item.indicator}</div>
                         </td>
-                        <td className="px-4 py-3 text-right text-xs text-gray-500 font-mono">
-                          {item.prevFact} <span className="text-[10px] text-gray-400">({item.prevPercent})</span>
+                        <td className="px-3.5 py-2.5 text-right text-xs text-slate-500 tabular-nums">
+                          {item.prevFact} <span className="text-[10px] text-slate-400">({item.prevPercent})</span>
                         </td>
-                        <td className="px-4 py-3 text-right text-xs font-bold text-gray-700 font-mono">
+                        <td className="px-3.5 py-2.5 text-right text-xs font-semibold text-slate-700 tabular-nums">
                           {item.planMonth}
                         </td>
-                        <td className="px-4 py-3 text-right text-xs font-extrabold text-gray-900 font-mono">
+                        <td className="px-3.5 py-2.5 text-right text-xs font-bold text-slate-900 tabular-nums">
                           {item.factMonth}
                         </td>
-                        <td className="px-5 py-3 text-center">
-                          <span className={`px-2.5 py-1 rounded-xl text-xs font-bold font-mono inline-block ${
+                        <td className="px-4 py-2.5 text-center">
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold tabular-nums inline-block border ${
                             item.percentMonth >= 100
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                               : item.percentMonth >= 70
-                              ? 'bg-indigo-50 text-indigo-700 border border-indigo-200/60'
+                              ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
                               : item.percentMonth > 0
-                              ? 'bg-amber-50 text-amber-700 border border-amber-200/60'
-                              : 'bg-gray-100 text-gray-500'
+                              ? 'bg-amber-50 text-amber-700 border-amber-200'
+                              : 'bg-slate-100 text-slate-500 border-slate-200'
                           }`}>
                             {item.percentMonth}%
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right text-xs font-bold text-purple-700 font-mono">
+                        <td className="px-3.5 py-2.5 text-right text-xs font-bold text-indigo-700 tabular-nums border-r border-slate-200">
                           {item.forecast}
                         </td>
-                        <td className="px-3 py-3 text-center text-xs font-mono bg-gray-50/40 text-gray-700">
-                          {item.w1.plan} / <strong className="text-gray-900">{item.w1.fact}</strong>
+                        <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20">
+                          {renderWeekCell(item.w1)}
                         </td>
-                        <td className="px-3 py-3 text-center text-xs font-mono bg-gray-50/40 text-gray-700">
-                          {item.w2.plan} / <strong className="text-gray-900">{item.w2.fact}</strong>
+                        <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20">
+                          {renderWeekCell(item.w2)}
                         </td>
-                        <td className="px-3 py-3 text-center text-xs font-mono bg-gray-50/40 text-gray-700">
-                          {item.w3.plan} / <strong className="text-gray-900">{item.w3.fact}</strong>
+                        <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20">
+                          {renderWeekCell(item.w3)}
                         </td>
-                        <td className="px-3 py-3 text-center text-xs font-mono bg-gray-50/40 text-gray-700">
-                          {item.w4.plan} / <strong className="text-gray-900">{item.w4.fact}</strong>
+                        <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20">
+                          {renderWeekCell(item.w4)}
                         </td>
-                        <td className="px-3 py-3 text-center text-xs font-mono bg-gray-50/40 text-gray-700">
-                          {item.w5.plan} / <strong className="text-gray-900">{item.w5.fact}</strong>
+                        <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20">
+                          {renderWeekCell(item.w5)}
                         </td>
                       </tr>
                     ))

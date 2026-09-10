@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { 
   Target, FolderKanban, TrendingUp, ArrowRight, 
-  Eye, ExternalLink, PieChart
+  Eye, ExternalLink
 } from 'lucide-react'
 
 export interface WeeklyPoint {
@@ -777,49 +777,159 @@ const periodsData: Record<string, PeriodData> = {
 }
 
 // =========================================================================
-// SVG CHART COMPONENTS
+// PERFORMANCE & ANALYTICS BREAKDOWN COMPONENTS (CLEAN CSS & TABULAR NUMS)
 // =========================================================================
 
-function Sparkline({ data, color = '#4f46e5' }: { data: number[]; color?: string }) {
-  if (!data || data.length === 0) return null
-  const min = Math.min(...data)
-  const max = Math.max(...data)
-  const range = max - min || 1
-  const w = 76
-  const h = 26
-  const points = data.map((val, idx) => {
-    const x = (idx / (data.length - 1)) * (w - 6) + 3
-    const y = h - 4 - ((val - min) / range) * (h - 8)
-    return `${x.toFixed(1)},${y.toFixed(1)}`
-  }).join(' ')
-
+function WeeklyPerformanceSummary({
+  data,
+  mode,
+  onModeChange
+}: {
+  data: WeeklyPoint[]
+  mode: 'visits' | 'reach' | 'budget'
+  onModeChange: (m: 'visits' | 'reach' | 'budget') => void
+}) {
   return (
-    <svg width={w} height={h} className="overflow-visible shrink-0" aria-hidden="true">
-      <polyline
-        fill="none"
-        stroke={color}
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        points={points}
-      />
-    </svg>
+    <div className="space-y-4">
+      {/* Header with Switcher Tabs */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900">Недельная динамика выполнения (План vs Факт)</h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            {mode === 'visits' && 'Контроль закрытия визитов и спринтовых задач по неделям'}
+            {mode === 'reach' && 'Фактический охват публикаций блогеров в сравнении с планом'}
+            {mode === 'budget' && 'Освоение маркетингового бюджета по неделям месяца'}
+          </p>
+        </div>
+
+        <div className="bg-slate-100 p-0.5 rounded-lg flex items-center gap-1 border border-slate-200/70 text-xs">
+          <button
+            type="button"
+            onClick={() => onModeChange('visits')}
+            className={`px-3 py-1.5 rounded-md transition-all cursor-pointer font-medium ${
+              mode === 'visits' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Визиты & Задачи
+          </button>
+          <button
+            type="button"
+            onClick={() => onModeChange('reach')}
+            className={`px-3 py-1.5 rounded-md transition-all cursor-pointer font-medium ${
+              mode === 'reach' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Охват (K)
+          </button>
+          <button
+            type="button"
+            onClick={() => onModeChange('budget')}
+            className={`px-3 py-1.5 rounded-md transition-all cursor-pointer font-medium ${
+              mode === 'budget' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Бюджет ($)
+          </button>
+        </div>
+      </div>
+
+      {/* Structured Weekly Rows with Clean Progress Bars */}
+      <div className="space-y-2.5">
+        {data.map((item, idx) => {
+          let plan = 0
+          let fact = 0
+          let unit = ''
+          if (mode === 'visits') {
+            plan = item.planVisits
+            fact = item.factVisits
+            unit = ' визитов'
+          } else if (mode === 'reach') {
+            plan = item.planReachK
+            fact = item.reachK
+            unit = 'K охвата'
+          } else {
+            plan = item.budgetPlan
+            fact = item.budgetSpent
+            unit = ' $'
+          }
+          const percent = plan > 0 ? Math.round((fact / plan) * 100) : 0
+          const delta = fact - plan
+          const isSuccess = percent >= 100
+
+          return (
+            <div key={idx} className="p-3 rounded-xl bg-slate-50/70 border border-slate-100/90 hover:bg-slate-50 transition-colors">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs mb-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-slate-800">{item.period}</span>
+                  <span className={`px-2 py-0.5 rounded-md font-bold text-[11px] tabular-nums border ${
+                    isSuccess 
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60'
+                      : percent >= 70
+                      ? 'bg-indigo-50 text-indigo-700 border-indigo-200/60'
+                      : 'bg-amber-50 text-amber-700 border-amber-200/60'
+                  }`}>
+                    {percent}%
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-slate-600 tabular-nums text-xs">
+                  <span>
+                    План: <strong className="text-slate-700">{plan.toLocaleString()}{unit}</strong>
+                  </span>
+                  <span className="text-slate-300">•</span>
+                  <span>
+                    Факт: <strong className={isSuccess ? 'text-emerald-700' : 'text-slate-900'}>{fact.toLocaleString()}{unit}</strong>
+                  </span>
+                  <span className="text-slate-300">•</span>
+                  <span className={`text-[11px] font-semibold ${delta >= 0 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                    {delta >= 0 ? `+${delta}` : delta}
+                  </span>
+                </div>
+              </div>
+
+              {/* Clean Minimalist Progress Bar */}
+              <div className="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    isSuccess 
+                      ? 'bg-emerald-600' 
+                      : percent >= 70 
+                      ? 'bg-indigo-600' 
+                      : 'bg-amber-500'
+                  }`}
+                  style={{ width: `${Math.min(percent, 100)}%` }}
+                />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Footer Metrics */}
+      <div className="grid grid-cols-3 gap-3 pt-3 mt-1 border-t border-slate-100 text-center text-xs">
+        <div className="p-2 rounded-lg bg-slate-50/70 border border-slate-100">
+          <span className="text-[10px] text-slate-400 font-medium block">Средний темп</span>
+          <span className="font-bold text-slate-900 mt-0.5 block tabular-nums">12.5 визитов/нед.</span>
+        </div>
+        <div className="p-2 rounded-lg bg-slate-50/70 border border-slate-100">
+          <span className="text-[10px] text-slate-400 font-medium block">Пик периода</span>
+          <span className="font-bold text-indigo-600 mt-0.5 block tabular-nums">2-я неделя (120K)</span>
+        </div>
+        <div className="p-2 rounded-lg bg-slate-50/70 border border-slate-100">
+          <span className="text-[10px] text-slate-400 font-medium block">Освоение бюджета</span>
+          <span className="font-bold text-emerald-600 mt-0.5 block tabular-nums">88% (в плане)</span>
+        </div>
+      </div>
+    </div>
   )
 }
 
-function DonutChart({
+function ChannelsBreakdown({
   platforms,
   totalReach
 }: {
-  platforms: Array<{ name: string; reach: string; share: number; color: string; cpm?: string }>;
-  totalReach: string;
+  platforms: Array<{ name: string; reach: string; share: number; color: string; cpm?: string }>
+  totalReach: string
 }) {
-  const size = 150
-  const strokeWidth = 16
-  const radius = (size - strokeWidth) / 2
-  const circumference = 2 * Math.PI * radius
-  let accumulatedPercent = 0
-
   const hexColors: Record<string, string> = {
     'bg-pink-500': '#ec4899',
     'bg-neutral-800': '#1e293b',
@@ -829,366 +939,63 @@ function DonutChart({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-5">
-      {/* SVG Donut */}
-      <div className="relative w-36 h-36 shrink-0">
-        <svg width={size} height={size} className="transform -rotate-90">
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke="#f1f5f9"
-            strokeWidth={strokeWidth}
-            fill="none"
-          />
-          {platforms.map((p, idx) => {
-            const strokeDashoffset = -((accumulatedPercent / 100) * circumference)
-            const strokeDasharray = `${(p.share / 100) * circumference} ${circumference}`
-            accumulatedPercent += p.share
-            const strokeColor = hexColors[p.color] || '#4f46e5'
+    <div className="space-y-4">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900">Каналы инфлюенс-маркетинга</h3>
+          <p className="text-xs text-slate-400 mt-0.5">Суммарный охват: <strong className="text-slate-800 font-bold tabular-nums">{totalReach}</strong></p>
+        </div>
+        <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+          {platforms.length} площадки
+        </span>
+      </div>
 
-            return (
-              <circle
-                key={idx}
-                cx={size / 2}
-                cy={size / 2}
-                r={radius}
-                stroke={strokeColor}
-                strokeWidth={strokeWidth}
-                strokeDasharray={strokeDasharray}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                fill="none"
-              />
-            )
-          })}
-        </svg>
-
-        {/* Center Label */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-          <span className="text-xl font-bold font-mono text-slate-900 tracking-tight leading-none">
-            {totalReach}
-          </span>
-          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-1">
-            Охват
-          </span>
+      {/* Segmented Proportion Bar */}
+      <div>
+        <div className="w-full h-2.5 rounded-full overflow-hidden flex bg-slate-100 gap-0.5 mb-1.5">
+          {platforms.map((p, idx) => (
+            <div
+              key={idx}
+              style={{ width: `${p.share}%`, backgroundColor: hexColors[p.color] || '#4f46e5' }}
+              title={`${p.name}: ${p.share}% (${p.reach})`}
+            />
+          ))}
+        </div>
+        <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium">
+          <span>0%</span>
+          <span>Доли каналов в общем охвате</span>
+          <span>100%</span>
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex-1 space-y-2.5 w-full">
+      {/* Channel Cards */}
+      <div className="space-y-2 pt-1">
         {platforms.map((p, idx) => {
           const hex = hexColors[p.color] || '#4f46e5'
           return (
-            <div key={idx} className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: hex }} />
-                <span className="font-semibold text-slate-800">{p.name}</span>
-                <span className="text-[11px] text-slate-400">({p.share}%)</span>
-              </div>
+            <div key={idx} className="p-2.5 rounded-xl border border-slate-100 bg-slate-50/50 flex items-center justify-between text-xs hover:bg-slate-50 transition-colors">
               <div className="flex items-center gap-2.5">
-                <span className="font-mono font-bold text-slate-900">{p.reach}</span>
+                <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: hex }} />
+                <div>
+                  <span className="font-bold text-slate-800 block leading-tight">{p.name}</span>
+                  <span className="text-[11px] text-slate-400 font-medium">Доля {p.share}%</span>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <span className="font-bold text-slate-900 tabular-nums block leading-tight">{p.reach}</span>
                 {p.cpm && (
-                  <span className="text-[10px] text-slate-400 font-medium">CPM {p.cpm}</span>
+                  <span className="text-[10px] text-slate-500 font-medium">CPM {p.cpm}</span>
                 )}
               </div>
             </div>
           )
         })}
       </div>
-    </div>
-  )
-}
 
-function WeeklyDynamicChart({
-  data,
-  mode,
-  onModeChange
-}: {
-  data: WeeklyPoint[];
-  mode: 'visits' | 'reach' | 'budget';
-  onModeChange: (m: 'visits' | 'reach' | 'budget') => void;
-}) {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
-
-  const maxVal = useMemo(() => {
-    if (mode === 'visits') {
-      return Math.max(...data.map(d => Math.max(d.planVisits, d.factVisits)), 16)
-    }
-    if (mode === 'reach') {
-      return Math.max(...data.map(d => Math.max(d.planReachK, d.reachK)), 150)
-    }
-    return Math.max(...data.map(d => Math.max(d.budgetPlan, d.budgetSpent)), 600)
-  }, [data, mode])
-
-  const chartHeight = 140
-  const chartWidth = 560
-
-  return (
-    <div>
-      {/* Header with Switcher Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
-        <div>
-          <h3 className="text-sm font-bold text-slate-900">Динамика выполнения по неделям</h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            {mode === 'visits' && 'Сопоставление плановых и фактических визитов / задач'}
-            {mode === 'reach' && 'Прогрессия накопленного и недельного охвата инфлюенсеров'}
-            {mode === 'budget' && 'Освоение маркетингового бюджета по неделям'}
-          </p>
-        </div>
-
-        <div className="bg-slate-100 p-1 rounded-lg flex items-center gap-1 border border-slate-200/60 text-xs">
-          <button
-            type="button"
-            onClick={() => onModeChange('visits')}
-            className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
-              mode === 'visits' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Визиты & Задачи
-          </button>
-          <button
-            type="button"
-            onClick={() => onModeChange('reach')}
-            className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
-              mode === 'reach' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Охват (K)
-          </button>
-          <button
-            type="button"
-            onClick={() => onModeChange('budget')}
-            className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
-              mode === 'budget' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Бюджет ($)
-          </button>
-        </div>
-      </div>
-
-      {/* SVG Chart */}
-      <div className="relative">
-        <svg viewBox={`0 0 ${chartWidth} ${chartHeight + 35}`} className="w-full h-auto overflow-visible">
-          <defs>
-            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.22" />
-              <stop offset="100%" stopColor="#4f46e5" stopOpacity="0.0" />
-            </linearGradient>
-          </defs>
-
-          {/* Grid lines */}
-          {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => {
-            const y = chartHeight - ratio * (chartHeight - 20)
-            return (
-              <g key={i}>
-                <line x1="30" y1={y} x2={chartWidth - 10} y2={y} stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3 3" />
-                <text x="24" y={y + 3} textAnchor="end" className="text-[9px] fill-slate-400 font-mono">
-                  {Math.round(ratio * maxVal)}
-                </text>
-              </g>
-            )
-          })}
-
-          {/* Chart Content based on mode */}
-          {mode === 'visits' && (
-            data.map((d, idx) => {
-              const slotWidth = (chartWidth - 50) / data.length
-              const xCenter = 45 + idx * slotWidth + slotWidth / 2
-              const barW = 16
-              const planH = Math.max((d.planVisits / maxVal) * (chartHeight - 20), 4)
-              const factH = Math.max((d.factVisits / maxVal) * (chartHeight - 20), 4)
-              const isHovered = hoveredIdx === idx
-
-              return (
-                <g 
-                  key={idx} 
-                  className="cursor-pointer"
-                  onMouseEnter={() => setHoveredIdx(idx)}
-                  onMouseLeave={() => setHoveredIdx(null)}
-                >
-                  {isHovered && (
-                    <rect
-                      x={45 + idx * slotWidth + 4}
-                      y="4"
-                      width={slotWidth - 8}
-                      height={chartHeight + 25}
-                      fill="#f8fafc"
-                      rx="8"
-                    />
-                  )}
-                  {/* Plan Bar */}
-                  <rect
-                    x={xCenter - barW - 2}
-                    y={chartHeight - planH}
-                    width={barW}
-                    height={planH}
-                    fill="#cbd5e1"
-                    rx="3"
-                  />
-                  {/* Fact Bar */}
-                  <rect
-                    x={xCenter + 2}
-                    y={chartHeight - factH}
-                    width={barW}
-                    height={factH}
-                    fill="#0f172a"
-                    rx="3"
-                  />
-                  <text x={xCenter - barW / 2 - 2} y={chartHeight - planH - 4} textAnchor="middle" className="text-[9px] font-mono fill-slate-400">
-                    {d.planVisits}
-                  </text>
-                  <text x={xCenter + barW / 2 + 2} y={chartHeight - factH - 4} textAnchor="middle" className="text-[10px] font-mono font-bold fill-slate-900">
-                    {d.factVisits}
-                  </text>
-                  <text x={xCenter} y={chartHeight + 18} textAnchor="middle" className="text-[10px] font-medium fill-slate-600">
-                    {d.period}
-                  </text>
-                </g>
-              )
-            })
-          )}
-
-          {mode === 'reach' && (
-            (() => {
-              const points = data.map((d, idx) => {
-                const slotWidth = (chartWidth - 50) / (data.length - 1 || 1)
-                const x = 45 + idx * slotWidth
-                const y = chartHeight - (d.reachK / maxVal) * (chartHeight - 20)
-                return { x, y, val: d.reachK, plan: d.planReachK, period: d.period }
-              })
-
-              const pathD = points.reduce((acc, pt, i) => `${acc} ${i === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`, '')
-              const areaD = `${pathD} L ${points[points.length - 1].x} ${chartHeight} L ${points[0].x} ${chartHeight} Z`
-
-              return (
-                <g>
-                  <path d={areaD} fill="url(#areaGrad)" />
-                  <path d={pathD} fill="none" stroke="#4f46e5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-
-                  {points.map((pt, i) => (
-                    <g 
-                      key={i} 
-                      className="cursor-pointer"
-                      onMouseEnter={() => setHoveredIdx(i)}
-                      onMouseLeave={() => setHoveredIdx(null)}
-                    >
-                      <circle cx={pt.x} cy={pt.y} r={hoveredIdx === i ? 6 : 4} fill="#ffffff" stroke="#4f46e5" strokeWidth="2.5" />
-                      <text x={pt.x} y={pt.y - 8} textAnchor="middle" className="text-[10px] font-mono font-bold fill-slate-900">
-                        {pt.val}K
-                      </text>
-                      <text x={pt.x} y={chartHeight + 18} textAnchor="middle" className="text-[10px] font-medium fill-slate-600">
-                        {pt.period}
-                      </text>
-                    </g>
-                  ))}
-                </g>
-              )
-            })()
-          )}
-
-          {mode === 'budget' && (
-            data.map((d, idx) => {
-              const slotWidth = (chartWidth - 50) / data.length
-              const xCenter = 45 + idx * slotWidth + slotWidth / 2
-              const barW = 16
-              const planH = Math.max((d.budgetPlan / maxVal) * (chartHeight - 20), 4)
-              const spentH = Math.max((d.budgetSpent / maxVal) * (chartHeight - 20), 4)
-              const isHovered = hoveredIdx === idx
-
-              return (
-                <g 
-                  key={idx} 
-                  className="cursor-pointer"
-                  onMouseEnter={() => setHoveredIdx(idx)}
-                  onMouseLeave={() => setHoveredIdx(null)}
-                >
-                  {isHovered && (
-                    <rect
-                      x={45 + idx * slotWidth + 4}
-                      y="4"
-                      width={slotWidth - 8}
-                      height={chartHeight + 25}
-                      fill="#f8fafc"
-                      rx="8"
-                    />
-                  )}
-                  <rect
-                    x={xCenter - barW - 2}
-                    y={chartHeight - planH}
-                    width={barW}
-                    height={planH}
-                    fill="#e2e8f0"
-                    rx="3"
-                  />
-                  <rect
-                    x={xCenter + 2}
-                    y={chartHeight - spentH}
-                    width={barW}
-                    height={spentH}
-                    fill="#10b981"
-                    rx="3"
-                  />
-                  <text x={xCenter - barW / 2 - 2} y={chartHeight - planH - 4} textAnchor="middle" className="text-[9px] font-mono fill-slate-400">
-                    ${d.budgetPlan}
-                  </text>
-                  <text x={xCenter + barW / 2 + 2} y={chartHeight - spentH - 4} textAnchor="middle" className="text-[10px] font-mono font-bold fill-slate-900">
-                    ${d.budgetSpent}
-                  </text>
-                  <text x={xCenter} y={chartHeight + 18} textAnchor="middle" className="text-[10px] font-medium fill-slate-600">
-                    {d.period}
-                  </text>
-                </g>
-              )
-            })
-          )}
-        </svg>
-
-        {/* Legend */}
-        <div className="flex items-center justify-between pt-3 mt-1 border-t border-slate-100 text-xs">
-          <div className="flex items-center gap-4 text-slate-500">
-            {mode === 'visits' && (
-              <>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-sm bg-slate-300" />
-                  <span>План визитов</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-sm bg-slate-900" />
-                  <span className="font-semibold text-slate-800">Факт выполнено</span>
-                </div>
-              </>
-            )}
-            {mode === 'reach' && (
-              <>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-3 h-1 rounded-full bg-indigo-600" />
-                  <span className="font-semibold text-slate-800">Фактический охват</span>
-                </div>
-                <span className="text-[11px] text-slate-400">Instagram, Telegram, TikTok</span>
-              </>
-            )}
-            {mode === 'budget' && (
-              <>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-sm bg-slate-200" />
-                  <span>План расходов</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-sm bg-emerald-500" />
-                  <span className="font-semibold text-slate-800">Фактически освоено</span>
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="text-[11px] text-slate-400 font-mono">
-            {hoveredIdx !== null 
-              ? `${data[hoveredIdx]?.period}: ${mode === 'visits' ? data[hoveredIdx]?.factVisits + ' визитов' : mode === 'reach' ? data[hoveredIdx]?.reachK + 'K охват' : '$' + data[hoveredIdx]?.budgetSpent}` 
-              : 'Наведите курсор для деталей'}
-          </div>
-        </div>
+      <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between items-center">
+        <span>Лидер: <strong className="text-slate-800">Instagram (72%)</strong></span>
+        <span className="text-indigo-600 font-semibold tabular-nums">ER ~4.8%</span>
       </div>
     </div>
   )
@@ -1396,7 +1203,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 2. Top 4 Metric Cards with Sparklines */}
+      {/* 2. Top 4 Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Plan Completion */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
@@ -1409,21 +1216,21 @@ export default function Dashboard() {
                 +9% к плану
               </span>
             </div>
-            <div className="mt-2 flex items-baseline justify-between gap-2">
-              <div>
-                <span className="text-3xl font-bold font-mono text-slate-900 tracking-tight">
-                  {currentData.stats[1]?.value || '78%'}
-                </span>
-                <span className="text-xs text-slate-400 font-medium block mt-0.5">средний факт/план</span>
-              </div>
-              <Sparkline data={currentData.sparklines.plan} color="#0f172a" />
+            <div className="mt-2.5">
+              <span className="text-3xl font-bold font-sans tabular-nums text-slate-900 tracking-tight">
+                {currentData.stats[1]?.value || '78%'}
+              </span>
+              <span className="text-xs text-slate-500 font-medium block mt-0.5">Средний факт / план по направлениям</span>
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100">
             <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
               <div className="bg-slate-900 h-full rounded-full" style={{ width: '78%' }} />
             </div>
-            <span className="text-[11px] text-slate-500">По 3 активным направлениям</span>
+            <div className="flex justify-between text-[11px] text-slate-500">
+              <span>Цель: 100%</span>
+              <span className="font-semibold text-slate-800">3 активных проекта</span>
+            </div>
           </div>
         </div>
 
@@ -1438,14 +1245,11 @@ export default function Dashboard() {
                 {currentData.bloggerMetrics.reachPercent}% плана
               </span>
             </div>
-            <div className="mt-2 flex items-baseline justify-between gap-2">
-              <div>
-                <span className="text-3xl font-bold font-mono text-slate-900 tracking-tight">
-                  {currentData.bloggerMetrics.factReach}
-                </span>
-                <span className="text-xs text-slate-400 font-medium block mt-0.5">из {currentData.bloggerMetrics.planReach}</span>
-              </div>
-              <Sparkline data={currentData.sparklines.reach} color="#4f46e5" />
+            <div className="mt-2.5">
+              <span className="text-3xl font-bold font-sans tabular-nums text-slate-900 tracking-tight">
+                {currentData.bloggerMetrics.factReach}
+              </span>
+              <span className="text-xs text-slate-500 font-medium block mt-0.5">из {currentData.bloggerMetrics.planReach} планового охвата</span>
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100">
@@ -1455,9 +1259,10 @@ export default function Dashboard() {
                 style={{ width: `${Math.min(currentData.bloggerMetrics.reachPercent, 100)}%` }} 
               />
             </div>
-            <span className="text-[11px] text-slate-500">
-              {currentData.bloggerMetrics.publishedCount} из {currentData.bloggerMetrics.totalCount} постов вышло • CPM {currentData.bloggerMetrics.cpm}
-            </span>
+            <div className="flex justify-between text-[11px] text-slate-500">
+              <span>{currentData.bloggerMetrics.publishedCount} из {currentData.bloggerMetrics.totalCount} постов</span>
+              <span className="font-semibold text-indigo-600">CPM {currentData.bloggerMetrics.cpm}</span>
+            </div>
           </div>
         </div>
 
@@ -1472,14 +1277,11 @@ export default function Dashboard() {
                 {currentData.companyMetrics.locationsPercent}% цели
               </span>
             </div>
-            <div className="mt-2 flex items-baseline justify-between gap-2">
-              <div>
-                <span className="text-3xl font-bold font-mono text-slate-900 tracking-tight">
-                  {currentData.companyMetrics.locationsCount}
-                </span>
-                <span className="text-xs text-slate-400 font-medium block mt-0.5">из {currentData.companyMetrics.planLocations} точек</span>
-              </div>
-              <Sparkline data={currentData.sparklines.venues} color="#059669" />
+            <div className="mt-2.5">
+              <span className="text-3xl font-bold font-sans tabular-nums text-slate-900 tracking-tight">
+                {currentData.companyMetrics.locationsCount}
+              </span>
+              <span className="text-xs text-slate-500 font-medium block mt-0.5">из {currentData.companyMetrics.planLocations} целевых локаций</span>
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100">
@@ -1489,9 +1291,10 @@ export default function Dashboard() {
                 style={{ width: `${Math.min(currentData.companyMetrics.locationsPercent, 100)}%` }} 
               />
             </div>
-            <span className="text-[11px] text-slate-500">
-              {currentData.companyMetrics.activePartnerships} активных • {currentData.companyMetrics.totalSpent} бюджет
-            </span>
+            <div className="flex justify-between text-[11px] text-slate-500">
+              <span>{currentData.companyMetrics.activePartnerships} активных</span>
+              <span className="font-semibold text-slate-800">{currentData.companyMetrics.totalSpent} бюджет</span>
+            </div>
           </div>
         </div>
 
@@ -1506,72 +1309,108 @@ export default function Dashboard() {
                 {currentData.stats[0]?.change || '+12%'}
               </span>
             </div>
-            <div className="mt-2 flex items-baseline justify-between gap-2">
-              <div>
-                <span className="text-3xl font-bold font-mono text-slate-900 tracking-tight">
-                  {currentData.stats[0]?.value || '48'}
-                </span>
-                <span className="text-xs text-slate-400 font-medium block mt-0.5">всего задач</span>
-              </div>
-              <Sparkline data={currentData.sparklines.tasks} color="#0284c7" />
+            <div className="mt-2.5">
+              <span className="text-3xl font-bold font-sans tabular-nums text-slate-900 tracking-tight">
+                {currentData.stats[0]?.value || '48'}
+              </span>
+              <span className="text-xs text-slate-500 font-medium block mt-0.5">всего спринтовых задач</span>
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100">
             <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
               <div className="bg-emerald-600 h-full rounded-full" style={{ width: '65%' }} />
             </div>
-            <span className="text-[11px] text-slate-500">5 активных задач в текущей очереди</span>
+            <div className="flex justify-between text-[11px] text-slate-500">
+              <span>28 выполнено • 15 в работе</span>
+              <span className="font-semibold text-emerald-600">5 в очереди</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 3. NEW SECTION: Analytics & Trends (8 cols + 4 cols) */}
+      {/* 2.5 RNP Overview Card */}
+      <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+              <Target size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-slate-900">Регулярный план-факт (РНП) — Июнь 2026</h3>
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                  Синхронизировано
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">30 ключевых показателей команды медпредов, визитов, рецептов и FMCG продаж</p>
+            </div>
+          </div>
+
+          <Link
+            to="/reports"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition-all shadow-xs shrink-0 cursor-pointer"
+          >
+            <span>Открыть полный отчет РНП</span>
+            <ArrowRight size={13} />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+          <div className="p-3 rounded-lg bg-slate-50/70 border border-slate-100">
+            <span className="text-[11px] text-slate-400 font-medium block">Полевые визиты (врачи & аптеки)</span>
+            <div className="mt-1 flex items-baseline gap-1.5">
+              <span className="text-lg font-bold text-slate-900 tabular-nums">1,544</span>
+              <span className="text-xs text-slate-400">/ 1,796</span>
+            </div>
+            <span className="text-[11px] font-semibold text-emerald-600 mt-0.5 block">86% выполнения</span>
+          </div>
+
+          <div className="p-3 rounded-lg bg-slate-50/70 border border-slate-100">
+            <span className="text-[11px] text-slate-400 font-medium block">Рецепты Энтеросгель</span>
+            <div className="mt-1 flex items-baseline gap-1.5">
+              <span className="text-lg font-bold text-indigo-600 tabular-nums">4,627</span>
+              <span className="text-xs text-slate-400">/ 17,000</span>
+            </div>
+            <span className="text-[11px] font-semibold text-indigo-600 mt-0.5 block">Прогноз: 11,568 (68%)</span>
+          </div>
+
+          <div className="p-3 rounded-lg bg-slate-50/70 border border-slate-100">
+            <span className="text-[11px] text-slate-400 font-medium block">Выручка E-Commerce</span>
+            <div className="mt-1 flex items-baseline gap-1.5">
+              <span className="text-lg font-bold text-slate-900 tabular-nums">286.1M</span>
+              <span className="text-xs text-slate-400">сум</span>
+            </div>
+            <span className="text-[11px] font-semibold text-purple-600 mt-0.5 block">71% плана (401M)</span>
+          </div>
+
+          <div className="p-3 rounded-lg bg-slate-50/70 border border-slate-100">
+            <span className="text-[11px] text-slate-400 font-medium block">FMCG Мерчендайзинг</span>
+            <div className="mt-1 flex items-baseline gap-1.5">
+              <span className="text-lg font-bold text-slate-900 tabular-nums">783</span>
+              <span className="text-xs text-slate-400">/ 858</span>
+            </div>
+            <span className="text-[11px] font-semibold text-amber-600 mt-0.5 block">91% охвата (3 района)</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. SECTION: Analytics & Breakdown (7 cols + 5 cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main Weekly Trend Chart (8 cols) */}
-        <div className="lg:col-span-8 bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
-          <WeeklyDynamicChart
+        {/* Weekly Performance Summary (7 cols) */}
+        <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+          <WeeklyPerformanceSummary
             data={currentData.weeklyTrend}
             mode={chartMode}
             onModeChange={setChartMode}
           />
-          {/* Key Summary metrics */}
-          <div className="grid grid-cols-3 gap-3 pt-4 mt-3 border-t border-slate-100 text-center text-xs">
-            <div className="p-2 rounded-lg bg-slate-50/70 border border-slate-100">
-              <span className="text-[10px] text-slate-400 font-medium block">Темп недели</span>
-              <span className="font-bold font-mono text-slate-900 mt-0.5 block">12.5 визитов/нед.</span>
-            </div>
-            <div className="p-2 rounded-lg bg-slate-50/70 border border-slate-100">
-              <span className="text-[10px] text-slate-400 font-medium block">Пик периода</span>
-              <span className="font-bold font-mono text-indigo-600 mt-0.5 block">2-я неделя (120K)</span>
-            </div>
-            <div className="p-2 rounded-lg bg-slate-50/70 border border-slate-100">
-              <span className="text-[10px] text-slate-400 font-medium block">Освоение бюджета</span>
-              <span className="font-bold font-mono text-emerald-600 mt-0.5 block">{currentData.bloggerMetrics.budgetPercent}%</span>
-            </div>
-          </div>
         </div>
 
-        {/* Social Channel Structure Donut Chart (4 cols) */}
-        <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">Структура охвата каналов</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Доли соцсетей в общем объеме</p>
-              </div>
-              <PieChart size={16} className="text-slate-400" />
-            </div>
-
-            <DonutChart
-              platforms={currentData.platforms}
-              totalReach={currentData.bloggerMetrics.factReach}
-            />
-          </div>
-
-          <div className="pt-3 mt-4 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between items-center">
-            <span>Лидирует: <strong className="text-slate-800">Instagram (72%)</strong></span>
-            <span className="text-indigo-600 font-semibold font-mono">ER ~4.8%</span>
-          </div>
+        {/* Social Channel Structure Breakdown (5 cols) */}
+        <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+          <ChannelsBreakdown
+            platforms={currentData.platforms}
+            totalReach={currentData.bloggerMetrics.factReach}
+          />
         </div>
       </div>
 
