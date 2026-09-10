@@ -3,9 +3,9 @@ import { useParams, Link } from 'react-router-dom'
 import { api } from '../lib/api'
 import { 
   ChevronRight, ChevronDown, Plus, Search, ArrowLeft, ChevronLeft,
-  Calendar, CheckCircle2, Circle, MoreVertical, LayoutList, Grip, X, Trash2, 
-  Layers, Check, Sparkles, SlidersHorizontal, ArrowDownCircle, Clock, CalendarDays,
-  ExternalLink, Edit3, User, AlignLeft, Tag, ArrowUpRight, Users, Link2, Eye, DollarSign, Send, Share2,
+  Calendar, CheckCircle2, Circle, LayoutList, Grip, X, Trash2, 
+  Check, Sparkles, SlidersHorizontal, CalendarDays,
+  ExternalLink, Edit3, User, Users, Eye, DollarSign, Share2,
   Building2, MapPin, Package, Phone, Zap, RefreshCw, Heart, MessageCircle, Bookmark, TrendingUp
 } from 'lucide-react'
 
@@ -449,6 +449,8 @@ function autoEnrichBlogger(name: string, rawInput: string, overrides: Record<str
     format = 'Reels с тренировки + 2 Stories'
   } else if (isDoctor) {
     format = 'Экспертный разбор состава геля + Stories'
+  } else if (isFood) {
+    format = 'Reels обзор / распаковка + 2 Stories'
   }
 
   // Price estimate (market rate in USD)
@@ -743,18 +745,6 @@ export default function ProjectView() {
     })
   }, [bloggersData, bloggerSearch, bloggerPlatformFilter, bloggerStatusFilter])
 
-  // Blogger metrics
-  const totalBloggerBudget = useMemo(() => {
-    return bloggersData.reduce((sum, b) => {
-      const num = parseInt(b.price.replace(/[^0-9]/g, '')) || 0
-      return sum + num
-    }, 0)
-  }, [bloggersData])
-
-  const publishedBloggersCount = useMemo(() => {
-    return bloggersData.filter(b => b.status === 'Вышел пост').length
-  }, [bloggersData])
-
   // Company Handlers
   const handleAddCompany = (e: React.FormEvent) => {
     e.preventDefault()
@@ -763,23 +753,17 @@ export default function ProjectView() {
     const newCompany = {
       id: `c_${Date.now()}`,
       name: cName.trim(),
-      category: cCategory.trim() || 'Компания / Партнер',
-      categoryBadge: cCategory.includes('Отель') || cCategory.includes('Гостиница')
-        ? 'bg-amber-50 text-amber-700 border-amber-100'
-        : cCategory.includes('Бар') || cCategory.includes('Ресторан')
-        ? 'bg-purple-50 text-purple-700 border-purple-100'
-        : cCategory.includes('Фитнес') || cCategory.includes('Спорт')
-        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-        : 'bg-blue-50 text-blue-700 border-blue-100',
-      location: cLocation.trim() || 'г. Ташкент',
+      category: cCategory,
+      categoryBadge: 'bg-indigo-50 text-indigo-700',
+      location: cLocation.trim() || 'Адрес не указан',
       spent: cSpent.trim() || '$0',
-      itemsProvided: cItemsProvided.trim() || 'Материалы согласовываются',
+      itemsProvided: cItemsProvided.trim() || 'Материалы не указаны',
       sprint: cSprint,
-      date: cDate.trim() || '20.09.2026',
-      contactPerson: cContactPerson.trim() || '—',
-      phone: cPhone.trim() || '—',
+      date: cDate,
       status: 'Переговоры',
-      notes: cNotes.trim() || 'Новый партнер бренда'
+      contactPerson: cContactPerson.trim() || 'Контакт не указан',
+      phone: cPhone.trim() || '—',
+      notes: cNotes.trim()
     }
 
     setCompaniesData([newCompany, ...companiesData])
@@ -792,8 +776,8 @@ export default function ProjectView() {
     setIsAddCompanyOpen(false)
   }
 
-  const cycleCompanyStatus = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation()
+  const cycleCompanyStatus = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation()
     const statuses = ['Переговоры', 'Согласовано', 'Материалы переданы', 'Активно', 'Завершено']
     setCompaniesData(data => data.map(c => {
       if (c.id === id) {
@@ -874,7 +858,7 @@ export default function ProjectView() {
   const [modalType, setModalType] = useState<'EPIC' | 'SPRINT' | 'DAILY' | 'TASK'>('TASK')
   const [modalName, setModalName] = useState('')
   const [modalDesc, setModalDesc] = useState('')
-  const [modalStatus, setModalStatus] = useState('Not Done')
+  const [modalStatus] = useState('Not Done')
   const [modalParentId, setModalParentId] = useState('')
 
   // ==========================================
@@ -1035,18 +1019,7 @@ export default function ProjectView() {
     setTasksData(removeNode(tasksData))
   }
 
-  // Quick inline rename helpers for Plans
-  const renamePlanMonth = (monthId: string, newName: string) => {
-    setPlansData(data => data.map(m => m.id === monthId ? { ...m, name: newName } : m))
-  }
-
-  const renamePlanItem = (monthId: string, itemId: string, newName: string) => {
-    setPlansData(data => data.map(m => m.id === monthId ? {
-      ...m,
-      items: m.items.map((it: any) => it.id === itemId ? { ...it, name: newName } : it)
-    } : m))
-  }
-
+  // Quick inline rename helper for Plans
   const renamePlanSprint = (monthId: string, itemId: string, sprintId: string, newName: string) => {
     setPlansData(data => data.map(m => m.id === monthId ? {
       ...m,
@@ -4115,7 +4088,6 @@ export default function ProjectView() {
                 const isCompleted = company.status === 'Завершено'
                 const isProvided = company.status === 'Предоставлено'
                 const isInProgress = company.status === 'В процессе'
-                const isAgreed = company.status === 'Договорились'
 
                 return (
                   <div
@@ -4183,7 +4155,7 @@ export default function ProjectView() {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation()
-                          cycleCompanyStatus(company.id)
+                          cycleCompanyStatus(company.id, e)
                         }}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors flex items-center gap-1.5 cursor-pointer ${
                           isCompleted

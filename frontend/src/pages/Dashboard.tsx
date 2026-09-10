@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { 
-  Target, CheckCircle2, FolderKanban, TrendingUp, Calendar, ArrowRight, 
-  Users, Eye, DollarSign, ExternalLink, Building2, MapPin, Package, Store, Layers
+  Target, FolderKanban, TrendingUp, ArrowRight, 
+  Eye, ExternalLink
 } from 'lucide-react'
 
 // Influencer & Project Performance Data By Period
@@ -695,7 +695,39 @@ export default function Dashboard() {
     { id: 5, name: 'Фармкружки по сетям 36.6', project: 'Энтеросгель', sprint: 'Спринт 2', status: 'Not Done', creator: 'Азамат' },
   ]
 
-  const filteredBloggers = currentData.bloggers.filter(
+  // Merge live bloggers from localStorage if available
+  const bloggersList = useMemo(() => {
+    let list = currentData.bloggers || []
+    try {
+      const stored = localStorage.getItem('pms_bloggers_p1')
+      if (stored && selectedPeriod === 'Сентябрь 2026') {
+        const parsed = JSON.parse(stored)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          list = parsed.map((item: any) => ({
+            id: item.id || String(Math.random()),
+            project: item.project || 'Extragel',
+            projectColor: 'bg-slate-100 text-slate-700',
+            name: item.name || 'Блогер',
+            handle: item.handle || '@blogger',
+            platform: item.platform || 'Instagram',
+            avatarChar: (item.name || 'Б')[0].toUpperCase(),
+            avatarColor: 'bg-slate-700',
+            reach: item.reach || '150K',
+            price: item.price || item.cost || '$300',
+            format: item.format || 'Интеграция',
+            status: item.status || 'Согласовано',
+            postUrl: item.postUrl || undefined,
+            date: item.publishDate || item.date || '01.09.2026'
+          }))
+        }
+      }
+    } catch (e) {
+      console.warn('Failed reading bloggers from localStorage', e)
+    }
+    return list
+  }, [selectedPeriod, currentData])
+
+  const filteredBloggers = bloggersList.filter(
     b => bloggerProjectFilter === 'ALL' || b.project === bloggerProjectFilter
   )
 
@@ -703,24 +735,20 @@ export default function Dashboard() {
   const companiesList = useMemo(() => {
     let list = currentData.companies || []
     try {
-      const stored = localStorage.getItem('project_companies_1')
+      const stored = localStorage.getItem('pms_companies_p1') || localStorage.getItem('project_companies_1')
       if (stored && selectedPeriod === 'Сентябрь 2026') {
         const parsed = JSON.parse(stored)
         if (Array.isArray(parsed) && parsed.length > 0) {
           list = parsed.map((item: any) => ({
             id: item.id || String(Math.random()),
             project: item.project || 'Extragel',
-            projectColor: item.project === 'Masculan' 
-              ? 'bg-blue-50 text-blue-700 border-blue-200' 
-              : item.project === 'Энтеросгель'
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-              : 'bg-indigo-50 text-indigo-700 border-indigo-200',
+            projectColor: 'bg-slate-100 text-slate-700',
             name: item.name || 'Партнерская площадка',
             category: item.category || 'Площадка',
-            categoryBadge: item.categoryBadge || 'bg-amber-50 text-amber-700 border-amber-200',
+            categoryBadge: 'bg-slate-100 text-slate-700',
             location: item.location || 'г. Ташкент',
             spent: item.spent || '$500',
-            itemsSummary: item.itemsProvided || 'Рекламные материалы и пробники',
+            itemsSummary: item.itemsProvided || item.itemsSummary || 'Рекламные материалы и пробники',
             status: item.status || 'Активно',
             contactPerson: item.contactPerson || 'Представитель',
             date: item.date || '01.09.2026'
@@ -740,654 +768,562 @@ export default function Dashboard() {
   })
 
   return (
-    <div className="max-w-[1400px] mx-auto font-sans pb-16">
-      {/* Top Header: Title & Period Selector */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div className="max-w-[1440px] mx-auto font-sans pb-16 space-y-6 text-slate-800">
+      {/* 1. Header: Title & Minimalist Period Segmented Control */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Dashboard</h1>
-          <p className="text-gray-500 text-sm font-medium mt-1">
-            Сводка показателей, выполнение планов, спринты и результаты по блогерам
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+              Обзор системы
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+              Актуальные данные
+            </span>
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Дашборд</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Сводная аналитика выполнения планов, спринтов, блогеров и партнерских площадок
           </p>
         </div>
 
-        {/* Period Switcher */}
-        <div className="flex items-center gap-2 bg-white border border-gray-200/80 p-1.5 rounded-2xl shadow-sm">
-          <div className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-gray-500">
-            <Calendar size={15} className="text-[#4f46e5]" />
-            <span>Период:</span>
-          </div>
-          <div className="flex items-center gap-1">
-            {['Сентябрь 2026', 'Август 2026', 'Июль 2026', 'Q3 2026'].map((period) => (
-              <button
-                key={period}
-                type="button"
-                onClick={() => setSelectedPeriod(period)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  selectedPeriod === period
-                    ? 'bg-[#1a2332] text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {period}
-              </button>
-            ))}
-          </div>
+        {/* Minimalist Segmented Period Switcher */}
+        <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200/60 shadow-xs">
+          {['Сентябрь 2026', 'Август 2026', 'Июль 2026', 'Q3 2026'].map((period) => (
+            <button
+              key={period}
+              type="button"
+              onClick={() => setSelectedPeriod(period)}
+              className={`px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                selectedPeriod === period
+                  ? 'bg-slate-900 text-white font-semibold shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-medium'
+              }`}
+            >
+              {period}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* 4 Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-        {currentData.stats.map((item, idx) => {
-          const Icon = item.icon
-          return (
-            <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl ${item.iconColor} flex items-center justify-center font-bold`}>
-                    <Icon size={24} />
-                  </div>
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-                    {item.change}
-                  </span>
-                </div>
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">{item.title}</p>
-                <h3 className="text-3xl font-extrabold text-gray-900 tracking-tight">{item.value}</h3>
-              </div>
-              <div className="border-t border-gray-50 pt-4 mt-4 text-xs font-medium text-gray-400">
-                {item.subtext}
-              </div>
+      {/* 2. Top 4 Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Plan Completion */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Выполнение плана
+              </span>
+              <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded">
+                +9% к плану
+              </span>
             </div>
-          )
-        })}
-      </div>
-
-      {/* ========================================================================= */}
-      {/* SECTION: BLOGGERS & INFLUENCER RESULTS FOR SELECTED PERIOD                */}
-      {/* ========================================================================= */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-        {/* Section Header */}
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold">
-              <Users size={20} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-gray-900">
-                  Результаты по блогерам за {selectedPeriod}
-                </h3>
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-[#4f46e5]">
-                  Инфлюенс-маркетинг
-                </span>
-              </div>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Фактический охват, бюджет, статус интеграций и платформы за выбранный период
-              </p>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-3xl font-bold font-mono text-slate-900 tracking-tight">
+                {currentData.stats[1]?.value || '78%'}
+              </span>
+              <span className="text-xs text-slate-400 font-medium">средний факт/план</span>
             </div>
           </div>
-
-          <div className="flex items-center gap-2">
-            {/* Filter by project */}
-            <span className="text-xs text-gray-400 font-medium">Проект:</span>
-            <select
-              value={bloggerProjectFilter}
-              onChange={(e) => setBloggerProjectFilter(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs font-bold text-gray-700 outline-none cursor-pointer focus:bg-white focus:border-[#4f46e5]"
-            >
-              <option value="ALL">Все бренды</option>
-              <option value="Extragel">Extragel</option>
-              <option value="Masculan">Masculan</option>
-              <option value="Энтеросгель">Энтеросгель</option>
-            </select>
-
-            <Link 
-              to="/projects/1" 
-              className="px-3 py-1.5 bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm ml-2"
-            >
-              К базе блогеров <ArrowRight size={13} />
-            </Link>
+          <div className="mt-4 pt-3 border-t border-slate-100">
+            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
+              <div className="bg-slate-900 h-full rounded-full" style={{ width: '78%' }} />
+            </div>
+            <span className="text-[11px] text-slate-500">По 3 активным направлениям</span>
           </div>
         </div>
 
-        {/* 4 Period Metric Badges */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Охват блогеров (Fact / Plan)</p>
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-2xl font-extrabold text-gray-900">{currentData.bloggerMetrics.factReach}</span>
-              <span className="text-xs text-gray-400">из {currentData.bloggerMetrics.planReach}</span>
+        {/* Card 2: Blogger Reach */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Охват блогеров
+              </span>
+              <span className="text-[11px] font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                {currentData.bloggerMetrics.reachPercent}% плана
+              </span>
             </div>
-            <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-3xl font-bold font-mono text-slate-900 tracking-tight">
+                {currentData.bloggerMetrics.factReach}
+              </span>
+              <span className="text-xs text-slate-400 font-medium">из {currentData.bloggerMetrics.planReach}</span>
+            </div>
+          </div>
+          <div className="mt-4 pt-3 border-t border-slate-100">
+            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
               <div 
-                className="bg-emerald-500 h-full rounded-full transition-all" 
+                className="bg-indigo-600 h-full rounded-full" 
                 style={{ width: `${Math.min(currentData.bloggerMetrics.reachPercent, 100)}%` }} 
               />
             </div>
-            <span className="text-[10px] font-bold text-emerald-600 mt-1 inline-block">
-              {currentData.bloggerMetrics.reachPercent}% выполнения плана
+            <span className="text-[11px] text-slate-500">
+              {currentData.bloggerMetrics.publishedCount} из {currentData.bloggerMetrics.totalCount} постов вышло • CPM {currentData.bloggerMetrics.cpm}
             </span>
           </div>
+        </div>
 
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Бюджет интеграций</p>
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-2xl font-extrabold text-gray-900">{currentData.bloggerMetrics.factBudget}</span>
-              <span className="text-xs text-gray-400">из {currentData.bloggerMetrics.planBudget}</span>
-            </div>
-            <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
-              <div 
-                className="bg-[#4f46e5] h-full rounded-full transition-all" 
-                style={{ width: `${Math.min(currentData.bloggerMetrics.budgetPercent, 100)}%` }} 
-              />
-            </div>
-            <span className="text-[10px] font-bold text-indigo-600 mt-1 inline-block">
-              {currentData.bloggerMetrics.budgetPercent}% освоено
-            </span>
-          </div>
-
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Публикации вышли</p>
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-2xl font-extrabold text-gray-900">
-                {currentData.bloggerMetrics.publishedCount} / {currentData.bloggerMetrics.totalCount}
+        {/* Card 3: Partner Venues */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Партнерские площадки
               </span>
-              <span className="text-xs text-purple-600 font-bold">постов</span>
+              <span className="text-[11px] font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                {currentData.companyMetrics.locationsPercent}% цели
+              </span>
             </div>
-            <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
-              <div 
-                className="bg-purple-600 h-full rounded-full transition-all" 
-                style={{ width: `${(currentData.bloggerMetrics.publishedCount / currentData.bloggerMetrics.totalCount) * 100}%` }} 
-              />
-            </div>
-            <span className="text-[10px] font-bold text-purple-600 mt-1 inline-block">
-              {Math.round((currentData.bloggerMetrics.publishedCount / currentData.bloggerMetrics.totalCount) * 100)}% выходов
-            </span>
-          </div>
-
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Эффективность (CPM)</p>
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-2xl font-extrabold text-gray-900">{currentData.bloggerMetrics.cpm}</span>
-              <span className="text-xs text-emerald-600 font-bold">за 1000 охвата</span>
-            </div>
-            <div className="w-full bg-emerald-100 h-1.5 rounded-full mt-2 overflow-hidden">
-              <div className="bg-emerald-500 h-full rounded-full w-full" />
-            </div>
-            <span className="text-[10px] font-bold text-gray-500 mt-1 inline-block">
-              В рамках фарм-бенчмарка ($4.20)
-            </span>
-          </div>
-        </div>
-
-        {/* Subgrid: Bloggers List for Period + Platform Shares */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Bloggers Table (2 cols) */}
-          <div className="lg:col-span-2 border border-gray-100 rounded-2xl overflow-hidden">
-            <div className="bg-gray-50/70 px-4 py-3 border-b border-gray-100 flex justify-between items-center text-xs font-bold text-gray-500">
-              <span>Интеграции периода ({filteredBloggers.length})</span>
-              <span>Охват & Статус</span>
-            </div>
-            
-            <div className="divide-y divide-gray-100">
-              {filteredBloggers.length === 0 ? (
-                <div className="p-8 text-center text-gray-400 text-xs">
-                  Нет блогеров по выбранному бренду в периоде {selectedPeriod}
-                </div>
-              ) : (
-                filteredBloggers.map(blogger => (
-                  <div key={blogger.id} className="p-3.5 hover:bg-gray-50/80 transition-colors flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-[200px]">
-                      <div className={`w-9 h-9 rounded-xl ${blogger.avatarColor} text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm`}>
-                        {blogger.avatarChar}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-sm text-gray-900">{blogger.name}</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${blogger.projectColor}`}>
-                            {blogger.project}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-400 font-mono">
-                          <span>{blogger.handle}</span>
-                          <span>•</span>
-                          <span className="text-gray-500 font-sans">{blogger.platform}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <span className="text-xs font-extrabold text-gray-800 font-mono">{blogger.reach}</span>
-                        <p className="text-[10px] text-gray-400">{blogger.price}</p>
-                      </div>
-
-                      <span className={`px-2.5 py-1 rounded-xl text-xs font-bold border flex items-center gap-1 ${
-                        blogger.status === 'Вышел пост'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : blogger.status === 'Оплачено'
-                          ? 'bg-blue-50 text-blue-700 border-blue-200'
-                          : blogger.status === 'Согласовано'
-                          ? 'bg-purple-50 text-purple-700 border-purple-200'
-                          : 'bg-amber-50 text-amber-700 border-amber-200'
-                      }`}>
-                        {blogger.status === 'Вышел пост' && <CheckCircle2 size={12} className="text-emerald-600" />}
-                        {blogger.status}
-                      </span>
-
-                      {blogger.postUrl && (
-                        <a
-                          href={blogger.postUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 flex items-center justify-center transition-colors"
-                          title="Открыть вышедшую публикацию"
-                        >
-                          <ExternalLink size={13} />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Right: Platform Reach Share (1 col) */}
-          <div className="border border-gray-100 rounded-2xl p-5 bg-gray-50/40 flex flex-col justify-between">
-            <div>
-              <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-4">
-                Охват по соцсетям ({selectedPeriod})
-              </h4>
-              <div className="space-y-4">
-                {currentData.platforms.map(platform => (
-                  <div key={platform.name}>
-                    <div className="flex justify-between items-center text-xs mb-1.5 font-bold">
-                      <div className="flex items-center gap-1.5">
-                        <span className={`px-2 py-0.5 rounded-md text-[11px] ${platform.bgColor} ${platform.textColor}`}>
-                          {platform.name}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-900 font-mono">{platform.reach}</span>
-                        <span className="text-gray-400 font-normal">({platform.share}%)</span>
-                      </div>
-                    </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full rounded-full ${platform.color}`} 
-                        style={{ width: `${platform.share}%` }} 
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="pt-4 mt-6 border-t border-gray-200/60 text-[11px] text-gray-500 flex justify-between items-center">
-              <span>Лидирует: <strong className="text-gray-800">Instagram Reels</strong></span>
-              <span className="text-indigo-600 font-bold">ER: ~4.8%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* SECTION: PARTNER COMPANIES & B2B VENUES FOR SELECTED PERIOD               */}
-      {/* ========================================================================= */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-        {/* Section Header */}
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-              <Building2 size={20} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-gray-900">
-                  Партнерские площадки & B2B-компании за {selectedPeriod}
-                </h3>
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                  Отели • Бары • Фитнес • Клиники
-                </span>
-              </div>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Учет локаций, бюджета интеграций, переданных диспенсеров, саше и рекламных материалов
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Filter by project */}
-            <span className="text-xs text-gray-400 font-medium">Проект:</span>
-            <select
-              value={companyProjectFilter}
-              onChange={(e) => setCompanyProjectFilter(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs font-bold text-gray-700 outline-none cursor-pointer focus:bg-white focus:border-[#4f46e5]"
-            >
-              <option value="ALL">Все бренды</option>
-              <option value="Extragel">Extragel</option>
-              <option value="Masculan">Masculan</option>
-              <option value="Энтеросгель">Энтеросгель</option>
-            </select>
-
-            {/* Filter by category */}
-            <span className="text-xs text-gray-400 font-medium ml-1">Тип:</span>
-            <select
-              value={companyCategoryFilter}
-              onChange={(e) => setCompanyCategoryFilter(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs font-bold text-gray-700 outline-none cursor-pointer focus:bg-white focus:border-[#4f46e5]"
-            >
-              <option value="ALL">Все категории</option>
-              <option value="Отель">Отели / HoReCa</option>
-              <option value="Бар">Бары / Клубы</option>
-              <option value="Фитнес">Фитнес-клубы</option>
-              <option value="Клиника">Клиники / Медцентры</option>
-            </select>
-
-            <Link 
-              to="/projects/1" 
-              className="px-3 py-1.5 bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm ml-2"
-            >
-              К площадкам <ArrowRight size={13} />
-            </Link>
-          </div>
-        </div>
-
-        {/* 4 Period Metric Badges */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Бюджет на площадки</p>
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-2xl font-extrabold text-gray-900">{currentData.companyMetrics.totalSpent}</span>
-              <span className="text-xs text-gray-400">из {currentData.companyMetrics.planBudget}</span>
-            </div>
-            <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
-              <div 
-                className="bg-[#4f46e5] h-full rounded-full transition-all" 
-                style={{ width: `${Math.min(currentData.companyMetrics.budgetPercent, 100)}%` }} 
-              />
-            </div>
-            <span className="text-[10px] font-bold text-indigo-600 mt-1 inline-block">
-              {currentData.companyMetrics.budgetPercent}% освоено бюджета
-            </span>
-          </div>
-
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Охвачено локаций</p>
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-2xl font-extrabold text-gray-900">
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-3xl font-bold font-mono text-slate-900 tracking-tight">
                 {currentData.companyMetrics.locationsCount}
               </span>
-              <span className="text-xs text-gray-400">из {currentData.companyMetrics.planLocations} точек</span>
+              <span className="text-xs text-slate-400 font-medium">из {currentData.companyMetrics.planLocations} точек</span>
             </div>
-            <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
+          </div>
+          <div className="mt-4 pt-3 border-t border-slate-100">
+            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
               <div 
-                className="bg-amber-500 h-full rounded-full transition-all" 
+                className="bg-slate-800 h-full rounded-full" 
                 style={{ width: `${Math.min(currentData.companyMetrics.locationsPercent, 100)}%` }} 
               />
             </div>
-            <span className="text-[10px] font-bold text-amber-600 mt-1 inline-block">
-              {currentData.companyMetrics.locationsPercent}% целевого покрытия
-            </span>
-          </div>
-
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Передано материалов</p>
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-2xl font-extrabold text-gray-900">
-                {currentData.companyMetrics.itemsDistributedCount.toLocaleString()}
-              </span>
-              <span className="text-xs text-emerald-600 font-bold">единиц</span>
-            </div>
-            <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
-              <div 
-                className="bg-emerald-500 h-full rounded-full transition-all" 
-                style={{ width: '92%' }} 
-              />
-            </div>
-            <span className="text-[10px] font-bold text-emerald-600 mt-1 inline-block">
-              Саше, диспенсеры, промо-стойки
-            </span>
-          </div>
-
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Действующие партнерства</p>
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-2xl font-extrabold text-gray-900">
-                {currentData.companyMetrics.activePartnerships}
-              </span>
-              <span className="text-xs text-purple-600 font-bold">из {currentData.companyMetrics.locationsCount}</span>
-            </div>
-            <div className="w-full bg-purple-100 h-1.5 rounded-full mt-2 overflow-hidden">
-              <div className="bg-purple-600 h-full rounded-full w-full" />
-            </div>
-            <span className="text-[10px] font-bold text-purple-600 mt-1 inline-block">
-              Все локации брендированы
+            <span className="text-[11px] text-slate-500">
+              {currentData.companyMetrics.activePartnerships} активных • {currentData.companyMetrics.totalSpent} бюджет
             </span>
           </div>
         </div>
 
-        {/* Subgrid: Companies Table (2 cols) + Category Breakdown (1 col) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Companies Table (2 cols) */}
-          <div className="lg:col-span-2 border border-gray-100 rounded-2xl overflow-hidden">
-            <div className="bg-gray-50/70 px-4 py-3 border-b border-gray-100 flex justify-between items-center text-xs font-bold text-gray-500">
-              <span>Партнерские компании & Локации ({filteredCompanies.length})</span>
-              <span>Бюджет & Статус</span>
+        {/* Card 4: Sprints & Tasks */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Задачи спринтов
+              </span>
+              <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded">
+                {currentData.stats[0]?.change || '+12%'}
+              </span>
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-3xl font-bold font-mono text-slate-900 tracking-tight">
+                {currentData.stats[0]?.value || '48'}
+              </span>
+              <span className="text-xs text-slate-400 font-medium">всего задач</span>
+            </div>
+          </div>
+          <div className="mt-4 pt-3 border-t border-slate-100">
+            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
+              <div className="bg-emerald-600 h-full rounded-full" style={{ width: '65%' }} />
+            </div>
+            <span className="text-[11px] text-slate-500">5 активных задач в текущей очереди</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Row 2: Projects Execution (7 cols) + Current Sprints Tasks (5 cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: Projects Progress */}
+        <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">Выполнение планов по направлениям</h3>
+                <p className="text-xs text-slate-400 mt-0.5">Фактические результаты аптечных визитов и задач ({selectedPeriod})</p>
+              </div>
+              <Link
+                to="/projects"
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 transition-colors"
+              >
+                Все проекты <ArrowRight size={13} />
+              </Link>
             </div>
 
-            <div className="divide-y divide-gray-100">
-              {filteredCompanies.length === 0 ? (
-                <div className="p-8 text-center text-gray-400 text-xs">
-                  Нет компаний по выбранным фильтрам в периоде {selectedPeriod}
-                </div>
-              ) : (
-                filteredCompanies.map(company => (
-                  <div key={company.id} className="p-3.5 hover:bg-gray-50/80 transition-colors flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-[200px]">
-                      <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-700 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
-                        <Store size={18} />
+            <div className="space-y-4 pt-1">
+              {currentData.projectProgress.map((project, idx) => {
+                const isHigh = project.percent >= 75
+                const isMid = project.percent >= 50 && project.percent < 75
+                return (
+                  <div key={project.name} className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-100 hover:border-slate-200 transition-all">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Link 
+                          to={`/project/${idx + 1}`}
+                          className="font-bold text-xs text-slate-900 hover:text-indigo-600 transition-colors"
+                        >
+                          {project.name}
+                        </Link>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {project.fact} из {project.plan} {project.unit}
+                        </span>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-sm text-gray-900">{company.name}</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${company.categoryBadge}`}>
-                            {company.category}
-                          </span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${company.projectColor}`}>
-                            {company.project}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-0.5">
-                          <MapPin size={11} className="text-gray-400 shrink-0" />
-                          <span className="truncate max-w-[260px] sm:max-w-[340px] text-gray-500">{company.location}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[11px] text-indigo-600 mt-1 font-medium">
-                          <Package size={11} className="shrink-0" />
-                          <span className="truncate max-w-[300px] sm:max-w-[380px]">{company.itemsSummary}</span>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold font-mono text-slate-900">{project.percent}%</span>
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
+                          isHigh ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' :
+                          isMid ? 'bg-slate-100 text-slate-700 border border-slate-200' :
+                          'bg-amber-50 text-amber-700 border border-amber-200/60'
+                        }`}>
+                          {isHigh ? 'В графике' : isMid ? 'В процессе' : 'Внимание'}
+                        </span>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-3 shrink-0">
-                      <div className="text-right">
-                        <span className="text-xs font-extrabold text-gray-900 font-mono">{company.spent}</span>
-                        <p className="text-[10px] text-gray-400">{company.contactPerson}</p>
-                      </div>
-
-                      <span className={`px-2.5 py-1 rounded-xl text-xs font-bold border flex items-center gap-1 ${
-                        company.status === 'Материалы переданы'
-                          ? 'bg-blue-50 text-blue-700 border-blue-200'
-                          : company.status === 'Активно'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : company.status === 'Согласовано'
-                          ? 'bg-purple-50 text-purple-700 border-purple-200'
-                          : company.status === 'Переговоры'
-                          ? 'bg-amber-50 text-amber-700 border-amber-200'
-                          : 'bg-gray-100 text-gray-700 border-gray-200'
-                      }`}>
-                        {company.status === 'Активно' && <CheckCircle2 size={12} className="text-emerald-600" />}
-                        {company.status}
-                      </span>
+                    <div className="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all ${
+                          isHigh ? 'bg-emerald-600' : isMid ? 'bg-slate-800' : 'bg-amber-500'
+                        }`}
+                        style={{ width: `${project.percent}%` }}
+                      />
                     </div>
                   </div>
-                ))
-              )}
+                )
+              })}
             </div>
           </div>
 
-          {/* Right: Category Shares & Key Materials (1 col) */}
-          <div className="border border-gray-100 rounded-2xl p-5 bg-gray-50/40 flex flex-col justify-between">
-            <div>
-              <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-4">
-                Затраты по категориям ({selectedPeriod})
-              </h4>
-              <div className="space-y-4">
-                {currentData.companyCategories.map(cat => (
-                  <div key={cat.name}>
-                    <div className="flex justify-between items-center text-xs mb-1.5 font-bold">
-                      <span className={`px-2 py-0.5 rounded-md text-[11px] ${cat.bgColor} ${cat.textColor}`}>
-                        {cat.name} ({cat.count})
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-900 font-mono">{cat.spent}</span>
-                        <span className="text-gray-400 font-normal">({cat.share}%)</span>
-                      </div>
+          <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+            <span>Общая цель: 160 визитов/задач</span>
+            <span className="font-medium text-slate-600">Синхронизировано со спринтами</span>
+          </div>
+        </div>
+
+        {/* Right: Sprint Tasks */}
+        <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">Задачи текущего спринта</h3>
+                <p className="text-xs text-slate-400 mt-0.5">Оперативные поручения команд</p>
+              </div>
+              <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                5 в очереди
+              </span>
+            </div>
+
+            <div className="space-y-2.5">
+              {recentTasks.map(task => (
+                <div key={task.id} className="p-2.5 rounded-lg border border-slate-100 hover:bg-slate-50/80 transition-colors flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-semibold text-slate-900 truncate">{task.name}</h4>
+                    <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
+                      <span className="font-medium text-slate-600">{task.project}</span>
+                      <span>•</span>
+                      <span>{task.sprint}</span>
+                      <span>•</span>
+                      <span>{task.creator}</span>
                     </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full rounded-full ${cat.color}`} 
-                        style={{ width: `${cat.share}%` }} 
-                      />
+                  </div>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded shrink-0 ${
+                    task.status === 'Done' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                    task.status === 'In Progress' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                    'bg-slate-100 text-slate-600'
+                  }`}>
+                    {task.status === 'Done' ? 'Готово' : task.status === 'In Progress' ? 'В работе' : 'Ожидание'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-3 mt-3 border-t border-slate-100 text-right">
+            <Link 
+              to="/projects/1"
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1"
+            >
+              Открыть доску спринта <ArrowRight size={13} />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Row 3: Influencers (6 cols) + Partner Venues (6 cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Card A: Influencers */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            {/* Header & Filter */}
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">Инфлюенс-кампании</h3>
+                <p className="text-xs text-slate-400 mt-0.5">Охват, бюджет и статус публикаций ({selectedPeriod})</p>
+              </div>
+
+              <select
+                value={bloggerProjectFilter}
+                onChange={(e) => setBloggerProjectFilter(e.target.value)}
+                className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-medium text-slate-700 outline-none cursor-pointer focus:bg-white focus:border-slate-400"
+              >
+                <option value="ALL">Все бренды</option>
+                <option value="Extragel">Extragel</option>
+                <option value="Masculan">Masculan</option>
+                <option value="Энтеросгель">Энтеросгель</option>
+              </select>
+            </div>
+
+            {/* Quick Strip */}
+            <div className="grid grid-cols-3 gap-2 mb-4 p-3 rounded-lg bg-slate-50 border border-slate-100 text-center">
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Охват факт / план</span>
+                <span className="text-xs font-bold font-mono text-slate-900">
+                  {currentData.bloggerMetrics.factReach} / {currentData.bloggerMetrics.planReach}
+                </span>
+              </div>
+              <div className="border-x border-slate-200">
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Бюджет факт / план</span>
+                <span className="text-xs font-bold font-mono text-slate-900">
+                  {currentData.bloggerMetrics.factBudget} / {currentData.bloggerMetrics.planBudget}
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Вышло постов</span>
+                <span className="text-xs font-bold font-mono text-slate-900">
+                  {currentData.bloggerMetrics.publishedCount} из {currentData.bloggerMetrics.totalCount}
+                </span>
+              </div>
+            </div>
+
+            {/* Platform Reach Distribution */}
+            <div className="mb-4 space-y-2">
+              <span className="text-[11px] font-semibold uppercase text-slate-400 tracking-wider block">
+                Доли каналов в охвате:
+              </span>
+              <div className="grid grid-cols-3 gap-2">
+                {currentData.platforms.map(p => (
+                  <div key={p.name} className="p-2 rounded-lg bg-slate-50/80 border border-slate-100">
+                    <div className="flex justify-between text-[11px] font-medium text-slate-600 mb-1">
+                      <span>{p.name}</span>
+                      <span className="font-mono text-slate-900 font-semibold">{p.reach}</span>
+                    </div>
+                    <div className="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+                      <div className="bg-slate-800 h-full rounded-full" style={{ width: `${p.share}%` }} />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-gray-200/60">
-              <div className="flex items-center gap-1.5 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                <Layers size={13} className="text-[#4f46e5]" />
-                <span>Распределено на точки:</span>
+            {/* Bloggers Table */}
+            <div className="border border-slate-100 rounded-lg overflow-hidden">
+              <div className="bg-slate-50 px-3 py-2 border-b border-slate-100 flex justify-between text-[11px] font-semibold text-slate-500">
+                <span>Блогер & Формат</span>
+                <span>Охват / Статус</span>
               </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-white p-2 rounded-xl border border-gray-100">
-                  <p className="text-[10px] text-gray-400">Саше Extragel</p>
-                  <p className="font-bold text-gray-900">1,250 шт.</p>
-                </div>
-                <div className="bg-white p-2 rounded-xl border border-gray-100">
-                  <p className="text-[10px] text-gray-400">Диспенсеры</p>
-                  <p className="font-bold text-gray-900">42 шт.</p>
-                </div>
-                <div className="bg-white p-2 rounded-xl border border-gray-100">
-                  <p className="text-[10px] text-gray-400">Тейбл-тенты</p>
-                  <p className="font-bold text-gray-900">150 шт.</p>
-                </div>
-                <div className="bg-white p-2 rounded-xl border border-gray-100">
-                  <p className="text-[10px] text-gray-400">Стенды / Стойки</p>
-                  <p className="font-bold text-gray-900">18 шт.</p>
-                </div>
-              </div>
-              <div className="mt-3 text-[11px] text-gray-500 flex justify-between items-center">
-                <span>Лидер: <strong className="text-gray-800">Отели & СПА</strong></span>
-                <span className="text-amber-600 font-bold">Высокий LTV</span>
+              <div className="divide-y divide-slate-100 max-h-[220px] overflow-y-auto">
+                {filteredBloggers.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-slate-400">Нет блогеров по выбранному фильтру</div>
+                ) : (
+                  filteredBloggers.map(b => (
+                    <div key={b.id} className="p-2.5 hover:bg-slate-50/60 transition-colors flex items-center justify-between gap-3 text-xs">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-slate-900 truncate">{b.name}</span>
+                          <span className="text-[10px] text-slate-400 font-mono">({b.platform})</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 truncate mt-0.5">{b.format}</p>
+                      </div>
+
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="text-right font-mono">
+                          <span className="font-bold text-slate-800">{b.reach}</span>
+                          <span className="text-[10px] text-slate-400 block">{b.price}</span>
+                        </div>
+
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
+                          b.status === 'Вышел пост' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                          b.status === 'Оплачено' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                          'bg-slate-100 text-slate-600'
+                        }`}>
+                          {b.status}
+                        </span>
+
+                        {b.postUrl && (
+                          <a
+                            href={b.postUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-slate-400 hover:text-indigo-600 transition-colors"
+                            title="Открыть пост"
+                          >
+                            <ExternalLink size={13} />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
+          </div>
+
+          <div className="pt-3 mt-3 border-t border-slate-100 text-right">
+            <Link 
+              to="/projects/1"
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1"
+            >
+              Перейти к базе блогеров ({filteredBloggers.length}) <ArrowRight size={13} />
+            </Link>
+          </div>
+        </div>
+
+        {/* Card B: Partner Venues */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            {/* Header & Filter */}
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">Партнерские площадки (B2B)</h3>
+                <p className="text-xs text-slate-400 mt-0.5">Отели, клубы, бары, переданные материалы ({selectedPeriod})</p>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={companyProjectFilter}
+                  onChange={(e) => setCompanyProjectFilter(e.target.value)}
+                  className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-medium text-slate-700 outline-none cursor-pointer focus:bg-white focus:border-slate-400"
+                >
+                  <option value="ALL">Все бренды</option>
+                  <option value="Extragel">Extragel</option>
+                  <option value="Masculan">Masculan</option>
+                  <option value="Энтеросгель">Энтеросгель</option>
+                </select>
+                <select
+                  value={companyCategoryFilter}
+                  onChange={(e) => setCompanyCategoryFilter(e.target.value)}
+                  className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-medium text-slate-700 outline-none cursor-pointer focus:bg-white focus:border-slate-400"
+                >
+                  <option value="ALL">Все категории</option>
+                  <option value="Отель">Отели</option>
+                  <option value="Фитнес">Фитнес</option>
+                  <option value="Бар">Бары</option>
+                  <option value="Клиника">Клиники</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Quick Strip */}
+            <div className="grid grid-cols-3 gap-2 mb-4 p-3 rounded-lg bg-slate-50 border border-slate-100 text-center">
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Покрытие точек</span>
+                <span className="text-xs font-bold font-mono text-slate-900">
+                  {currentData.companyMetrics.locationsCount} из {currentData.companyMetrics.planLocations}
+                </span>
+              </div>
+              <div className="border-x border-slate-200">
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Бюджет факт / план</span>
+                <span className="text-xs font-bold font-mono text-slate-900">
+                  {currentData.companyMetrics.totalSpent} / {currentData.companyMetrics.planBudget}
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Материалов выдано</span>
+                <span className="text-xs font-bold font-mono text-slate-900">
+                  {currentData.companyMetrics.itemsDistributedCount.toLocaleString()} ед.
+                </span>
+              </div>
+            </div>
+
+            {/* Categories Distribution */}
+            <div className="mb-4 space-y-2">
+              <span className="text-[11px] font-semibold uppercase text-slate-400 tracking-wider block">
+                Распределение по категориям:
+              </span>
+              <div className="grid grid-cols-4 gap-2">
+                {currentData.companyCategories.map(c => (
+                  <div key={c.name} className="p-2 rounded-lg bg-slate-50/80 border border-slate-100">
+                    <div className="text-[10px] text-slate-500 font-medium truncate mb-1" title={c.name}>
+                      {c.name.split(' ')[0]}
+                    </div>
+                    <div className="flex justify-between items-baseline">
+                      <span className="font-mono text-xs font-semibold text-slate-900">{c.count}</span>
+                      <span className="text-[10px] text-slate-400">{c.share}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Companies Table */}
+            <div className="border border-slate-100 rounded-lg overflow-hidden">
+              <div className="bg-slate-50 px-3 py-2 border-b border-slate-100 flex justify-between text-[11px] font-semibold text-slate-500">
+                <span>Площадка & Материалы</span>
+                <span>Бюджет / Статус</span>
+              </div>
+              <div className="divide-y divide-slate-100 max-h-[220px] overflow-y-auto">
+                {filteredCompanies.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-slate-400">Нет компаний по выбранному фильтру</div>
+                ) : (
+                  filteredCompanies.map(c => (
+                    <div key={c.id} className="p-2.5 hover:bg-slate-50/60 transition-colors flex items-center justify-between gap-3 text-xs">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-slate-900 truncate">{c.name}</span>
+                          <span className="text-[10px] text-slate-400">({c.category.split('/')[0].trim()})</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 truncate mt-0.5" title={c.itemsSummary}>
+                          {c.itemsSummary}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="text-right font-mono">
+                          <span className="font-bold text-slate-800">{c.spent}</span>
+                          <span className="text-[10px] text-slate-400 block truncate max-w-[80px]">{c.contactPerson}</span>
+                        </div>
+
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
+                          c.status === 'Активно' || c.status === 'Материалы переданы'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                            : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          {c.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-3 mt-3 border-t border-slate-100 text-right">
+            <Link 
+              to="/projects/1"
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1"
+            >
+              Перейти к базе площадок ({filteredCompanies.length}) <ArrowRight size={13} />
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Main Grid: Chart + Recent Tasks */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Chart Column (2 cols) */}
-        <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">
-                  Выполнение плана по проектам ({selectedPeriod})
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5">Сравнение плановых показателей и текущего факта</p>
-              </div>
-              <div className="flex items-center gap-4 text-xs font-semibold">
-                <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-gray-200 mr-2"></span> План</div>
-                <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-[#4f46e5] mr-2"></span> Факт</div>
-              </div>
-            </div>
-
-            {/* Custom Bar Comparison */}
-            <div className="space-y-6 pt-4">
-              {currentData.projectProgress.map(project => (
-                <div key={project.name}>
-                  <div className="flex justify-between text-sm font-bold text-gray-800 mb-2">
-                    <span>{project.name}</span>
-                    <span className="text-[#4f46e5]">
-                      {project.percent}% ({project.fact} / {project.plan} {project.unit})
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden flex">
-                    <div 
-                      className="bg-[#4f46e5] h-3 rounded-full transition-all duration-300" 
-                      style={{ width: `${project.percent}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="border-t border-gray-100 pt-6 mt-8 flex justify-between items-center">
-            <span className="text-xs font-medium text-gray-500">
-              Статистика синхронизирована за {selectedPeriod}
+      {/* 5. Clean RNP Report Banner */}
+      <div className="bg-slate-900 text-white rounded-xl p-5 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider bg-emerald-950/60 px-2 py-0.5 rounded">
+              Детализированная отчетность
             </span>
-            <Link to="/projects" className="text-xs font-bold text-[#4f46e5] hover:text-[#4338ca] flex items-center">
-              Перейти к проектам <ArrowRight size={14} className="ml-1" />
-            </Link>
           </div>
+          <h3 className="text-base font-bold text-white">
+            РНП Маркетинг & Медпреды (Июнь 2026)
+          </h3>
+          <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+            Оперативные данные по врачам, аптекам, назначениям препаратов (Энтеросгель, Фитосепт, Сафекс), мерчендайзингу FMCG и каналам E-Commerce (Uzum, Лавка, Корзинка GO).
+          </p>
         </div>
 
-        {/* Recent Active Tasks (1 col) */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
-          <div>
-            <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900">Задачи в спринтах</h3>
-              <span className="text-xs font-semibold bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
-                5 активных
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              {recentTasks.map(task => (
-                <div key={task.id} className="p-3.5 rounded-xl bg-gray-50 hover:bg-gray-100/80 transition-colors">
-                  <div className="flex justify-between items-start mb-1.5">
-                    <span className="text-xs font-bold text-[#4f46e5] bg-indigo-50 px-2 py-0.5 rounded">
-                      {task.project}
-                    </span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                      task.status === 'Done' ? 'bg-emerald-100 text-emerald-700' :
-                      task.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
-                      'bg-gray-200 text-gray-600'
-                    }`}>
-                      {task.status}
-                    </span>
-                  </div>
-                  <h4 className="font-semibold text-sm text-gray-900 mb-1">{task.name}</h4>
-                  <div className="flex items-center justify-between text-xs text-gray-400 font-medium">
-                    <span className="flex items-center"><Calendar size={12} className="mr-1" /> {task.sprint}</span>
-                    <span>{task.creator}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="border-t border-gray-100 pt-4 mt-6">
-            <Link to="/projects" className="w-full block text-center py-2.5 bg-gray-50 hover:bg-gray-100 text-xs font-bold text-gray-700 rounded-xl transition-colors">
-              Смотреть все задачи
-            </Link>
-          </div>
-        </div>
+        <Link
+          to="/reports"
+          className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-900 font-semibold text-xs rounded-lg transition-colors flex items-center gap-2 shrink-0"
+        >
+          Открыть полный отчет РНП <ArrowRight size={14} />
+        </Link>
       </div>
     </div>
   )
 }
+
+

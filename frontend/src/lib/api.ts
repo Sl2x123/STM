@@ -1,6 +1,7 @@
+/// <reference types="vite/client" />
 import axios from 'axios'
 
-const rawBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const rawBaseUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000'
 const baseURL = rawBaseUrl.endsWith('/api/v1') ? rawBaseUrl : `${rawBaseUrl.replace(/\/$/, '')}/api/v1`
 
 export const api = axios.create({

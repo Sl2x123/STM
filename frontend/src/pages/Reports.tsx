@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react'
 import { 
-  FileText, Download, Calendar, Filter, CheckCircle2, AlertCircle, 
-  Users, Building2, TrendingUp, DollarSign, Eye, MapPin, Package, ExternalLink, Sparkles,
-  Upload, Search, ShoppingBag, Stethoscope, Briefcase, Award, BarChart3
+  FileText, Download, Filter, CheckCircle2, 
+  Users, Building2, Package,
+  Upload, Search, ShoppingBag, Stethoscope, Briefcase, BarChart3
 } from 'lucide-react'
 import { initialRnpData, RnpItem } from '../data/rnpData'
 

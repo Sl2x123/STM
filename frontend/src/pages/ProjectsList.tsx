@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FolderKanban, MoreVertical, Users, Plus, Calendar, X, ArrowUpRight, ArrowLeft } from 'lucide-react'
+import { FolderKanban, MoreVertical, Users, Plus, Calendar, ArrowUpRight, ArrowLeft } from 'lucide-react'
 
 const initialProjects = [
   { 
