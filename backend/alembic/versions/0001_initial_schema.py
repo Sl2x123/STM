@@ -235,3 +235,4 @@ def downgrade() -> None:
     # Drop enums
     op.execute('DROP TYPE IF EXISTS statusenum')
     op.execute('DROP TYPE IF EXISTS roleenum')
+

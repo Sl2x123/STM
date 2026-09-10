@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { 
   FileText, Download, Calendar, Filter, CheckCircle2, AlertCircle, 
-  Users, Building2, TrendingUp, DollarSign, Eye, MapPin, Package, ExternalLink, Sparkles 
+  Users, Building2, TrendingUp, DollarSign, Eye, MapPin, Package, ExternalLink, Sparkles,
+  Upload, Search, ShoppingBag, Stethoscope, Briefcase, Award, BarChart3
 } from 'lucide-react'
+import { initialRnpData, RnpItem } from '../data/rnpData'
+
 
 // Operational Task Plan / Fact Dataset
 const operationalReportData = [
@@ -182,9 +185,26 @@ const companiesReportData = [
 ]
 
 export default function Reports() {
-  const [activeReportTab, setActiveReportTab] = useState<'plans' | 'bloggers' | 'companies'>('plans')
-  const [selectedMonth, setSelectedMonth] = useState('Сентябрь 2026')
+  const [activeReportTab, setActiveReportTab] = useState<'rnp' | 'plans' | 'bloggers' | 'companies'>('rnp')
+  const [selectedMonth, setSelectedMonth] = useState('Июнь 2026')
   const [selectedProject, setSelectedProject] = useState('ALL')
+  const [rnpData, setRnpData] = useState<RnpItem[]>(initialRnpData)
+  const [rnpSectionFilter, setRnpSectionFilter] = useState<string>('ALL')
+  const [rnpSearch, setRnpSearch] = useState<string>('')
+  const [uploadFeedback, setUploadFeedback] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Filtered RNP items
+  const filteredRnp = rnpData.filter(item => {
+    const matchSection = rnpSectionFilter === 'ALL' || item.section === rnpSectionFilter
+    const searchLower = rnpSearch.toLowerCase()
+    const matchSearch = !rnpSearch || 
+      item.indicator.toLowerCase().includes(searchLower) ||
+      (item.person && item.person.toLowerCase().includes(searchLower)) ||
+      (item.role && item.role.toLowerCase().includes(searchLower)) ||
+      item.sectionName.toLowerCase().includes(searchLower)
+    return matchSection && matchSearch
+  })
 
   // Filtered operational tasks
   const filteredProjects = operationalReportData.filter(p => selectedProject === 'ALL' || p.project === selectedProject)
@@ -212,7 +232,12 @@ export default function Reports() {
   const handleExportExcel = () => {
     let csvRows: string[] = []
 
-    if (activeReportTab === 'plans') {
+    if (activeReportTab === 'rnp') {
+      csvRows.push('Раздел,Сотрудник / Роль,Показатель,Факт Прошлый месяц,% Прошлого месяца,План месяц,Факт месяц,% Выполнения,Прогноз,1 неделя План,1 неделя Факт,2 неделя План,2 неделя Факт,3 неделя План,3 неделя Факт,4 неделя План,4 неделя Факт,5 неделя План,5 неделя Факт')
+      filteredRnp.forEach(item => {
+        csvRows.push(`"${item.sectionName}","${item.person || item.role || '-'}","${item.indicator}","${item.prevFact}","${item.prevPercent}","${item.planMonth}","${item.factMonth}","${item.percentMonth}%","${item.forecast}","${item.w1.plan}","${item.w1.fact}","${item.w2.plan}","${item.w2.fact}","${item.w3.plan}","${item.w3.fact}","${item.w4.plan}","${item.w4.fact}","${item.w5.plan}","${item.w5.fact}"`)
+      })
+    } else if (activeReportTab === 'plans') {
       csvRows.push('Проект,Месяц,Показатель / Задача,План,Факт,Единица,Процент,Статус')
       filteredProjects.forEach(p => {
         p.items.forEach(i => {
@@ -242,6 +267,61 @@ export default function Reports() {
     document.body.removeChild(link)
   }
 
+  const handleUploadRnpCsv = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (evt) => {
+      try {
+        const text = evt.target?.result as string
+        if (text) {
+          const lines = text.split(/\r?\n/)
+          const parsedItems: RnpItem[] = []
+          lines.forEach((line, idx) => {
+            if (idx < 8) return
+            const cols = line.split(',')
+            if (cols.length >= 7) {
+              const indicator = (cols[2] || cols[0] || '').replace(/^"|"$/g, '').trim()
+              if (!indicator) return
+              const plan = (cols[5] || '').replace(/^"|"$/g, '').trim()
+              const fact = (cols[6] || '').replace(/^"|"$/g, '').trim()
+              const pctStr = (cols[7] || '0%').replace('%', '').trim()
+              const percent = parseFloat(pctStr) || 0
+              parsedItems.push({
+                id: `up_${idx}`,
+                section: idx < 17 ? 'visits' : idx < 21 ? 'prescriptions' : idx < 95 ? 'reps' : idx < 101 ? 'merch' : idx < 116 ? 'ecommerce' : 'promo',
+                sectionName: idx < 17 ? 'Визиты и Активности' : idx < 21 ? 'Рецепты препаратов' : idx < 95 ? 'Медицинские представители' : idx < 101 ? 'Мерчендайзинг FMCG' : idx < 116 ? 'Онлайн продажи' : 'Промо-акции',
+                role: cols[0]?.replace(/^"|"$/g, '').trim() || undefined,
+                person: cols[1]?.replace(/^"|"$/g, '').trim() || undefined,
+                indicator,
+                prevFact: cols[3]?.replace(/^"|"$/g, '').trim() || '-',
+                prevPercent: cols[4]?.replace(/^"|"$/g, '').trim() || '-',
+                planMonth: plan || '-',
+                factMonth: fact || '-',
+                percentMonth: Math.round(percent),
+                forecast: cols[8]?.replace(/^"|"$/g, '').trim() || '-',
+                w1: { plan: cols[10]?.trim() || '-', fact: cols[11]?.trim() || '-' },
+                w2: { plan: cols[12]?.trim() || '-', fact: cols[13]?.trim() || '-' },
+                w3: { plan: cols[14]?.trim() || '-', fact: cols[15]?.trim() || '-' },
+                w4: { plan: cols[16]?.trim() || '-', fact: cols[17]?.trim() || '-' },
+                w5: { plan: cols[18]?.trim() || '-', fact: cols[19]?.trim() || '-' },
+              })
+            }
+          })
+          if (parsedItems.length > 0) {
+            setRnpData(parsedItems)
+            setUploadFeedback(`Успешно загружено ${parsedItems.length} строк из файла ${file.name}`)
+            setTimeout(() => setUploadFeedback(null), 4000)
+          }
+        }
+      } catch (err) {
+        console.error(err)
+        setUploadFeedback('Ошибка при разборе файла CSV')
+      }
+    }
+    reader.readAsText(file, 'utf-8')
+  }
+
   return (
     <div className="max-w-[1500px] mx-auto font-sans pb-16">
       {/* Header */}
@@ -252,17 +332,58 @@ export default function Reports() {
             Сводные отчёты по операционным планам, инфлюенс-маркетингу и партнерским интеграциям
           </p>
         </div>
-        <button 
-          onClick={handleExportExcel}
-          className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center transition-all shadow-sm cursor-pointer"
-        >
-          <Download size={18} className="mr-2" />
-          Экспорт в Excel (.csv)
-        </button>
+        <div className="flex items-center gap-3">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleUploadRnpCsv} 
+            accept=".csv" 
+            className="hidden" 
+          />
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200/90 px-4 py-2.5 rounded-xl font-bold text-sm flex items-center transition-all shadow-sm cursor-pointer"
+            title="Загрузить файл РНП за другой месяц"
+          >
+            <Upload size={17} className="mr-2 text-[#4f46e5]" />
+            Загрузить CSV (РНП)
+          </button>
+
+          <button 
+            onClick={handleExportExcel}
+            className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center transition-all shadow-sm cursor-pointer"
+          >
+            <Download size={18} className="mr-2" />
+            Экспорт в Excel (.csv)
+          </button>
+        </div>
       </div>
+
+      {uploadFeedback && (
+        <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 shadow-sm animate-fade-in">
+          <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+          <span>{uploadFeedback}</span>
+        </div>
+      )}
 
       {/* Report Category Switcher */}
       <div className="flex items-center gap-2 border-b border-gray-200 mb-8 overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => setActiveReportTab('rnp')}
+          className={`pb-3 px-4 font-bold text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+            activeReportTab === 'rnp'
+              ? 'border-[#4f46e5] text-[#4f46e5]'
+              : 'border-transparent text-gray-500 hover:text-gray-800'
+          }`}
+        >
+          <BarChart3 size={18} />
+          РНП Маркетинг & Медпреды (Июнь 2026)
+          <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700">
+            {rnpData.length} строк
+          </span>
+        </button>
+
         <button
           type="button"
           onClick={() => setActiveReportTab('plans')}
@@ -311,43 +432,263 @@ export default function Reports() {
 
       {/* Filter Toolbar */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8 flex flex-wrap gap-4 items-center justify-between">
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="flex items-center text-sm font-semibold text-gray-600 mr-2">
+        <div className="flex flex-wrap gap-3 items-center flex-1">
+          <div className="flex items-center text-sm font-semibold text-gray-600 mr-1">
             <Filter size={16} className="mr-2 text-gray-400" /> Фильтры:
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400 font-bold uppercase">Месяц:</span>
-            <select 
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold text-gray-700 outline-none cursor-pointer focus:bg-white"
-            >
-              <option>Сентябрь 2026</option>
-              <option>Август 2026</option>
-              <option>Июль 2026</option>
-            </select>
-          </div>
+          {activeReportTab === 'rnp' ? (
+            <>
+              {/* RNP Section filter pills */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {[
+                  { id: 'ALL', label: 'Все разделы' },
+                  { id: 'visits', label: '🩺 Визиты' },
+                  { id: 'prescriptions', label: '💊 Рецепты' },
+                  { id: 'reps', label: '👥 Медпреды' },
+                  { id: 'merch', label: '🛒 Мерчендайзинг' },
+                  { id: 'ecommerce', label: '🌐 E-Commerce' },
+                  { id: 'promo', label: '🎯 Акции' },
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setRnpSectionFilter(tab.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      rnpSectionFilter === tab.id
+                        ? 'bg-[#1a2332] text-white shadow-sm'
+                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400 font-bold uppercase">Проект:</span>
-            <select 
-              value={selectedProject}
-              onChange={(e) => setSelectedProject(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold text-gray-700 outline-none cursor-pointer focus:bg-white"
-            >
-              <option value="ALL">Все проекты</option>
-              <option value="Extragel">Extragel</option>
-              <option value="Masculan">Masculan</option>
-              <option value="Энтеросгель">Энтеросгель</option>
-            </select>
-          </div>
+              {/* RNP Search */}
+              <div className="relative ml-auto min-w-[220px]">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                  <Search size={14} />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Поиск (Святослав, Дурдона, Uzum...)"
+                  value={rnpSearch}
+                  onChange={(e) => setRnpSearch(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-800 outline-none focus:bg-white focus:border-[#4f46e5]"
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 font-bold uppercase">Месяц:</span>
+                <select 
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold text-gray-700 outline-none cursor-pointer focus:bg-white"
+                >
+                  <option>Сентябрь 2026</option>
+                  <option>Август 2026</option>
+                  <option>Июль 2026</option>
+                  <option>Июнь 2026</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 font-bold uppercase">Проект:</span>
+                <select 
+                  value={selectedProject}
+                  onChange={(e) => setSelectedProject(e.target.value)}
+                  className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold text-gray-700 outline-none cursor-pointer focus:bg-white"
+                >
+                  <option value="ALL">Все проекты</option>
+                  <option value="Extragel">Extragel</option>
+                  <option value="Masculan">Masculan</option>
+                  <option value="Энтеросгель">Энтеросгель</option>
+                </select>
+              </div>
+            </>
+          )}
         </div>
 
-        <div className="text-xs text-gray-400 font-medium">
-          Автоматическая синхронизация со спринтами и метриками
-        </div>
+        {activeReportTab !== 'rnp' && (
+          <div className="text-xs text-gray-400 font-medium">
+            Автоматическая синхронизация со спринтами и метриками
+          </div>
+        )}
       </div>
+
+      {/* ========================================================================= */}
+      {/* TAB 0: RNP MARKETING & FIELD REPS REPORT (FROM CSV)                      */}
+      {/* ========================================================================= */}
+      {activeReportTab === 'rnp' && (
+        <div className="space-y-8 animate-fade-in">
+          {/* Summary KPIs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Визиты к врачам & аптекам</span>
+                <span className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                  <Stethoscope size={16} />
+                </span>
+              </div>
+              <h3 className="text-3xl font-extrabold text-gray-900 tracking-tight">1,544 <span className="text-sm text-gray-400 font-medium">/ 1,796</span></h3>
+              <div className="w-full bg-gray-100 h-1.5 rounded-full mt-3 overflow-hidden">
+                <div className="bg-emerald-500 h-full rounded-full" style={{ width: '86%' }} />
+              </div>
+              <p className="text-xs text-emerald-600 font-bold mt-2">86% от месячного плана</p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Рецепты Энтеросгель</span>
+                <span className="w-8 h-8 rounded-xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold">
+                  <Package size={16} />
+                </span>
+              </div>
+              <h3 className="text-3xl font-extrabold text-[#4f46e5] tracking-tight">4,627 <span className="text-sm text-gray-400 font-medium">/ 17,000</span></h3>
+              <div className="w-full bg-gray-100 h-1.5 rounded-full mt-3 overflow-hidden">
+                <div className="bg-[#4f46e5] h-full rounded-full" style={{ width: '27%' }} />
+              </div>
+              <p className="text-xs text-indigo-600 font-semibold mt-2">Прогноз закрытия: 11,568 (68%)</p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Выручка E-Commerce (Uzum / Яндекс)</span>
+                <span className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+                  <ShoppingBag size={16} />
+                </span>
+              </div>
+              <h3 className="text-3xl font-extrabold text-gray-900 tracking-tight">286.1M <span className="text-sm text-gray-400 font-medium">сум</span></h3>
+              <div className="w-full bg-gray-100 h-1.5 rounded-full mt-3 overflow-hidden">
+                <div className="bg-purple-600 h-full rounded-full" style={{ width: '71%' }} />
+              </div>
+              <p className="text-xs text-purple-600 font-bold mt-2">71% плана (401M сум)</p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">FMCG Мерчендайзинг Ташкент</span>
+                <span className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                  <Briefcase size={16} />
+                </span>
+              </div>
+              <h3 className="text-3xl font-extrabold text-amber-600 tracking-tight">783 <span className="text-sm text-gray-400 font-medium">/ 858</span></h3>
+              <div className="w-full bg-gray-100 h-1.5 rounded-full mt-3 overflow-hidden">
+                <div className="bg-amber-500 h-full rounded-full" style={{ width: '91%' }} />
+              </div>
+              <p className="text-xs text-amber-600 font-bold mt-2">91% охвата (3 района)</p>
+            </div>
+          </div>
+
+          {/* RNP Data Table */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex flex-wrap justify-between items-center bg-gray-50/50 gap-2">
+              <div>
+                <h3 className="font-bold text-gray-900 text-base">
+                  Регулярный план-факт (РНП) — Июнь 2026
+                </h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Отображено {filteredRnp.length} показателей • Реальные данные команды и продаж
+                </p>
+              </div>
+              <div className="text-xs font-semibold text-gray-500 flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span> 100%+ факт
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-indigo-500 ml-2"></span> 70-99%
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 ml-2"></span> &lt;70%
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left border-collapse">
+                <thead className="text-[11px] uppercase font-bold text-gray-400 bg-white border-b border-gray-100 sticky top-0">
+                  <tr>
+                    <th className="px-5 py-3.5">Раздел / Сотрудник</th>
+                    <th className="px-5 py-3.5">Показатель</th>
+                    <th className="px-4 py-3.5 text-right">Прошлый факт</th>
+                    <th className="px-4 py-3.5 text-right">План месяц</th>
+                    <th className="px-4 py-3.5 text-right">Факт месяц</th>
+                    <th className="px-5 py-3.5 text-center">% Выполнения</th>
+                    <th className="px-4 py-3.5 text-right">Прогноз</th>
+                    <th className="px-3 py-3.5 text-center bg-gray-50/60">1 нед (П/Ф)</th>
+                    <th className="px-3 py-3.5 text-center bg-gray-50/60">2 нед (П/Ф)</th>
+                    <th className="px-3 py-3.5 text-center bg-gray-50/60">3 нед (П/Ф)</th>
+                    <th className="px-3 py-3.5 text-center bg-gray-50/60">4 нед (П/Ф)</th>
+                    <th className="px-3 py-3.5 text-center bg-gray-50/60">5 нед (П/Ф)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50 font-sans">
+                  {filteredRnp.length === 0 ? (
+                    <tr>
+                      <td colSpan={12} className="px-6 py-12 text-center text-gray-400 text-xs">
+                        Показатели не найдены по текущему фильтру или поисковому запросу.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredRnp.map(item => (
+                      <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="px-5 py-3">
+                          <div className="font-bold text-gray-900 text-xs">{item.sectionName}</div>
+                          {item.person && (
+                            <div className="text-[11px] text-indigo-600 font-medium mt-0.5">
+                              {item.person} {item.role ? `(${item.role})` : ''}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-5 py-3 font-semibold text-gray-800 text-xs max-w-xs">
+                          {item.indicator}
+                        </td>
+                        <td className="px-4 py-3 text-right text-xs text-gray-500 font-mono">
+                          {item.prevFact} <span className="text-[10px] text-gray-400">({item.prevPercent})</span>
+                        </td>
+                        <td className="px-4 py-3 text-right text-xs font-bold text-gray-700 font-mono">
+                          {item.planMonth}
+                        </td>
+                        <td className="px-4 py-3 text-right text-xs font-extrabold text-gray-900 font-mono">
+                          {item.factMonth}
+                        </td>
+                        <td className="px-5 py-3 text-center">
+                          <span className={`px-2.5 py-1 rounded-xl text-xs font-bold font-mono inline-block ${
+                            item.percentMonth >= 100
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                              : item.percentMonth >= 70
+                              ? 'bg-indigo-50 text-indigo-700 border border-indigo-200/60'
+                              : item.percentMonth > 0
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200/60'
+                              : 'bg-gray-100 text-gray-500'
+                          }`}>
+                            {item.percentMonth}%
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right text-xs font-bold text-purple-700 font-mono">
+                          {item.forecast}
+                        </td>
+                        <td className="px-3 py-3 text-center text-xs font-mono bg-gray-50/40 text-gray-700">
+                          {item.w1.plan} / <strong className="text-gray-900">{item.w1.fact}</strong>
+                        </td>
+                        <td className="px-3 py-3 text-center text-xs font-mono bg-gray-50/40 text-gray-700">
+                          {item.w2.plan} / <strong className="text-gray-900">{item.w2.fact}</strong>
+                        </td>
+                        <td className="px-3 py-3 text-center text-xs font-mono bg-gray-50/40 text-gray-700">
+                          {item.w3.plan} / <strong className="text-gray-900">{item.w3.fact}</strong>
+                        </td>
+                        <td className="px-3 py-3 text-center text-xs font-mono bg-gray-50/40 text-gray-700">
+                          {item.w4.plan} / <strong className="text-gray-900">{item.w4.fact}</strong>
+                        </td>
+                        <td className="px-3 py-3 text-center text-xs font-mono bg-gray-50/40 text-gray-700">
+                          {item.w5.plan} / <strong className="text-gray-900">{item.w5.fact}</strong>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* TAB 1: OPERATIONAL PLAN / FACT                                            */}

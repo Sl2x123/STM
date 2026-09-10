@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Lock, Mail, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react'
 import { api } from '../lib/api'
@@ -9,6 +9,12 @@ export default function Login() {
   const [password, setPassword] = useState('password')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (localStorage.getItem('auth_token')) {
+      navigate('/', { replace: true })
+    }
+  }, [navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -176,3 +182,4 @@ export default function Login() {
     </div>
   )
 }
+

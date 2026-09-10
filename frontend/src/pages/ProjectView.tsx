@@ -1477,8 +1477,10 @@ export default function ProjectView() {
             <button
               type="button"
               onClick={() => {
-                deleteCompany(selectedCompany.id)
-                setSelectedCompany(null)
+                if (window.confirm(`Вы уверены, что хотите удалить компанию "${selectedCompany.name}"?`)) {
+                  deleteCompany(selectedCompany.id)
+                  setSelectedCompany(null)
+                }
               }}
               className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-4 py-2.5 rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
             >
@@ -1980,8 +1982,10 @@ export default function ProjectView() {
             <button
               type="button"
               onClick={() => {
-                deleteBlogger(selectedBlogger.id)
-                setSelectedBlogger(null)
+                if (window.confirm(`Вы уверены, что хотите удалить блогера ${selectedBlogger.name}?`)) {
+                  deleteBlogger(selectedBlogger.id)
+                  setSelectedBlogger(null)
+                }
               }}
               className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-4 py-2.5 rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
             >
@@ -3961,6 +3965,21 @@ export default function ProjectView() {
                       >
                         Подробнее <ChevronRight size={14} />
                       </button>
+
+                      {/* Quick Delete Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (window.confirm(`Вы уверены, что хотите удалить блогера ${blogger.name}?`)) {
+                            deleteBlogger(blogger.id, e)
+                          }
+                        }}
+                        className="w-8 h-8 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
+                        title="Удалить блогера"
+                      >
+                        <Trash2 size={15} />
+                      </button>
                     </div>
                   </div>
                 )
@@ -4188,6 +4207,21 @@ export default function ProjectView() {
                         className="px-3 py-1.5 bg-gray-50 hover:bg-indigo-50 hover:text-[#4f46e5] text-gray-600 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors"
                       >
                         Подробнее <ChevronRight size={14} />
+                      </button>
+
+                      {/* Quick Delete Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (window.confirm(`Вы уверены, что хотите удалить компанию "${company.name}"?`)) {
+                            deleteCompany(company.id, e)
+                          }
+                        }}
+                        className="w-8 h-8 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
+                        title="Удалить компанию"
+                      >
+                        <Trash2 size={15} />
                       </button>
                     </div>
                   </div>
