@@ -149,3 +149,36 @@ class Company(Base):
     project = relationship("Project")
 
 
+class RnpItem(Base):
+    __tablename__ = "rnp_items"
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    project_name = Column(String, default="Extragel", index=True)
+    month_name = Column(String, default="Июнь 2026", index=True)
+    section = Column(String, default="visits", index=True)
+    section_name = Column(String, default="Визиты и Активности")
+    role = Column(String, nullable=True)
+    person = Column(String, nullable=True)
+    indicator = Column(String, nullable=False)
+    prev_fact = Column(String, default="0")
+    prev_percent = Column(String, default="0%")
+    plan_month = Column(String, default="0")
+    fact_month = Column(String, default="0")
+    percent_month = Column(Float, default=0.0)
+    forecast = Column(String, default="0")
+    w1_plan = Column(String, default="0")
+    w1_fact = Column(String, default="0")
+    w2_plan = Column(String, default="0")
+    w2_fact = Column(String, default="0")
+    w3_plan = Column(String, default="0")
+    w3_fact = Column(String, default="0")
+    w4_plan = Column(String, default="0")
+    w4_fact = Column(String, default="0")
+    w5_plan = Column(String, default="0")
+    w5_fact = Column(String, default="0")
+    order = Column(Integer, default=0)
+
+    project = relationship("Project")
+
+
+

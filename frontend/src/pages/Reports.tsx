@@ -1,10 +1,12 @@
-import React, { useState, useRef, useMemo } from 'react'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
 import { 
   FileText, Download, Filter, CheckCircle2, 
   Users, Building2, Package,
-  Upload, Search, ShoppingBag, Stethoscope, Briefcase, BarChart3
+  Upload, Search, ShoppingBag, Stethoscope, Briefcase, BarChart3, RefreshCw
 } from 'lucide-react'
 import { initialRnpData, RnpItem } from '../data/rnpData'
+import { api } from '../lib/api'
+
 
 
 // Operational Task Plan / Fact Dataset
@@ -193,7 +195,79 @@ export default function Reports() {
   const [rnpSearch, setRnpSearch] = useState<string>('')
   const [rnpViewMode, setRnpViewMode] = useState<'grouped' | 'table'>('grouped')
   const [uploadFeedback, setUploadFeedback] = useState<string | null>(null)
+  const [isLoadingRnp, setIsLoadingRnp] = useState<boolean>(false)
+  const [editingCell, setEditingCell] = useState<{ id: string; field: string; value: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Fetch RNP items from backend PostgreSQL database
+  useEffect(() => {
+    let isMounted = true
+    const fetchRnp = async () => {
+      setIsLoadingRnp(true)
+      try {
+        const res = await api.get('/rnp/', { params: { month_name: selectedMonth } })
+        if (isMounted && Array.isArray(res.data) && res.data.length > 0) {
+          const mapped: RnpItem[] = res.data.map((item: any) => ({
+            id: String(item.id),
+            section: item.section,
+            sectionName: item.section_name,
+            role: item.role,
+            person: item.person,
+            indicator: item.indicator,
+            prevFact: item.prev_fact,
+            prevPercent: item.prev_percent,
+            planMonth: item.plan_month,
+            factMonth: item.fact_month,
+            percentMonth: item.percent_month,
+            forecast: item.forecast,
+            w1: { plan: item.w1_plan, fact: item.w1_fact },
+            w2: { plan: item.w2_plan, fact: item.w2_fact },
+            w3: { plan: item.w3_plan, fact: item.w3_fact },
+            w4: { plan: item.w4_plan, fact: item.w4_fact },
+            w5: { plan: item.w5_plan, fact: item.w5_fact }
+          }))
+          setRnpData(mapped)
+        }
+      } catch (err) {
+        console.warn('Using initial RNP dataset (backend offline or loading):', err)
+      } finally {
+        if (isMounted) setIsLoadingRnp(false)
+      }
+    }
+    fetchRnp()
+    return () => { isMounted = false }
+  }, [selectedMonth])
+
+  // Save inline cell edit to PostgreSQL backend
+  const handleSaveCell = async (id: string, field: string, newVal: string) => {
+    setEditingCell(null)
+    const numericId = parseInt(id, 10)
+    if (isNaN(numericId)) return
+
+    // Optimistic update
+    setRnpData(prev => prev.map(item => {
+      if (item.id !== id) return item
+      if (field === 'factMonth') {
+        const plan = parseFloat((item.planMonth || '0').replace(/,/g, '')) || 1
+        const fact = parseFloat(newVal.replace(/,/g, '')) || 0
+        const pct = Math.round((fact / plan) * 100)
+        return { ...item, factMonth: newVal, percentMonth: pct }
+      }
+      return item
+    }))
+
+    try {
+      if (field === 'factMonth') {
+        const current = rnpData.find(it => it.id === id)
+        const plan = parseFloat((current?.planMonth || '0').replace(/,/g, '')) || 1
+        const fact = parseFloat(newVal.replace(/,/g, '')) || 0
+        const pct = Math.round((fact / plan) * 100)
+        await api.put(`/rnp/${numericId}`, { fact_month: newVal, percent_month: pct })
+      }
+    } catch (err) {
+      console.error('Failed to save edit to backend:', err)
+    }
+  }
 
   // Filtered RNP items
   const filteredRnp = useMemo(() => {
@@ -327,59 +401,141 @@ export default function Reports() {
     document.body.removeChild(link)
   }
 
-  const handleUploadRnpCsv = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSyncFromDatabase = async () => {
+    try {
+      setIsLoadingRnp(true)
+      setUploadFeedback('Синхронизация с базой данных PostgreSQL...')
+      const res = await api.post('/rnp/seed-csv', null, { params: { month_name: selectedMonth } })
+      const reloadRes = await api.get('/rnp/', { params: { month_name: selectedMonth } })
+      if (Array.isArray(reloadRes.data)) {
+        const mapped: RnpItem[] = reloadRes.data.map((item: any) => ({
+          id: String(item.id),
+          section: item.section,
+          sectionName: item.section_name,
+          role: item.role,
+          person: item.person,
+          indicator: item.indicator,
+          prevFact: item.prev_fact,
+          prevPercent: item.prev_percent,
+          planMonth: item.plan_month,
+          factMonth: item.fact_month,
+          percentMonth: item.percent_month,
+          forecast: item.forecast,
+          w1: { plan: item.w1_plan, fact: item.w1_fact },
+          w2: { plan: item.w2_plan, fact: item.w2_fact },
+          w3: { plan: item.w3_plan, fact: item.w3_fact },
+          w4: { plan: item.w4_plan, fact: item.w4_fact },
+          w5: { plan: item.w5_plan, fact: item.w5_fact }
+        }))
+        setRnpData(mapped)
+      }
+      setUploadFeedback(`Успешно синхронизировано ${res.data?.count || 151} показателей с базой данных!`)
+      setTimeout(() => setUploadFeedback(null), 4000)
+    } catch (err) {
+      console.error('Sync error:', err)
+      setUploadFeedback('Ошибка синхронизации с базой данных')
+      setTimeout(() => setUploadFeedback(null), 3000)
+    } finally {
+      setIsLoadingRnp(false)
+    }
+  }
+
+  const handleUploadRnpCsv = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = (evt) => {
-      try {
-        const text = evt.target?.result as string
-        if (text) {
-          const lines = text.split(/\r?\n/)
-          const parsedItems: RnpItem[] = []
-          lines.forEach((line, idx) => {
-            if (idx < 8) return
-            const cols = line.split(',')
-            if (cols.length >= 7) {
-              const indicator = (cols[2] || cols[0] || '').replace(/^"|"$/g, '').trim()
-              if (!indicator) return
-              const plan = (cols[5] || '').replace(/^"|"$/g, '').trim()
-              const fact = (cols[6] || '').replace(/^"|"$/g, '').trim()
-              const pctStr = (cols[7] || '0%').replace('%', '').trim()
-              const percent = parseFloat(pctStr) || 0
-              parsedItems.push({
-                id: `up_${idx}`,
-                section: idx < 17 ? 'visits' : idx < 21 ? 'prescriptions' : idx < 95 ? 'reps' : idx < 101 ? 'merch' : idx < 116 ? 'ecommerce' : 'promo',
-                sectionName: idx < 17 ? 'Визиты и Активности' : idx < 21 ? 'Рецепты препаратов' : idx < 95 ? 'Медицинские представители' : idx < 101 ? 'Мерчендайзинг FMCG' : idx < 116 ? 'Онлайн продажи' : 'Промо-акции',
-                role: cols[0]?.replace(/^"|"$/g, '').trim() || undefined,
-                person: cols[1]?.replace(/^"|"$/g, '').trim() || undefined,
-                indicator,
-                prevFact: cols[3]?.replace(/^"|"$/g, '').trim() || '-',
-                prevPercent: cols[4]?.replace(/^"|"$/g, '').trim() || '-',
-                planMonth: plan || '-',
-                factMonth: fact || '-',
-                percentMonth: Math.round(percent),
-                forecast: cols[8]?.replace(/^"|"$/g, '').trim() || '-',
-                w1: { plan: cols[10]?.trim() || '-', fact: cols[11]?.trim() || '-' },
-                w2: { plan: cols[12]?.trim() || '-', fact: cols[13]?.trim() || '-' },
-                w3: { plan: cols[14]?.trim() || '-', fact: cols[15]?.trim() || '-' },
-                w4: { plan: cols[16]?.trim() || '-', fact: cols[17]?.trim() || '-' },
-                w5: { plan: cols[18]?.trim() || '-', fact: cols[19]?.trim() || '-' },
-              })
-            }
-          })
-          if (parsedItems.length > 0) {
-            setRnpData(parsedItems)
-            setUploadFeedback(`Успешно загружено ${parsedItems.length} строк из файла ${file.name}`)
-            setTimeout(() => setUploadFeedback(null), 4000)
-          }
-        }
-      } catch (err) {
-        console.error(err)
-        setUploadFeedback('Ошибка при разборе файла CSV')
+    setIsLoadingRnp(true)
+    setUploadFeedback(`Загрузка файла ${file.name} в базу данных...`)
+
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const res = await api.post('/rnp/upload-csv', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        params: { month_name: selectedMonth }
+      })
+
+      const reloadRes = await api.get('/rnp/', { params: { month_name: selectedMonth } })
+      if (Array.isArray(reloadRes.data)) {
+        const mapped: RnpItem[] = reloadRes.data.map((item: any) => ({
+          id: String(item.id),
+          section: item.section,
+          sectionName: item.section_name,
+          role: item.role,
+          person: item.person,
+          indicator: item.indicator,
+          prevFact: item.prev_fact,
+          prevPercent: item.prev_percent,
+          planMonth: item.plan_month,
+          factMonth: item.fact_month,
+          percentMonth: item.percent_month,
+          forecast: item.forecast,
+          w1: { plan: item.w1_plan, fact: item.w1_fact },
+          w2: { plan: item.w2_plan, fact: item.w2_fact },
+          w3: { plan: item.w3_plan, fact: item.w3_fact },
+          w4: { plan: item.w4_plan, fact: item.w4_fact },
+          w5: { plan: item.w5_plan, fact: item.w5_fact }
+        }))
+        setRnpData(mapped)
       }
+      setUploadFeedback(`Успешно сохранено в БД ${res.data?.count || ''} показателей из CSV!`)
+      setTimeout(() => setUploadFeedback(null), 4000)
+    } catch (err) {
+      console.error('Backend upload error, falling back to local client parse:', err)
+      // Fallback to local parsing if backend is unreachable
+      const reader = new FileReader()
+      reader.onload = (evt) => {
+        try {
+          const text = evt.target?.result as string
+          if (text) {
+            const lines = text.split(/\r?\n/)
+            const parsedItems: RnpItem[] = []
+            lines.forEach((line, idx) => {
+              if (idx < 8) return
+              const cols = line.split(',')
+              if (cols.length >= 7) {
+                const indicator = (cols[2] || cols[0] || '').replace(/^"|"$/g, '').trim()
+                if (!indicator) return
+                const plan = (cols[5] || '').replace(/^"|"$/g, '').trim()
+                const fact = (cols[6] || '').replace(/^"|"$/g, '').trim()
+                const pctStr = (cols[7] || '0%').replace('%', '').trim()
+                const percent = parseFloat(pctStr) || 0
+                parsedItems.push({
+                  id: `up_${idx}`,
+                  section: idx < 17 ? 'visits' : idx < 21 ? 'prescriptions' : idx < 95 ? 'reps' : idx < 101 ? 'merch' : idx < 116 ? 'ecommerce' : 'promo',
+                  sectionName: idx < 17 ? 'Визиты и Активности' : idx < 21 ? 'Рецепты препаратов' : idx < 95 ? 'Медицинские представители' : idx < 101 ? 'Мерчендайзинг FMCG' : idx < 116 ? 'Онлайн продажи' : 'Промо-акции',
+                  role: cols[0]?.replace(/^"|"$/g, '').trim() || undefined,
+                  person: cols[1]?.replace(/^"|"$/g, '').trim() || undefined,
+                  indicator,
+                  prevFact: cols[3]?.replace(/^"|"$/g, '').trim() || '-',
+                  prevPercent: cols[4]?.replace(/^"|"$/g, '').trim() || '-',
+                  planMonth: plan || '-',
+                  factMonth: fact || '-',
+                  percentMonth: Math.round(percent),
+                  forecast: cols[8]?.replace(/^"|"$/g, '').trim() || '-',
+                  w1: { plan: cols[10]?.trim() || '-', fact: cols[11]?.trim() || '-' },
+                  w2: { plan: cols[12]?.trim() || '-', fact: cols[13]?.trim() || '-' },
+                  w3: { plan: cols[14]?.trim() || '-', fact: cols[15]?.trim() || '-' },
+                  w4: { plan: cols[16]?.trim() || '-', fact: cols[17]?.trim() || '-' },
+                  w5: { plan: cols[18]?.trim() || '-', fact: cols[19]?.trim() || '-' },
+                })
+              }
+            })
+            if (parsedItems.length > 0) {
+              setRnpData(parsedItems)
+              setUploadFeedback(`Загружено ${parsedItems.length} строк локально`)
+              setTimeout(() => setUploadFeedback(null), 4000)
+            }
+          }
+        } catch (e) {
+          setUploadFeedback('Ошибка при разборе файла CSV')
+        }
+      }
+      reader.readAsText(file, 'utf-8')
+    } finally {
+      setIsLoadingRnp(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
     }
-    reader.readAsText(file, 'utf-8')
   }
 
   return (
@@ -392,7 +548,19 @@ export default function Reports() {
             Сводные отчёты по операционным планам, инфлюенс-маркетингу и партнерским интеграциям
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {activeReportTab === 'rnp' && (
+            <button
+              onClick={handleSyncFromDatabase}
+              disabled={isLoadingRnp}
+              className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center transition-all shadow-xs cursor-pointer disabled:opacity-50"
+              title="Синхронизировать данные РНП с PostgreSQL"
+            >
+              <RefreshCw size={14} className={`mr-2 text-[#0052cc] ${isLoadingRnp ? 'animate-spin' : ''}`} />
+              Синхронизация с БД
+            </button>
+          )}
+
           <input 
             type="file" 
             ref={fileInputRef} 
@@ -402,18 +570,19 @@ export default function Reports() {
           />
           <button 
             onClick={() => fileInputRef.current?.click()}
-            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200/90 px-4 py-2.5 rounded-xl font-bold text-sm flex items-center transition-all shadow-sm cursor-pointer"
+            disabled={isLoadingRnp}
+            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200/90 px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center transition-all shadow-xs cursor-pointer disabled:opacity-50"
             title="Загрузить файл РНП за другой месяц"
           >
-            <Upload size={17} className="mr-2 text-[#4f46e5]" />
-            Загрузить CSV (РНП)
+            <Upload size={14} className="mr-2 text-[#0052cc]" />
+            Импорт CSV
           </button>
 
           <button 
             onClick={handleExportExcel}
-            className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center transition-all shadow-sm cursor-pointer"
+            className="bg-[#0052cc] hover:bg-[#0047b3] text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center transition-all shadow-xs cursor-pointer"
           >
-            <Download size={18} className="mr-2" />
+            <Download size={14} className="mr-2" />
             Экспорт в Excel (.csv)
           </button>
         </div>
@@ -782,8 +951,30 @@ export default function Reports() {
                             <td className="px-3.5 py-2.5 text-right text-xs font-semibold text-slate-700 tabular-nums">
                               {item.planMonth}
                             </td>
-                            <td className="px-3.5 py-2.5 text-right text-xs font-bold text-slate-900 tabular-nums">
-                              {item.factMonth}
+                            <td 
+                              className="px-3.5 py-2.5 text-right text-xs font-bold text-slate-900 tabular-nums cursor-pointer hover:bg-amber-50/80 transition-colors group relative"
+                              title="Нажмите для редактирования факта (автоматически сохраняется в PostgreSQL)"
+                              onClick={() => setEditingCell({ id: item.id, field: 'factMonth', value: item.factMonth })}
+                            >
+                              {editingCell?.id === item.id && editingCell.field === 'factMonth' ? (
+                                <input
+                                  type="text"
+                                  autoFocus
+                                  defaultValue={editingCell.value}
+                                  onBlur={(e) => handleSaveCell(item.id, 'factMonth', e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveCell(item.id, 'factMonth', (e.target as HTMLInputElement).value)
+                                    if (e.key === 'Escape') setEditingCell(null)
+                                  }}
+                                  className="w-20 px-1 py-0.5 text-right text-xs font-bold border border-[#0052cc] rounded bg-white outline-none shadow-xs"
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                              ) : (
+                                <span className="inline-flex items-center justify-end gap-1">
+                                  <span>{item.factMonth}</span>
+                                  <span className="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
+                                </span>
+                              )}
                             </td>
                             <td className="px-4 py-2.5 text-center">
                               <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold tabular-nums inline-block border ${
@@ -845,8 +1036,30 @@ export default function Reports() {
                         <td className="px-3.5 py-2.5 text-right text-xs font-semibold text-slate-700 tabular-nums">
                           {item.planMonth}
                         </td>
-                        <td className="px-3.5 py-2.5 text-right text-xs font-bold text-slate-900 tabular-nums">
-                          {item.factMonth}
+                        <td 
+                          className="px-3.5 py-2.5 text-right text-xs font-bold text-slate-900 tabular-nums cursor-pointer hover:bg-amber-50/80 transition-colors group relative"
+                          title="Нажмите для редактирования факта (автоматически сохраняется в PostgreSQL)"
+                          onClick={() => setEditingCell({ id: item.id, field: 'factMonth', value: item.factMonth })}
+                        >
+                          {editingCell?.id === item.id && editingCell.field === 'factMonth' ? (
+                            <input
+                              type="text"
+                              autoFocus
+                              defaultValue={editingCell.value}
+                              onBlur={(e) => handleSaveCell(item.id, 'factMonth', e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveCell(item.id, 'factMonth', (e.target as HTMLInputElement).value)
+                                if (e.key === 'Escape') setEditingCell(null)
+                              }}
+                              className="w-20 px-1 py-0.5 text-right text-xs font-bold border border-[#0052cc] rounded bg-white outline-none shadow-xs"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          ) : (
+                            <span className="inline-flex items-center justify-end gap-1">
+                              <span>{item.factMonth}</span>
+                              <span className="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-2.5 text-center">
                           <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold tabular-nums inline-block border ${

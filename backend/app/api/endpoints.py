@@ -145,3 +145,70 @@ def get_instagram_metrics(handle: str, name: Optional[str] = None):
         raise HTTPException(status_code=400, detail="Handle parameter is required")
     return lookup_instagram_influencer(handle=handle, name=name)
 
+# RNP Items (Operational Plans & Facts)
+from fastapi import UploadFile, File
+from app.services.rnp_importer import parse_rnp_csv
+import os
+
+@router.get("/rnp/", response_model=List[schemas.RnpItemResponse])
+def read_rnp_items(
+    project_name: Optional[str] = None,
+    month_name: Optional[str] = None,
+    section: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    items = crud.get_rnp_items(db=db, project_name=project_name, month_name=month_name, section=section)
+    if not items and (month_name == "Июнь 2026" or not month_name):
+        # Auto-seed from CSV if table is empty
+        csv_path = "app/data/rnp_june_2026.csv"
+        if os.path.exists(csv_path):
+            with open(csv_path, "r", encoding="utf-8") as f:
+                parsed = parse_rnp_csv(f.read(), project_name="Extragel", month_name="Июнь 2026")
+                items = crud.bulk_upsert_rnp_items(db=db, items=parsed)
+                if section:
+                    items = [it for it in items if it.section == section]
+    return items
+
+@router.post("/rnp/", response_model=schemas.RnpItemResponse)
+def create_rnp_item(item: schemas.RnpItemCreate, db: Session = Depends(get_db)):
+    return crud.create_rnp_item(db=db, item=item)
+
+@router.put("/rnp/{item_id}", response_model=schemas.RnpItemResponse)
+def update_rnp_item(item_id: int, item_update: schemas.RnpItemUpdate, db: Session = Depends(get_db)):
+    return crud.update_rnp_item(db=db, item_id=item_id, item_update=item_update)
+
+@router.delete("/rnp/{item_id}")
+def delete_rnp_item(item_id: int, db: Session = Depends(get_db)):
+    return crud.delete_rnp_item(db=db, item_id=item_id)
+
+@router.post("/rnp/seed-csv")
+def seed_rnp_from_bundled_csv(
+    project_name: str = "Extragel",
+    month_name: str = "Июнь 2026",
+    db: Session = Depends(get_db)
+):
+    csv_path = "app/data/rnp_june_2026.csv"
+    if not os.path.exists(csv_path):
+        raise HTTPException(status_code=404, detail="Bundled CSV file not found")
+    with open(csv_path, "r", encoding="utf-8") as f:
+        parsed = parse_rnp_csv(f.read(), project_name=project_name, month_name=month_name)
+    items = crud.bulk_upsert_rnp_items(db=db, items=parsed)
+    return {"message": f"Successfully loaded {len(items)} RNP items from CSV", "count": len(items)}
+
+@router.post("/rnp/upload-csv")
+async def upload_rnp_csv(
+    file: UploadFile = File(...),
+    project_name: str = "Extragel",
+    month_name: str = "Июнь 2026",
+    db: Session = Depends(get_db)
+):
+    content = await file.read()
+    try:
+        decoded = content.decode("utf-8")
+    except UnicodeDecodeError:
+        decoded = content.decode("cp1251", errors="ignore")
+    parsed = parse_rnp_csv(decoded, project_name=project_name, month_name=month_name)
+    items = crud.bulk_upsert_rnp_items(db=db, items=parsed)
+    return {"message": f"Successfully imported {len(items)} items from uploaded CSV", "count": len(items)}
+
+

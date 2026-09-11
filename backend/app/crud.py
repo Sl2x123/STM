@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.models import UserMonthPlan, Epic, PlanItem, SprintPlanItem, User, Month, Sprint, Project, Blogger, Company
+from app.models import UserMonthPlan, Epic, PlanItem, SprintPlanItem, User, Month, Sprint, Project, Blogger, Company, RnpItem
 from app.schemas import (
     UserMonthPlanCreate, UserCreate, MonthCreate, SprintCreate, ProjectCreate,
-    BloggerCreate, BloggerUpdate, CompanyCreate, CompanyUpdate
+    BloggerCreate, BloggerUpdate, CompanyCreate, CompanyUpdate,
+    RnpItemCreate, RnpItemUpdate
 )
 from app.auth import get_password_hash, verify_password
 
@@ -177,4 +178,70 @@ def delete_company(db: Session, company_id: int):
     db.delete(db_company)
     db.commit()
     return {"ok": True}
+
+# RNP Items
+def get_rnp_items(
+    db: Session,
+    project_name: str = None,
+    month_name: str = None,
+    section: str = None
+):
+    query = db.query(RnpItem)
+    if project_name:
+        query = query.filter(RnpItem.project_name == project_name)
+    if month_name:
+        query = query.filter(RnpItem.month_name == month_name)
+    if section:
+        query = query.filter(RnpItem.section == section)
+    return query.order_by(RnpItem.order, RnpItem.id).all()
+
+def create_rnp_item(db: Session, item: RnpItemCreate):
+    db_item = RnpItem(**item.dict())
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+def update_rnp_item(db: Session, item_id: int, item_update: RnpItemUpdate):
+    db_item = db.query(RnpItem).filter(RnpItem.id == item_id).first()
+    if not db_item:
+        raise HTTPException(status_code=404, detail="RnpItem not found")
+    update_data = item_update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_item, key, value)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+def delete_rnp_item(db: Session, item_id: int):
+    db_item = db.query(RnpItem).filter(RnpItem.id == item_id).first()
+    if not db_item:
+        raise HTTPException(status_code=404, detail="RnpItem not found")
+    db.delete(db_item)
+    db.commit()
+    return {"ok": True}
+
+def bulk_upsert_rnp_items(db: Session, items: list[RnpItemCreate]):
+    created = []
+    for it in items:
+        # Check if item exists by month_name, indicator, person/role
+        existing = db.query(RnpItem).filter(
+            RnpItem.month_name == it.month_name,
+            RnpItem.indicator == it.indicator,
+            RnpItem.person == it.person,
+            RnpItem.role == it.role
+        ).first()
+        if existing:
+            for k, v in it.dict(exclude_unset=True).items():
+                setattr(existing, k, v)
+            created.append(existing)
+        else:
+            new_item = RnpItem(**it.dict())
+            db.add(new_item)
+            created.append(new_item)
+    db.commit()
+    for item in created:
+        db.refresh(item)
+    return created
+
 

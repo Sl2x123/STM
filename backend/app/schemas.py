@@ -240,4 +240,68 @@ class CompanyResponse(CompanyBase):
     class Config:
         from_attributes = True
 
+# RNP Items
+class RnpItemBase(BaseModel):
+    project_id: Optional[int] = None
+    project_name: Optional[str] = "Extragel"
+    month_name: Optional[str] = "Июнь 2026"
+    section: str = "visits"
+    section_name: str = "Визиты и Активности"
+    role: Optional[str] = None
+    person: Optional[str] = None
+    indicator: str
+    prev_fact: Optional[str] = "0"
+    prev_percent: Optional[str] = "0%"
+    plan_month: Optional[str] = "0"
+    fact_month: Optional[str] = "0"
+    percent_month: Optional[float] = 0.0
+    forecast: Optional[str] = "0"
+    w1_plan: Optional[str] = "0"
+    w1_fact: Optional[str] = "0"
+    w2_plan: Optional[str] = "0"
+    w2_fact: Optional[str] = "0"
+    w3_plan: Optional[str] = "0"
+    w3_fact: Optional[str] = "0"
+    w4_plan: Optional[str] = "0"
+    w4_fact: Optional[str] = "0"
+    w5_plan: Optional[str] = "0"
+    w5_fact: Optional[str] = "0"
+    order: Optional[int] = 0
+
+class RnpItemCreate(RnpItemBase):
+    pass
+
+class RnpItemUpdate(BaseModel):
+    project_id: Optional[int] = None
+    project_name: Optional[str] = None
+    month_name: Optional[str] = None
+    section: Optional[str] = None
+    section_name: Optional[str] = None
+    role: Optional[str] = None
+    person: Optional[str] = None
+    indicator: Optional[str] = None
+    prev_fact: Optional[str] = None
+    prev_percent: Optional[str] = None
+    plan_month: Optional[str] = None
+    fact_month: Optional[str] = None
+    percent_month: Optional[float] = None
+    forecast: Optional[str] = None
+    w1_plan: Optional[str] = None
+    w1_fact: Optional[str] = None
+    w2_plan: Optional[str] = None
+    w2_fact: Optional[str] = None
+    w3_plan: Optional[str] = None
+    w3_fact: Optional[str] = None
+    w4_plan: Optional[str] = None
+    w4_fact: Optional[str] = None
+    w5_plan: Optional[str] = None
+    w5_fact: Optional[str] = None
+    order: Optional[int] = None
+
+class RnpItemResponse(RnpItemBase):
+    id: int
+    class Config:
+        from_attributes = True
+
+
 
