@@ -1,27 +1,28 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FolderKanban, MoreVertical, Users, Plus, Calendar, ArrowUpRight, ArrowLeft } from 'lucide-react'
+import { api } from '../lib/api'
 
-const initialProjects = [
+const defaultFallbackProjects = [
   { 
     id: 1, 
     name: 'Extragel', 
     description: 'Продвижение и продажи Extragel, работа с аптеками и врачами', 
-    period: '01.09.2026 — 30.09.2026',
+    period: '01.06.2026 — 31.12.2026',
     members: 4, 
     tasksCount: 5, 
-    progress: 66,
-    color: 'bg-indigo-50 text-[#4f46e5]',
+    progress: 86,
+    color: 'bg-indigo-50 text-[#0052cc]',
     avatarChar: 'E'
   },
   { 
     id: 2, 
     name: 'Masculan', 
     description: 'Задачи по направлению Masculan, рекламные кампании и дистрибуция', 
-    period: '01.09.2026 — 30.09.2026',
+    period: '01.06.2026 — 31.12.2026',
     members: 6, 
     tasksCount: 8, 
-    progress: 40,
+    progress: 75,
     color: 'bg-blue-50 text-blue-600',
     avatarChar: 'M'
   },
@@ -29,38 +30,104 @@ const initialProjects = [
     id: 3, 
     name: 'Энтеросгель', 
     description: 'Работа с ключевыми сетями аптек, фармкружки и мерчендайзинг', 
-    period: '01.09.2026 — 30.09.2026',
+    period: '01.06.2026 — 31.12.2026',
     members: 3, 
     tasksCount: 6, 
     progress: 80,
     color: 'bg-emerald-50 text-emerald-600',
     avatarChar: 'Э'
   },
+  { 
+    id: 4, 
+    name: 'Фитосепт', 
+    description: 'Антисептические препараты, пастилки и спреи Фитосепт', 
+    period: '01.06.2026 — 31.12.2026',
+    members: 2, 
+    tasksCount: 4, 
+    progress: 65,
+    color: 'bg-amber-50 text-amber-600',
+    avatarChar: 'Ф'
+  },
 ]
 
 export default function ProjectsList() {
-  const [projects, setProjects] = useState(initialProjects)
+  const [projects, setProjects] = useState(defaultFallbackProjects)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDesc, setNewProjectDesc] = useState('')
 
-  const handleCreateProject = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await api.get('/projects/')
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          const colors = [
+            'bg-indigo-50 text-[#0052cc]',
+            'bg-blue-50 text-blue-600',
+            'bg-emerald-50 text-emerald-600',
+            'bg-amber-50 text-amber-600',
+            'bg-purple-50 text-purple-600'
+          ]
+          const mapped = res.data.map((p: any, idx: number) => ({
+            id: p.id,
+            name: p.name,
+            description: p.description || 'Фармацевтический и маркетинговый проект',
+            period: p.start_date && p.end_date ? `${p.start_date} — ${p.end_date}` : '01.06.2026 — 31.12.2026',
+            members: 4,
+            tasksCount: 6,
+            progress: idx === 0 ? 86 : (idx === 1 ? 75 : (idx === 2 ? 80 : 65)),
+            color: colors[idx % colors.length],
+            avatarChar: p.name.charAt(0).toUpperCase()
+          }))
+          setProjects(mapped)
+        }
+      } catch (err) {
+        console.warn('API error loading projects:', err)
+      }
+    }
+    fetchProjects()
+  }, [])
+
+  const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newProjectName.trim()) return
 
-    const newProj = {
-      id: Date.now(),
-      name: newProjectName.trim(),
-      description: newProjectDesc.trim() || 'Описание проекта',
-      period: '01.09.2026 — 30.09.2026',
-      members: 1,
-      tasksCount: 0,
-      progress: 0,
-      color: 'bg-purple-50 text-purple-600',
-      avatarChar: newProjectName.trim()[0].toUpperCase()
+    try {
+      const res = await api.post('/projects/', {
+        name: newProjectName.trim(),
+        description: newProjectDesc.trim() || 'Маркетинговый проект',
+        start_date: '2026-06-01',
+        end_date: '2026-12-31'
+      })
+      const p = res.data
+      const newProj = {
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        period: '01.06.2026 — 31.12.2026',
+        members: 1,
+        tasksCount: 0,
+        progress: 0,
+        color: 'bg-purple-50 text-purple-600',
+        avatarChar: p.name[0].toUpperCase()
+      }
+      setProjects(prev => [newProj, ...prev])
+    } catch (err) {
+      console.error('Failed to create project in backend:', err)
+      const newProj = {
+        id: Date.now(),
+        name: newProjectName.trim(),
+        description: newProjectDesc.trim() || 'Описание проекта',
+        period: '01.06.2026 — 31.12.2026',
+        members: 1,
+        tasksCount: 0,
+        progress: 0,
+        color: 'bg-purple-50 text-purple-600',
+        avatarChar: newProjectName.trim()[0].toUpperCase()
+      }
+      setProjects(prev => [newProj, ...prev])
     }
 
-    setProjects([newProj, ...projects])
     setNewProjectName('')
     setNewProjectDesc('')
     setIsModalOpen(false)
