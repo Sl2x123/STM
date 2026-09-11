@@ -16,8 +16,28 @@ def create_project(project: schemas.ProjectCreate, db: Session = Depends(get_db)
 def read_projects(db: Session = Depends(get_db)):
     return crud.get_projects(db)
 
+@router.get("/projects/{project_id}", response_model=schemas.ProjectResponse)
+def read_project(project_id: int, db: Session = Depends(get_db)):
+    project = crud.get_project(db, project_id=project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return project
+
+@router.put("/projects/{project_id}", response_model=schemas.ProjectResponse)
+def update_project(project_id: int, project_update: schemas.ProjectUpdate, db: Session = Depends(get_db)):
+    return crud.update_project(db, project_id=project_id, project_update=project_update)
+
+@router.delete("/projects/{project_id}")
+def delete_project(project_id: int, db: Session = Depends(get_db)):
+    return crud.delete_project(db, project_id=project_id)
+
 from app.auth import create_access_token
 from app import models
+from fastapi.security import OAuth2PasswordBearer
+from jose import jwt, JWTError
+from app.config import settings
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
 # Auth
 @router.post("/auth/login", response_model=schemas.Token)
@@ -47,14 +67,27 @@ def login(login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
     }
 
 @router.get("/auth/me", response_model=schemas.UserResponse)
-def get_current_user(db: Session = Depends(get_db)):
-    user = db.query(models.User).first()
+def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    if token:
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+            email = payload.get("sub")
+            if email:
+                user = crud.get_user_by_email(db, email=email)
+                if user:
+                    return user
+        except JWTError:
+            pass
+
+    user = db.query(models.User).filter(models.User.email == "admin@extragel.uz").first()
+    if not user:
+        user = db.query(models.User).first()
     if not user:
         user = crud.create_user(db, schemas.UserCreate(
-            email="azamat@extragel.uz",
+            email="admin@extragel.uz",
             full_name="Азамат (Администратор)",
             role="admin",
-            password="password123"
+            password="password"
         ))
     return user
 

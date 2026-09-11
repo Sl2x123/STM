@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.models import UserMonthPlan, Epic, PlanItem, SprintPlanItem, User, Month, Sprint, Project, Blogger, Company, RnpItem
 from app.schemas import (
-    UserMonthPlanCreate, UserCreate, MonthCreate, SprintCreate, ProjectCreate,
+    UserMonthPlanCreate, UserCreate, MonthCreate, SprintCreate, ProjectCreate, ProjectUpdate,
     BloggerCreate, BloggerUpdate, CompanyCreate, CompanyUpdate,
     RnpItemCreate, RnpItemUpdate
 )
@@ -11,6 +11,9 @@ from app.auth import get_password_hash, verify_password
 # Projects
 def get_projects(db: Session):
     return db.query(Project).all()
+
+def get_project(db: Session, project_id: int):
+    return db.query(Project).filter(Project.id == project_id).first()
 
 def create_project(db: Session, project: ProjectCreate):
     db_proj = Project(
@@ -23,6 +26,24 @@ def create_project(db: Session, project: ProjectCreate):
     db.commit()
     db.refresh(db_proj)
     return db_proj
+
+def update_project(db: Session, project_id: int, project_update: ProjectUpdate):
+    db_proj = db.query(Project).filter(Project.id == project_id).first()
+    if not db_proj:
+        raise HTTPException(status_code=404, detail="Project not found")
+    for key, value in project_update.dict(exclude_unset=True).items():
+        setattr(db_proj, key, value)
+    db.commit()
+    db.refresh(db_proj)
+    return db_proj
+
+def delete_project(db: Session, project_id: int):
+    db_proj = db.query(Project).filter(Project.id == project_id).first()
+    if not db_proj:
+        raise HTTPException(status_code=404, detail="Project not found")
+    db.delete(db_proj)
+    db.commit()
+    return {"ok": True}
 
 # Users
 def get_users(db: Session):

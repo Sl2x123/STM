@@ -462,6 +462,16 @@ def seed_all():
                 crud.bulk_upsert_rnp_items(db=db, items=parsed)
                 print(f"RNP items confirmed in DB: {len(parsed)}")
 
+        # Synchronize PostgreSQL serial sequences to highest assigned IDs
+        from sqlalchemy import text
+        tables = ['projects', 'teams', 'users', 'months', 'sprints', 'sprint_plan_items', 'bloggers', 'companies', 'rnp_items']
+        for table in tables:
+            try:
+                db.execute(text(f"SELECT setval(pg_get_serial_sequence('{table}', 'id'), COALESCE(MAX(id), 1)) FROM {table};"))
+            except Exception as seq_err:
+                print(f"Notice updating sequence for {table}: {seq_err}")
+        db.commit()
+
         print("--- Database Seeding Completed Successfully! ---")
 
     except Exception as e:

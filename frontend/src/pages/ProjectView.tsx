@@ -1,12 +1,13 @@
 import { useState, useMemo, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { 
   ChevronRight, ChevronDown, Plus, Search, ArrowLeft, ChevronLeft,
   Calendar, CheckCircle2, Circle, LayoutList, Grip, X, Trash2, 
   Check, Sparkles, SlidersHorizontal, CalendarDays,
   ExternalLink, Edit3, User, Users, Eye, DollarSign, Share2,
-  Building2, MapPin, Package, Phone, Zap, RefreshCw, Heart, MessageCircle, Bookmark, TrendingUp
+  Building2, MapPin, Package, Phone, Zap, RefreshCw, Heart, MessageCircle, Bookmark, TrendingUp,
+  Save, AlertTriangle, Mail
 } from 'lucide-react'
 
 // Hierarchical Plans Data: Month -> Plan Item -> Sprints
@@ -520,26 +521,125 @@ function autoEnrichBlogger(name: string, rawInput: string, overrides: Record<str
   }
 }
 
+// Normalization Helpers to bridge frontend camelCase and backend snake_case
+const normalizeBlogger = (b: any) => ({
+  ...b,
+  id: b.id,
+  name: b.name || '',
+  handle: b.handle || '',
+  platform: b.platform || 'Instagram',
+  followers: b.followers || '100K',
+  reach: b.reach || '25K',
+  views: b.views || 0,
+  format: b.format || 'Reels + 2 Stories',
+  price: b.price || '$250',
+  status: b.status || 'Переговоры',
+  publishDate: b.publishDate || b.publish_date || b.date || '15.09.2026',
+  publish_date: b.publish_date || b.publishDate || b.date || '15.09.2026',
+  sprint: b.sprint || 'Спринт 2',
+  profileUrl: b.profileUrl || b.profile_url || '',
+  profile_url: b.profile_url || b.profileUrl || '',
+  postUrl: b.postUrl || b.post_url || '',
+  post_url: b.post_url || b.postUrl || '',
+  managerContact: b.managerContact || b.manager_contact || '',
+  manager_contact: b.manager_contact || b.managerContact || '',
+  notes: b.notes || '',
+  likes: b.likes || 0,
+  comments: b.comments || 0,
+  shares: b.shares || 0,
+  saves: b.saves || 0,
+  profile_visits: b.profile_visits || b.profileVisits || 0,
+  link_clicks: b.link_clicks || b.linkClicks || 0,
+  avatarChar: b.avatarChar || (b.name ? b.name[0].toUpperCase() : 'Б'),
+  avatarColor: b.avatarColor || (
+    b.platform === 'Telegram' ? 'bg-sky-500' :
+    b.platform === 'TikTok' ? 'bg-neutral-800' :
+    b.platform === 'YouTube' ? 'bg-red-500' : 'bg-pink-500'
+  )
+})
+
+const normalizeCompany = (c: any) => ({
+  ...c,
+  id: c.id,
+  name: c.name || '',
+  category: c.category || 'Гостиница / Отель',
+  location: c.location || 'Адрес не указан',
+  spent: c.spent || '$0',
+  itemsProvided: c.itemsProvided || c.items_provided || 'Материалы не указаны',
+  items_provided: c.items_provided || c.itemsProvided || 'Материалы не указаны',
+  sprint: c.sprint || 'Спринт 2',
+  date: c.date || '15.09.2026',
+  status: c.status || 'Переговоры',
+  contactPerson: c.contactPerson || c.contact_person || 'Контакт не указан',
+  contact_person: c.contact_person || c.contactPerson || 'Контакт не указан',
+  phone: c.phone || '—',
+  notes: c.notes || '',
+  categoryBadge: c.categoryBadge || (
+    c.category?.includes('Гостиница') ? 'bg-amber-50 text-amber-700 border-amber-100' :
+    c.category?.includes('Фитнес') ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+    c.category?.includes('Бар') || c.category?.includes('Ресторан') ? 'bg-purple-50 text-purple-700 border-purple-100' :
+    'bg-indigo-50 text-indigo-700 border-indigo-100'
+  )
+})
+
 export default function ProjectView() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const projectId = Number(id) || 1
 
-  const projectName = projectId === 1 ? 'Extragel' : projectId === 2 ? 'Masculan' : 'Энтеросгель'
-  const projectInitial = projectName[0]
+  const [currentProject, setCurrentProject] = useState<any>(null)
+  const [projectMembers, setProjectMembers] = useState<any[]>([])
+  const [isSavingProject, setIsSavingProject] = useState(false)
+  const [projectSavedFeedback, setProjectSavedFeedback] = useState(false)
+  const [projectEditForm, setProjectEditForm] = useState({
+    name: '',
+    description: '',
+    start_date: '2026-06-01',
+    end_date: '2026-12-31'
+  })
+
+  // Load project details dynamically
+  useEffect(() => {
+    let isMounted = true
+    api.get(`/projects/${projectId}`)
+      .then(res => {
+        if (isMounted && res.data) {
+          setCurrentProject(res.data)
+          setProjectEditForm({
+            name: res.data.name || '',
+            description: res.data.description || '',
+            start_date: res.data.start_date || '2026-06-01',
+            end_date: res.data.end_date || '2026-12-31'
+          })
+        }
+      })
+      .catch(() => {})
+
+    api.get('/users/')
+      .then(res => {
+        if (isMounted && Array.isArray(res.data)) {
+          setProjectMembers(res.data)
+        }
+      })
+      .catch(() => {})
+
+    return () => { isMounted = false }
+  }, [projectId])
+
+  const fallbackNames: Record<number, string> = {
+    1: 'Extragel',
+    2: 'Masculan',
+    3: 'Энтеросгель',
+    4: 'Фитосепт'
+  }
+  const projectName = currentProject?.name || fallbackNames[projectId] || `Проект #${projectId}`
+  const projectInitial = projectName[0] || 'П'
 
   // Active Tab: 'tasks' | 'plans' | 'bloggers' | 'companies' | 'members' | 'settings'
   const [activeTab, setActiveTab] = useState<'tasks' | 'plans' | 'bloggers' | 'companies' | 'members' | 'settings'>('tasks')
 
   // Companies Tracking State (with LocalStorage & API sync)
-  const [companiesData, setCompaniesData] = useState<any[]>(() => {
-    try {
-      const saved = localStorage.getItem(`pms_companies_p${projectId}`)
-      if (saved) return JSON.parse(saved)
-    } catch (e) {
-      console.error(e)
-    }
-    return initialCompanies
-  })
+  const [companiesData, setCompaniesData] = useState<any[]>([])
   const [companySearch, setCompanySearch] = useState('')
   const [companyCategoryFilter, setCompanyCategoryFilter] = useState('ALL')
   const [companyStatusFilter, setCompanyStatusFilter] = useState('ALL')
@@ -559,20 +659,71 @@ export default function ProjectView() {
   const [cNotes, setCNotes] = useState('')
 
   // Bloggers Tracking State (with LocalStorage & API sync)
-  const [bloggersData, setBloggersData] = useState<any[]>(() => {
-    try {
-      const saved = localStorage.getItem(`pms_bloggers_p${projectId}`)
-      if (saved) return JSON.parse(saved)
-    } catch (e) {
-      console.error(e)
-    }
-    return initialBloggers
-  })
+  const [bloggersData, setBloggersData] = useState<any[]>([])
   const [bloggerSearch, setBloggerSearch] = useState('')
   const [bloggerPlatformFilter, setBloggerPlatformFilter] = useState('ALL')
   const [bloggerStatusFilter, setBloggerStatusFilter] = useState('ALL')
   const [isAddBloggerOpen, setIsAddBloggerOpen] = useState(false)
   const [selectedBlogger, setSelectedBlogger] = useState<any | null>(null)
+
+  // Load bloggers & companies specifically for the active projectId
+  useEffect(() => {
+    let isMounted = true
+
+    // Check localStorage cache for instantaneous display
+    try {
+      const savedBloggers = localStorage.getItem(`pms_bloggers_p${projectId}`)
+      if (savedBloggers) {
+        setBloggersData(JSON.parse(savedBloggers).map(normalizeBlogger))
+      } else if (projectId === 1) {
+        setBloggersData(initialBloggers.map(normalizeBlogger))
+      } else {
+        setBloggersData([])
+      }
+    } catch {
+      setBloggersData(projectId === 1 ? initialBloggers.map(normalizeBlogger) : [])
+    }
+
+    try {
+      const savedCompanies = localStorage.getItem(`pms_companies_p${projectId}`)
+      if (savedCompanies) {
+        setCompaniesData(JSON.parse(savedCompanies).map(normalizeCompany))
+      } else if (projectId === 1) {
+        setCompaniesData(initialCompanies.map(normalizeCompany))
+      } else {
+        setCompaniesData([])
+      }
+    } catch {
+      setCompaniesData(projectId === 1 ? initialCompanies.map(normalizeCompany) : [])
+    }
+
+    // Background sync from backend PostgreSQL
+    api.get(`/bloggers/?project_id=${projectId}`)
+      .then(res => {
+        if (isMounted && res.data) {
+          const normalized = res.data.map(normalizeBlogger)
+          setBloggersData(normalized)
+          try {
+            localStorage.setItem(`pms_bloggers_p${projectId}`, JSON.stringify(normalized))
+          } catch {}
+        }
+      })
+      .catch(() => {})
+
+    api.get(`/companies/?project_id=${projectId}`)
+      .then(res => {
+        if (isMounted && res.data) {
+          const normalized = res.data.map(normalizeCompany)
+          setCompaniesData(normalized)
+          try {
+            localStorage.setItem(`pms_companies_p${projectId}`, JSON.stringify(normalized))
+          } catch {}
+        }
+      })
+      .catch(() => {})
+
+    return () => { isMounted = false }
+  }, [projectId])
 
   // LocalStorage Persist Effects
   useEffect(() => {
@@ -590,28 +741,6 @@ export default function ProjectView() {
       console.error(e)
     }
   }, [bloggersData, projectId])
-
-  // Optional background fetch from API
-  useEffect(() => {
-    let isMounted = true
-    api.get(`/bloggers/?project_id=${projectId}`)
-      .then(res => {
-        if (isMounted && res.data && res.data.length > 0) {
-          setBloggersData(res.data)
-        }
-      })
-      .catch(() => {})
-
-    api.get(`/companies/?project_id=${projectId}`)
-      .then(res => {
-        if (isMounted && res.data && res.data.length > 0) {
-          setCompaniesData(res.data)
-        }
-      })
-      .catch(() => {})
-
-    return () => { isMounted = false }
-  }, [projectId])
 
   // Add Blogger Form Fields (Auto-Enrichment Engine)
   const [bName, setBName] = useState('')
@@ -643,8 +772,8 @@ export default function ProjectView() {
       })
       if (res.data) {
         const update = res.data
-        setBloggersData(prev => prev.map(b => b.id === selectedBlogger.id ? { ...b, ...update, id: b.id } : b))
-        setSelectedBlogger((prev: any) => prev ? { ...prev, ...update, id: prev.id } : prev)
+        setBloggersData(prev => prev.map(b => b.id === selectedBlogger.id ? normalizeBlogger({ ...b, ...update, id: b.id }) : b))
+        setSelectedBlogger((prev: any) => prev ? normalizeBlogger({ ...prev, ...update, id: prev.id }) : prev)
       }
       setSyncFeedback('Метрики публикации успешно синхронизированы с Instagram Insights!')
     } catch {
@@ -667,7 +796,7 @@ export default function ProjectView() {
     })
   }, [bName, bHandle, bPlatform, bFormat, bPrice, bSprint, bDate])
 
-  const handleAddBlogger = (e?: React.FormEvent) => {
+  const handleAddBlogger = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     if (!bName.trim() && !bHandle.trim()) return
 
@@ -690,63 +819,153 @@ export default function ProjectView() {
       } : {}
     )
 
-    setBloggersData([enriched, ...bloggersData])
+    const normalized = normalizeBlogger(enriched)
+    setBloggersData(prev => [normalized, ...prev])
     setBName('')
     setBHandle('')
     setBContact('')
     setBNotes('')
     setShowManualBloggerFields(false)
     setIsAddBloggerOpen(false)
+
+    try {
+      const res = await api.post('/bloggers/', {
+        name: normalized.name,
+        handle: normalized.handle,
+        platform: normalized.platform,
+        followers: normalized.followers,
+        reach: normalized.reach,
+        views: normalized.views || 0,
+        format: normalized.format,
+        price: normalized.price,
+        status: normalized.status,
+        publish_date: normalized.publishDate,
+        sprint: normalized.sprint,
+        profile_url: normalized.profileUrl,
+        post_url: normalized.postUrl || '',
+        manager_contact: normalized.managerContact,
+        notes: normalized.notes,
+        project_id: projectId
+      })
+      if (res.data) {
+        const saved = normalizeBlogger(res.data)
+        setBloggersData(prev => prev.map(b => b.id === normalized.id ? saved : b))
+      }
+    } catch (err) {
+      console.error('Failed to create blogger in backend:', err)
+    }
   }
 
-  const handleQuickAddBlogger = (e: React.FormEvent) => {
+  const handleQuickAddBlogger = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!quickBloggerName.trim() && !quickBloggerHandle.trim()) return
     const nameToUse = quickBloggerName.trim() || quickBloggerHandle.trim().replace(/^@+/, '')
     const handleToUse = quickBloggerHandle.trim() || `@${nameToUse.toLowerCase().replace(/\s+/g, '_')}`
     const enriched = autoEnrichBlogger(nameToUse, handleToUse)
-    setBloggersData([enriched, ...bloggersData])
+    const normalized = normalizeBlogger(enriched)
+    setBloggersData(prev => [normalized, ...prev])
     setQuickBloggerName('')
     setQuickBloggerHandle('')
+
+    try {
+      const res = await api.post('/bloggers/', {
+        name: normalized.name,
+        handle: normalized.handle,
+        platform: normalized.platform,
+        followers: normalized.followers,
+        reach: normalized.reach,
+        views: normalized.views || 0,
+        format: normalized.format,
+        price: normalized.price,
+        status: normalized.status,
+        publish_date: normalized.publishDate,
+        sprint: normalized.sprint,
+        profile_url: normalized.profileUrl,
+        post_url: normalized.postUrl || '',
+        manager_contact: normalized.managerContact,
+        notes: normalized.notes,
+        project_id: projectId
+      })
+      if (res.data) {
+        const saved = normalizeBlogger(res.data)
+        setBloggersData(prev => prev.map(b => b.id === normalized.id ? saved : b))
+      }
+    } catch (err) {
+      console.error('Failed to quick add blogger:', err)
+    }
   }
 
-  const cycleBloggerStatus = (id: string, e: React.MouseEvent) => {
+  const cycleBloggerStatus = async (id: any, e: React.MouseEvent) => {
     e.stopPropagation()
     const statuses = ['Переговоры', 'Согласовано', 'Оплачено', 'Вышел пост']
-    setBloggersData(data => data.map(b => {
-      if (b.id === id) {
-        const nextIdx = (statuses.indexOf(b.status) + 1) % statuses.length
-        return { ...b, status: statuses[nextIdx] }
+    const target = bloggersData.find(b => b.id === id)
+    if (!target) return
+    const nextIdx = (statuses.indexOf(target.status) + 1) % statuses.length
+    const nextStatus = statuses[nextIdx]
+
+    setBloggersData(data => data.map(b => b.id === id ? { ...b, status: nextStatus } : b))
+
+    if (typeof id === 'number' || (typeof id === 'string' && /^\d+$/.test(id))) {
+      try {
+        await api.put(`/bloggers/${id}`, { status: nextStatus })
+      } catch (err) {
+        console.error('Failed to update blogger status in backend:', err)
       }
-      return b
-    }))
+    }
   }
 
-  const deleteBlogger = (id: string, e?: React.MouseEvent) => {
+  const deleteBlogger = async (id: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation()
     setBloggersData(data => data.filter(b => b.id !== id))
+    if (selectedBlogger?.id === id) setSelectedBlogger(null)
+
+    if (typeof id === 'number' || (typeof id === 'string' && /^\d+$/.test(id))) {
+      try {
+        await api.delete(`/bloggers/${id}`)
+      } catch (err) {
+        console.error('Failed to delete blogger in backend:', err)
+      }
+    }
   }
 
-  const handleSaveBlogger = (updated: any) => {
-    setBloggersData(data => data.map(b => b.id === updated.id ? updated : b))
+  const handleSaveBlogger = async (updated: any) => {
+    const normalized = normalizeBlogger(updated)
+    setBloggersData(data => data.map(b => b.id === normalized.id ? normalized : b))
     setSelectedBlogger(null)
-  }
 
-  const filteredBloggers = useMemo(() => {
-    return bloggersData.filter(b => {
-      const q = bloggerSearch.toLowerCase().trim()
-      const matchesSearch = !q || 
-        b.name.toLowerCase().includes(q) || 
-        b.handle.toLowerCase().includes(q) ||
-        (b.notes && b.notes.toLowerCase().includes(q))
-      const matchesPlatform = bloggerPlatformFilter === 'ALL' || b.platform === bloggerPlatformFilter
-      const matchesStatus = bloggerStatusFilter === 'ALL' || b.status === bloggerStatusFilter
-      return matchesSearch && matchesPlatform && matchesStatus
-    })
-  }, [bloggersData, bloggerSearch, bloggerPlatformFilter, bloggerStatusFilter])
+    if (typeof normalized.id === 'number' || (typeof normalized.id === 'string' && /^\d+$/.test(normalized.id))) {
+      try {
+        await api.put(`/bloggers/${normalized.id}`, {
+          name: normalized.name,
+          handle: normalized.handle,
+          platform: normalized.platform,
+          followers: normalized.followers,
+          reach: normalized.reach,
+          views: normalized.views || 0,
+          format: normalized.format,
+          price: normalized.price,
+          status: normalized.status,
+          publish_date: normalized.publishDate,
+          sprint: normalized.sprint,
+          profile_url: normalized.profileUrl,
+          post_url: normalized.postUrl || '',
+          manager_contact: normalized.managerContact,
+          notes: normalized.notes,
+          likes: normalized.likes,
+          comments: normalized.comments,
+          shares: normalized.shares,
+          saves: normalized.saves,
+          profile_visits: normalized.profile_visits,
+          link_clicks: normalized.link_clicks
+        })
+      } catch (err) {
+        console.error('Failed to save blogger in backend:', err)
+      }
+    }
+  }
 
   // Company Handlers
-  const handleAddCompany = (e: React.FormEvent) => {
+  const handleAddCompany = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!cName.trim()) return
 
@@ -766,7 +985,8 @@ export default function ProjectView() {
       notes: cNotes.trim()
     }
 
-    setCompaniesData([newCompany, ...companiesData])
+    const normalized = normalizeCompany(newCompany)
+    setCompaniesData(prev => [normalized, ...prev])
     setCName('')
     setCLocation('')
     setCItemsProvided('')
@@ -774,29 +994,135 @@ export default function ProjectView() {
     setCPhone('')
     setCNotes('')
     setIsAddCompanyOpen(false)
+
+    try {
+      const res = await api.post('/companies/', {
+        name: normalized.name,
+        category: normalized.category,
+        location: normalized.location,
+        spent: normalized.spent,
+        items_provided: normalized.itemsProvided,
+        sprint: normalized.sprint,
+        date: normalized.date,
+        contact_person: normalized.contactPerson,
+        phone: normalized.phone,
+        status: normalized.status,
+        notes: normalized.notes,
+        project_id: projectId
+      })
+      if (res.data) {
+        const saved = normalizeCompany(res.data)
+        setCompaniesData(prev => prev.map(c => c.id === normalized.id ? saved : c))
+      }
+    } catch (err) {
+      console.error('Failed to create company in backend:', err)
+    }
   }
 
-  const cycleCompanyStatus = (id: string, e?: React.MouseEvent) => {
+  const cycleCompanyStatus = async (id: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation()
     const statuses = ['Переговоры', 'Согласовано', 'Материалы переданы', 'Активно', 'Завершено']
-    setCompaniesData(data => data.map(c => {
-      if (c.id === id) {
-        const nextIdx = (statuses.indexOf(c.status) + 1) % statuses.length
-        return { ...c, status: statuses[nextIdx] }
+    const target = companiesData.find(c => c.id === id)
+    if (!target) return
+    const nextIdx = (statuses.indexOf(target.status) + 1) % statuses.length
+    const nextStatus = statuses[nextIdx]
+
+    setCompaniesData(data => data.map(c => c.id === id ? { ...c, status: nextStatus } : c))
+
+    if (typeof id === 'number' || (typeof id === 'string' && /^\d+$/.test(id))) {
+      try {
+        await api.put(`/companies/${id}`, { status: nextStatus })
+      } catch (err) {
+        console.error('Failed to update company status in backend:', err)
       }
-      return c
-    }))
+    }
   }
 
-  const deleteCompany = (id: string, e?: React.MouseEvent) => {
+  const deleteCompany = async (id: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation()
     setCompaniesData(data => data.filter(c => c.id !== id))
+    if (selectedCompany?.id === id) setSelectedCompany(null)
+
+    if (typeof id === 'number' || (typeof id === 'string' && /^\d+$/.test(id))) {
+      try {
+        await api.delete(`/companies/${id}`)
+      } catch (err) {
+        console.error('Failed to delete company in backend:', err)
+      }
+    }
   }
 
-  const handleSaveCompany = (updated: any) => {
-    setCompaniesData(data => data.map(c => c.id === updated.id ? updated : c))
+  const handleSaveCompany = async (updated: any) => {
+    const normalized = normalizeCompany(updated)
+    setCompaniesData(data => data.map(c => c.id === normalized.id ? normalized : c))
     setSelectedCompany(null)
+
+    if (typeof normalized.id === 'number' || (typeof normalized.id === 'string' && /^\d+$/.test(normalized.id))) {
+      try {
+        await api.put(`/companies/${normalized.id}`, {
+          name: normalized.name,
+          category: normalized.category,
+          location: normalized.location,
+          spent: normalized.spent,
+          items_provided: normalized.itemsProvided,
+          sprint: normalized.sprint,
+          date: normalized.date,
+          contact_person: normalized.contactPerson,
+          phone: normalized.phone,
+          status: normalized.status,
+          notes: normalized.notes
+        })
+      } catch (err) {
+        console.error('Failed to save company in backend:', err)
+      }
+    }
   }
+
+  const handleUpdateProjectSettings = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSavingProject(true)
+    try {
+      const res = await api.put(`/projects/${projectId}`, {
+        name: projectEditForm.name.trim() || projectName,
+        description: projectEditForm.description.trim(),
+        start_date: projectEditForm.start_date,
+        end_date: projectEditForm.end_date
+      })
+      if (res.data) {
+        setCurrentProject(res.data)
+        setProjectSavedFeedback(true)
+        setTimeout(() => setProjectSavedFeedback(false), 3000)
+      }
+    } catch (err) {
+      console.error('Failed to update project settings:', err)
+    } finally {
+      setIsSavingProject(false)
+    }
+  }
+
+  const handleDeleteProject = async () => {
+    if (!window.confirm(`Вы уверены, что хотите безвозвратно удалить проект "${projectName}"?`)) return
+    try {
+      await api.delete(`/projects/${projectId}`)
+      navigate('/projects')
+    } catch (err) {
+      console.error('Failed to delete project:', err)
+      navigate('/projects')
+    }
+  }
+
+  const filteredBloggers = useMemo(() => {
+    return bloggersData.filter(b => {
+      const q = bloggerSearch.toLowerCase().trim()
+      const matchesSearch = !q || 
+        b.name.toLowerCase().includes(q) || 
+        b.handle.toLowerCase().includes(q) ||
+        (b.notes && b.notes.toLowerCase().includes(q))
+      const matchesPlatform = bloggerPlatformFilter === 'ALL' || b.platform === bloggerPlatformFilter
+      const matchesStatus = bloggerStatusFilter === 'ALL' || b.status === bloggerStatusFilter
+      return matchesSearch && matchesPlatform && matchesStatus
+    })
+  }, [bloggersData, bloggerSearch, bloggerPlatformFilter, bloggerStatusFilter])
 
   const filteredCompanies = useMemo(() => {
     return companiesData.filter(c => {
@@ -4211,17 +4537,153 @@ export default function ProjectView() {
       )}
 
       {/* ========================================================================= */}
-      {/* TAB 3 & 4 PLACEHOLDERS                                                    */}
+      {/* MEMBERS TAB                                                               */}
       {/* ========================================================================= */}
       {activeTab === 'members' && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center text-gray-500">
-          Участники проекта: Азамат (Lead), Дилрабо (Marketing), Джамшид (Medical Rep)
+        <div className="space-y-6">
+          <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Команда проекта ({projectName})</h2>
+              <p className="text-sm text-gray-500 mt-1">Сотрудники, медицинские представители и маркетологи направления</p>
+            </div>
+            <div className="px-4 py-2 bg-indigo-50 text-[#4f46e5] font-bold rounded-2xl text-xs flex items-center gap-2">
+              <Users size={16} /> {projectMembers.length || 4} активных участников
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {(projectMembers.length > 0 ? projectMembers : [
+              { id: 1, full_name: 'Азамат (Администратор)', email: 'admin@extragel.uz', role: 'admin' },
+              { id: 2, full_name: 'Дилрабо Усманова', email: 'dilrabo@pharma.uz', role: 'marketing' },
+              { id: 3, full_name: 'Джамшид Рахимов', email: 'jamshid@pharma.uz', role: 'medrep' },
+              { id: 4, full_name: 'Малика Каримова', email: 'malika@pharma.uz', role: 'lead' }
+            ]).map((user: any) => {
+              const roleLabels: Record<string, { label: string; bg: string }> = {
+                admin: { label: 'Администратор / PM', bg: 'bg-rose-50 text-rose-700 border-rose-100' },
+                marketing: { label: 'Маркетинг / PR', bg: 'bg-purple-50 text-purple-700 border-purple-100' },
+                medrep: { label: 'Медицинский представитель', bg: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
+                lead: { label: 'Бренд-менеджер', bg: 'bg-indigo-50 text-indigo-700 border-indigo-100' }
+              }
+              const roleInfo = roleLabels[user.role] || { label: user.role || 'Участник', bg: 'bg-gray-100 text-gray-700 border-gray-200' }
+              return (
+                <div key={user.id} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#4f46e5] font-bold text-lg flex items-center justify-center shrink-0">
+                      {user.full_name ? user.full_name[0] : 'U'}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-bold text-gray-900 truncate">{user.full_name}</h3>
+                      <p className="text-xs text-gray-400 truncate flex items-center gap-1.5 mt-1 font-mono">
+                        <Mail size={12} /> {user.email}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between">
+                    <span className={`px-2.5 py-1 rounded-xl text-xs font-bold border ${roleInfo.bg}`}>
+                      {roleInfo.label}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> В сети
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
 
+      {/* ========================================================================= */}
+      {/* SETTINGS TAB                                                              */}
+      {/* ========================================================================= */}
       {activeTab === 'settings' && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center text-gray-500">
-          Настройки проекта и интеграции
+        <div className="space-y-6 max-w-3xl mx-auto">
+          <form onSubmit={handleUpdateProjectSettings} className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between pb-6 mb-6 border-b border-gray-100">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Настройки проекта</h2>
+                <p className="text-sm text-gray-500 mt-1">Редактирование основных параметров и сроков проекта</p>
+              </div>
+              {projectSavedFeedback && (
+                <span className="px-3.5 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold flex items-center gap-1.5 animate-in fade-in">
+                  <Check size={14} /> Сохранено!
+                </span>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Название проекта</label>
+                <input 
+                  type="text" 
+                  value={projectEditForm.name || projectName}
+                  onChange={(e) => setProjectEditForm({ ...projectEditForm, name: e.target.value })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-semibold text-gray-900 outline-none focus:border-[#4f46e5] focus:bg-white transition-all"
+                  placeholder="Например: Extragel"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Описание и цели направления</label>
+                <textarea 
+                  value={projectEditForm.description}
+                  onChange={(e) => setProjectEditForm({ ...projectEditForm, description: e.target.value })}
+                  rows={3}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none focus:border-[#4f46e5] focus:bg-white transition-all"
+                  placeholder="Опишите фармацевтическое направление, фокусные целевые группы..."
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Дата начала</label>
+                  <input 
+                    type="date"
+                    value={projectEditForm.start_date}
+                    onChange={(e) => setProjectEditForm({ ...projectEditForm, start_date: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-2.5 text-sm font-semibold text-gray-900 outline-none focus:border-[#4f46e5] focus:bg-white transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Дата завершения</label>
+                  <input 
+                    type="date"
+                    value={projectEditForm.end_date}
+                    onChange={(e) => setProjectEditForm({ ...projectEditForm, end_date: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-2.5 text-sm font-semibold text-gray-900 outline-none focus:border-[#4f46e5] focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end">
+              <button 
+                type="submit" 
+                disabled={isSavingProject}
+                className="px-6 py-3 bg-[#4f46e5] text-white rounded-2xl font-bold text-sm shadow-md hover:bg-[#4338ca] transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                <Save size={16} /> {isSavingProject ? 'Сохранение...' : 'Сохранить изменения'}
+              </button>
+            </div>
+          </form>
+
+          {/* Danger Zone */}
+          <div className="bg-red-50/50 rounded-3xl p-6 lg:p-8 border border-red-200">
+            <div className="flex items-center gap-3 text-red-700 font-bold mb-2">
+              <AlertTriangle size={20} /> Опасная зона
+            </div>
+            <p className="text-xs text-red-600 mb-5">
+              Удаление проекта приведет к удалению всех связанных планов, спринтов, блогеров и партнеров.
+            </p>
+            <button 
+              type="button" 
+              onClick={handleDeleteProject}
+              className="px-5 py-2.5 bg-red-600 text-white rounded-xl font-bold text-xs shadow hover:bg-red-700 transition-colors flex items-center gap-2 cursor-pointer"
+            >
+              <Trash2 size={15} /> Удалить проект безвозвратно
+            </button>
+          </div>
         </div>
       )}
 
