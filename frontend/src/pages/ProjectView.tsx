@@ -26,9 +26,9 @@ const initialPlansTree = [
         period: '01.09 — 07.09',
         isOpen: true,
         tasks: [
-          { id: 't1_1', name: 'Визиты аптечные Ташкент', plan: 30, fact: 30, unit: 'визитов', status: 'Done', assignee: 'Азамат' },
-          { id: 't1_2', name: 'Визиты к врачам (Кардиологи, Терапевты)', plan: 20, fact: 20, unit: 'визитов', status: 'Done', assignee: 'Наргиза' },
-          { id: 't1_3', name: 'Установка промостоек в аптеках 36.6', plan: 5, fact: 5, unit: 'стоек', status: 'Done', assignee: 'Тимур' },
+          { id: 't1_1', type: 'TASK', name: 'Визиты аптечные Ташкент', plan: 30, fact: 30, unit: '', status: 'Done', assignee: 'Азамат' },
+          { id: 't1_2', type: 'DAILY', name: 'Визиты к врачам (Кардиологи, Терапевты)', plan: 20, fact: 20, unit: '', status: 'Done', assignee: 'Наргиза' },
+          { id: 't1_3', type: 'TASK', name: 'Установка промостоек в аптеках 36.6', plan: 5, fact: 5, unit: '', status: 'Done', assignee: 'Тимур' },
         ]
       },
       {
@@ -37,9 +37,9 @@ const initialPlansTree = [
         period: '08.09 — 14.09',
         isOpen: true,
         tasks: [
-          { id: 't2_1', name: 'Визиты аптечные Ташкент', plan: 30, fact: 15, unit: 'визитов', status: 'In Progress', assignee: 'Азамат' },
-          { id: 't2_2', name: 'Визиты к врачам (Педиатры)', plan: 20, fact: 18, unit: 'визитов', status: 'In Progress', assignee: 'Наргиза' },
-          { id: 't2_3', name: 'Установка промостоек Olam Farm', plan: 5, fact: 3, unit: 'стоек', status: 'In Progress', assignee: 'Тимур' },
+          { id: 't2_1', type: 'TASK', name: 'Визиты аптечные Ташкент', plan: 30, fact: 15, unit: '', status: 'In Progress', assignee: 'Азамат' },
+          { id: 't2_2', type: 'DAILY', name: 'Визиты к врачам (Педиатры)', plan: 20, fact: 18, unit: '', status: 'In Progress', assignee: 'Наргиза' },
+          { id: 't2_3', type: 'TASK', name: 'Установка промостоек Olam Farm', plan: 5, fact: 3, unit: '', status: 'In Progress', assignee: 'Тимур' },
         ]
       },
       {
@@ -48,8 +48,8 @@ const initialPlansTree = [
         period: '15.09 — 21.09',
         isOpen: true,
         tasks: [
-          { id: 't3_1', name: 'Визиты аптечные Ташкент', plan: 30, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Азамат' },
-          { id: 't3_2', name: 'Визиты к врачам (Аллергологи)', plan: 20, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Наргиза' },
+          { id: 't3_1', type: 'TASK', name: 'Визиты аптечные Ташкент', plan: 30, fact: 0, unit: '', status: 'Not Done', assignee: 'Азамат' },
+          { id: 't3_2', type: 'DAILY', name: 'Визиты к врачам (Аллергологи)', plan: 20, fact: 0, unit: '', status: 'Not Done', assignee: 'Наргиза' },
         ]
       },
       {
@@ -58,8 +58,8 @@ const initialPlansTree = [
         period: '22.09 — 30.09',
         isOpen: true,
         tasks: [
-          { id: 't4_1', name: 'Визиты аптечные Ташкент', plan: 30, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Азамат' },
-          { id: 't4_2', name: 'Визиты к врачам (Терапевты)', plan: 20, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Наргиза' },
+          { id: 't4_1', type: 'TASK', name: 'Визиты аптечные Ташкент', plan: 30, fact: 0, unit: '', status: 'Not Done', assignee: 'Азамат' },
+          { id: 't4_2', type: 'DAILY', name: 'Визиты к врачам (Терапевты)', plan: 20, fact: 0, unit: '', status: 'Not Done', assignee: 'Наргиза' },
         ]
       }
     ]
@@ -1203,6 +1203,7 @@ export default function ProjectView() {
   const [targetSprintId, setTargetSprintId] = useState('')
   const [targetSprintName, setTargetSprintName] = useState('')
   const [newTaskName, setNewTaskName] = useState('')
+  const [newTaskType, setNewTaskType] = useState<'TASK' | 'DAILY'>('TASK')
   const [newTaskPlan, setNewTaskPlan] = useState<number>(30)
   const [newTaskFact, setNewTaskFact] = useState<number>(0)
   const [newTaskAssignee, setNewTaskAssignee] = useState('Азамат')
@@ -1307,6 +1308,7 @@ export default function ProjectView() {
 
     const newTask = {
       id: `t_${Date.now()}`,
+      type: newTaskType,
       name: newTaskName.trim(),
       plan: Number(newTaskPlan) || 0,
       fact: Number(newTaskFact) || 0,
@@ -1334,6 +1336,7 @@ export default function ProjectView() {
     }))
 
     setNewTaskName('')
+    setNewTaskType('TASK')
     setNewTaskPlan(30)
     setNewTaskFact(0)
     setIsAddTaskToSprintOpen(false)
@@ -1555,6 +1558,7 @@ export default function ProjectView() {
                 return {
                   ...t,
                   name: updatedItem.name,
+                  type: updatedItem.type || t.type || 'TASK',
                   plan: updatedItem.plan !== undefined ? Number(updatedItem.plan) : t.plan,
                   fact: updatedItem.fact !== undefined ? Number(updatedItem.fact) : t.fact,
                   unit: updatedItem.unit || t.unit,
@@ -3179,17 +3183,32 @@ export default function ProjectView() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-gray-400 font-bold uppercase">Статус:</span>
-            <select
-              value={selectedDetailItem.status || 'Not Done'}
-              onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, status: e.target.value })}
-              className="bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
-            >
-              <option value="Not Done">⚪ Не начато</option>
-              <option value="In Progress">🔵 В процессе</option>
-              <option value="Done">🟢 Выполнено</option>
-            </select>
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400 font-bold uppercase">Тип:</span>
+              <select
+                value={selectedDetailItem.type || 'TASK'}
+                onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, type: e.target.value })}
+                className="bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-3 py-2 text-xs font-bold text-gray-800 dark:text-white outline-none cursor-pointer"
+              >
+                <option value="TASK">TASK (Таск)</option>
+                <option value="DAILY">DAILY (Делик)</option>
+                <option value="SPRINT">SPRINT (Спринт)</option>
+                <option value="EPIC">EPIC (Эпик)</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400 font-bold uppercase">Статус:</span>
+              <select
+                value={selectedDetailItem.status || 'Not Done'}
+                onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, status: e.target.value })}
+                className="bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
+              >
+                <option value="Not Done">⚪ Не начато</option>
+                <option value="In Progress">🔵 В процессе</option>
+                <option value="Done">🟢 Выполнено</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -3646,6 +3665,36 @@ export default function ProjectView() {
           </p>
 
           <form onSubmit={handleAddTaskToSprint} className="space-y-5">
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Тип элемента</label>
+              <div className="grid grid-cols-2 gap-3 mb-1">
+                <button
+                  type="button"
+                  onClick={() => setNewTaskType('TASK')}
+                  className={`py-2.5 px-3 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                    newTaskType === 'TASK'
+                      ? 'bg-[#4f46e5] text-white border-[#4f46e5] shadow-xs'
+                      : 'bg-gray-50 dark:bg-[#121418] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-[#2b303c] hover:bg-gray-100 dark:hover:bg-[#1e222a]'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-indigo-300" />
+                  TASK (Таск / Задача)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewTaskType('DAILY')}
+                  className={`py-2.5 px-3 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                    newTaskType === 'DAILY'
+                      ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
+                      : 'bg-gray-50 dark:bg-[#121418] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-[#2b303c] hover:bg-gray-100 dark:hover:bg-[#1e222a]'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-amber-300" />
+                  DAILY (Делик / Ежедневный)
+                </button>
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Название задачи / показателя</label>
               <input
@@ -4138,13 +4187,20 @@ export default function ProjectView() {
                                       <button className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
                                         {sprint.isOpen !== false ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                                       </button>
-                                      <span className="font-bold text-gray-900 dark:text-white text-sm">
-                                        {sprint.name.includes(sprint.period) ? sprint.name : `${sprint.name} (${sprint.period})`}
+                                      <span className="bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider uppercase shrink-0">
+                                        СПРИНТ
+                                      </span>
+                                      <span className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-1.5">
+                                        <Calendar size={14} className="text-indigo-500" />
+                                        {sprint.period || sprint.name}
                                       </span>
                                     </div>
 
-                                    {/* Minimal Right side: Status and Progress % */}
-                                    <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+                                    {/* Minimal Right side: Sprint Status and Progress % */}
+                                    <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                                      <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 hidden sm:inline">
+                                        Выполнение спринта:
+                                      </span>
                                       <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
                                         sprintProgress >= 100
                                           ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
@@ -4214,7 +4270,7 @@ export default function ProjectView() {
                                       ) : (
                                         <div className="divide-y divide-gray-100 dark:divide-[#262932]">
                                           <div className="flex items-center px-5 py-2.5 text-[10px] uppercase font-bold text-gray-400 tracking-wider bg-slate-50/80 dark:bg-[#15181f]">
-                                            <div className="flex-1">Задача / Показатель</div>
+                                            <div className="flex-1">Элемент / Задача</div>
                                             <div className="w-44">Ответственный</div>
                                             <div className="w-44 text-right pr-2">Статус</div>
                                             <div className="w-14 text-right">Действия</div>
@@ -4225,12 +4281,21 @@ export default function ProjectView() {
                                               key={task.id}
                                               className="flex items-center px-5 py-3 hover:bg-white dark:hover:bg-[#181b20] transition-colors gap-3"
                                             >
-                                              {/* Task Name (clickable to open detail modal) */}
+                                              {/* Task Name and Type Badge (clickable to open detail modal) */}
                                               <div 
-                                                onClick={() => setSelectedDetailItem({ ...task, type: 'TASK', monthId: month.id, sprintId: sprint.id })}
+                                                onClick={() => setSelectedDetailItem({ ...task, type: task.type || 'TASK', monthId: month.id, sprintId: sprint.id })}
                                                 className="flex-1 font-semibold text-gray-800 dark:text-gray-200 text-sm hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors group flex items-center gap-2"
-                                                title="Нажмите, чтобы открыть полную информацию о задаче"
+                                                title="Нажмите, чтобы открыть полную информацию"
                                               >
+                                                {task.type === 'DAILY' ? (
+                                                  <span className="bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded tracking-wide uppercase shrink-0">
+                                                    DAILY
+                                                  </span>
+                                                ) : (
+                                                  <span className="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-900/50 tracking-wide uppercase shrink-0">
+                                                    TASK
+                                                  </span>
+                                                )}
                                                 <span className="group-hover:underline">{task.name}</span>
                                               </div>
 
