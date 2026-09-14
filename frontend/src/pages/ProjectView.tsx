@@ -1368,7 +1368,7 @@ export default function ProjectView() {
     setIsAddSprintOpen(false)
   }
 
-  const updateSprintTaskFact = (monthId: string, sprintId: string, taskId: string, factVal: number) => {
+  const updateSprintTaskStatus = (monthId: string, sprintId: string, taskId: string, newStatus: string) => {
     setPlansData(data => data.map(m => {
       if (m.id === monthId) {
         return {
@@ -1379,42 +1379,8 @@ export default function ProjectView() {
                 ...s,
                 tasks: (s.tasks || []).map((t: any) => {
                   if (t.id === taskId) {
-                    const newFact = Math.max(0, factVal)
-                    let newStatus = t.status
-                    if (newFact >= t.plan && t.plan > 0) newStatus = 'Done'
-                    else if (newFact > 0) newStatus = 'In Progress'
-                    else newStatus = 'Not Done'
-                    return { ...t, fact: newFact, status: newStatus }
-                  }
-                  return t
-                })
-              }
-            }
-            return s
-          })
-        }
-      }
-      return m
-    }))
-  }
-
-  const cycleSprintTaskStatus = (monthId: string, sprintId: string, taskId: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    setPlansData(data => data.map(m => {
-      if (m.id === monthId) {
-        return {
-          ...m,
-          sprints: (m.sprints || []).map((s: any) => {
-            if (s.id === sprintId) {
-              return {
-                ...s,
-                tasks: (s.tasks || []).map((t: any) => {
-                  if (t.id === taskId) {
-                    const nextStatus = 
-                      t.status === 'Not Done' ? 'In Progress' :
-                      t.status === 'In Progress' ? 'Done' : 'Not Done'
-                    const nextFact = nextStatus === 'Done' ? (t.fact < t.plan ? t.plan : t.fact) : t.fact
-                    return { ...t, status: nextStatus, fact: nextFact }
+                    const nextFact = newStatus === 'Done' ? (t.fact < t.plan ? t.plan : t.fact) : t.fact
+                    return { ...t, status: newStatus, fact: nextFact }
                   }
                   return t
                 })
@@ -3221,9 +3187,9 @@ export default function ProjectView() {
               onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, status: e.target.value })}
               className="bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
             >
-              <option value="Not Done">Not Done</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Done">Done</option>
+              <option value="Not Done">⚪ Не начато</option>
+              <option value="In Progress">🔵 В процессе</option>
+              <option value="Done">🟢 Выполнено</option>
             </select>
           </div>
         </div>
@@ -3287,6 +3253,44 @@ export default function ProjectView() {
               </div>
             )}
 
+            {(selectedDetailItem.plan !== undefined || selectedDetailItem.fact !== undefined || selectedDetailItem.unit !== undefined) && (
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm space-y-4">
+                <h3 className="text-sm font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider">
+                  Целевые показатели задачи
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">План</label>
+                    <input
+                      type="number"
+                      value={selectedDetailItem.plan ?? 0}
+                      onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, plan: Number(e.target.value) })}
+                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Факт (Выполнено)</label>
+                    <input
+                      type="number"
+                      value={selectedDetailItem.fact ?? 0}
+                      onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, fact: Number(e.target.value) })}
+                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Единица измерения</label>
+                    <input
+                      type="text"
+                      placeholder="визиты, шт, звонки..."
+                      value={selectedDetailItem.unit || ''}
+                      onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, unit: e.target.value })}
+                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
               <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Подробное описание и инструкции</label>
               <textarea
@@ -3325,12 +3329,19 @@ export default function ProjectView() {
               <h3 className="text-sm font-bold text-gray-900 dark:text-white">Метаданные</h3>
               <div>
                 <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Создатель / Ответственный</label>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-2 mt-1 mb-2">
                   <div className="w-7 h-7 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">
-                    {selectedDetailItem.creatorInitial || 'A'}
+                    {selectedDetailItem.creatorInitial || (selectedDetailItem.assignee ? selectedDetailItem.assignee[0].toUpperCase() : 'A')}
                   </div>
-                  <span className="text-sm font-semibold text-gray-800 dark:text-white">{selectedDetailItem.creator || 'Азамат'}</span>
+                  <span className="text-sm font-semibold text-gray-800 dark:text-white">{selectedDetailItem.assignee || selectedDetailItem.creator || 'Не назначен'}</span>
                 </div>
+                <input
+                  type="text"
+                  placeholder="Изменить ответственного..."
+                  value={selectedDetailItem.assignee || ''}
+                  onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, assignee: e.target.value })}
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-3 py-2 text-xs font-semibold text-gray-800 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20]"
+                />
               </div>
 
               <div>
@@ -4252,112 +4263,76 @@ export default function ProjectView() {
                                       ) : (
                                         <div className="divide-y divide-gray-100 dark:divide-[#262932]">
                                           <div className="flex items-center px-5 py-2.5 text-[10px] uppercase font-bold text-gray-400 tracking-wider bg-slate-50/80 dark:bg-[#15181f]">
-                                            <div className="w-28">Статус</div>
                                             <div className="flex-1">Задача / Показатель</div>
-                                            <div className="w-36">Ответственный</div>
-                                            <div className="w-28 text-right">План</div>
-                                            <div className="w-32 text-right">Факт</div>
-                                            <div className="w-28 text-right">Выполнение</div>
-                                            <div className="w-16 text-right">Действия</div>
+                                            <div className="w-44">Ответственный</div>
+                                            <div className="w-44 text-right pr-2">Статус</div>
+                                            <div className="w-14 text-right">Действия</div>
                                           </div>
 
-                                          {sprintTasks.map((task: any) => {
-                                            const taskProgress = task.plan > 0 ? Math.min(100, Math.round((task.fact / task.plan) * 100)) : 0
-                                            return (
+                                          {sprintTasks.map((task: any) => (
+                                            <div 
+                                              key={task.id}
+                                              className="flex items-center px-5 py-3 hover:bg-white dark:hover:bg-[#181b20] transition-colors gap-3"
+                                            >
+                                              {/* Task Name (clickable to open detail modal) */}
                                               <div 
-                                                key={task.id}
-                                                className="flex items-center px-5 py-3 hover:bg-white dark:hover:bg-[#181b20] transition-colors"
+                                                onClick={() => setSelectedDetailItem({ ...task, type: 'TASK', monthId: month.id, sprintId: sprint.id })}
+                                                className="flex-1 font-semibold text-gray-800 dark:text-gray-200 text-sm hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors group flex items-center gap-2"
+                                                title="Нажмите, чтобы открыть полную информацию о задаче"
                                               >
-                                                {/* Clickable Status Badge */}
-                                                <div className="w-28">
-                                                  <button
-                                                    onClick={(e) => cycleSprintTaskStatus(month.id, sprint.id, task.id, e)}
-                                                    className={`inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-lg cursor-pointer transition-all ${
-                                                      task.status === 'Done'
-                                                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100'
-                                                        : task.status === 'In Progress'
-                                                        ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-100'
-                                                        : 'bg-gray-100 dark:bg-[#202530] text-gray-500 hover:bg-gray-200'
-                                                    }`}
-                                                    title="Нажмите, чтобы изменить статус"
-                                                  >
-                                                    {task.status === 'Done' ? (
-                                                      <>
-                                                        <CheckCircle2 size={12} className="mr-1" /> Готово
-                                                      </>
-                                                    ) : task.status === 'In Progress' ? (
-                                                      <>
-                                                        <Circle size={10} className="mr-1 fill-blue-500" /> В работе
-                                                      </>
-                                                    ) : (
-                                                      'Не начато'
-                                                    )}
-                                                  </button>
-                                                </div>
+                                                <span className="group-hover:underline">{task.name}</span>
+                                              </div>
 
-                                                {/* Task Name */}
-                                                <div className="flex-1 font-semibold text-gray-800 dark:text-gray-200 text-sm">
-                                                  {task.name}
-                                                </div>
-
-                                                {/* Assignee */}
-                                                <div className="w-36">
+                                              {/* Assignee */}
+                                              <div className="w-44">
+                                                {task.assignee ? (
                                                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-[#202530] px-2.5 py-1 rounded-lg">
                                                     <User size={12} className="text-indigo-500" />
                                                     {task.assignee}
                                                   </span>
-                                                </div>
-
-                                                {/* Plan Target */}
-                                                <div className="w-28 text-right font-bold text-gray-900 dark:text-white text-sm">
-                                                  {task.plan} <span className="text-xs font-normal text-gray-400">{task.unit}</span>
-                                                </div>
-
-                                                {/* Inline Editable Fact */}
-                                                <div className="w-32 text-right">
-                                                  <div className="inline-flex items-center gap-1 justify-end">
-                                                    <input
-                                                      type="number"
-                                                      min="0"
-                                                      value={task.fact}
-                                                      onChange={(e) => updateSprintTaskFact(month.id, sprint.id, task.id, Number(e.target.value))}
-                                                      className="w-16 text-right font-bold text-[#4f46e5] dark:text-indigo-400 bg-white dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-lg px-2 py-1 text-xs focus:ring-1 focus:ring-[#4f46e5] outline-none"
-                                                      title="Кликните для изменения фактического значения"
-                                                    />
-                                                    <span className="text-xs text-gray-400">{task.unit}</span>
-                                                  </div>
-                                                </div>
-
-                                                {/* Progress Bar & % */}
-                                                <div className="w-28 text-right pr-2">
-                                                  <span className={`text-xs font-bold ${
-                                                    taskProgress >= 100 ? 'text-emerald-600' : 'text-indigo-600 dark:text-indigo-400'
-                                                  }`}>
-                                                    {taskProgress}%
-                                                  </span>
-                                                  <div className="w-full bg-gray-200 dark:bg-[#2b303c] rounded-full h-1.5 mt-1 overflow-hidden">
-                                                    <div
-                                                      className={`h-1.5 rounded-full ${
-                                                        taskProgress >= 100 ? 'bg-emerald-500' : 'bg-[#4f46e5]'
-                                                      }`}
-                                                      style={{ width: `${taskProgress}%` }}
-                                                    />
-                                                  </div>
-                                                </div>
-
-                                                {/* Delete Task */}
-                                                <div className="w-16 text-right">
-                                                  <button
-                                                    onClick={(e) => deleteSprintTask(month.id, sprint.id, task.id, e)}
-                                                    className="p-1 text-gray-400 hover:text-rose-500 rounded transition-colors cursor-pointer"
-                                                    title="Удалить задачу"
-                                                  >
-                                                    <Trash2 size={14} />
-                                                  </button>
-                                                </div>
+                                                ) : (
+                                                  <span className="text-xs text-gray-400 italic">Не назначен</span>
+                                                )}
                                               </div>
-                                            )
-                                          })}
+
+                                              {/* Status Dropdown on the Right */}
+                                              <div className="w-44 flex justify-end">
+                                                <select
+                                                  value={task.status || 'Not Done'}
+                                                  onChange={(e) => updateSprintTaskStatus(month.id, sprint.id, task.id, e.target.value)}
+                                                  className={`text-xs font-bold px-3 py-1.5 rounded-lg border outline-none cursor-pointer transition-all ${
+                                                    task.status === 'Done'
+                                                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60 focus:ring-1 focus:ring-emerald-500'
+                                                      : task.status === 'In Progress'
+                                                      ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800/60 focus:ring-1 focus:ring-blue-500'
+                                                      : 'bg-gray-50 dark:bg-[#202530] text-gray-600 dark:text-gray-400 border-gray-200 dark:border-[#2b303c] focus:ring-1 focus:ring-gray-400'
+                                                  }`}
+                                                  title="Выберите статус"
+                                                >
+                                                  <option value="Not Done" className="bg-white dark:bg-[#181b20] text-gray-700 dark:text-gray-300">
+                                                    ⚪ Не начато
+                                                  </option>
+                                                  <option value="In Progress" className="bg-white dark:bg-[#181b20] text-blue-600 dark:text-blue-400">
+                                                    🔵 В процессе
+                                                  </option>
+                                                  <option value="Done" className="bg-white dark:bg-[#181b20] text-emerald-600 dark:text-emerald-400">
+                                                    🟢 Выполнено
+                                                  </option>
+                                                </select>
+                                              </div>
+
+                                              {/* Delete Task */}
+                                              <div className="w-14 text-right">
+                                                <button
+                                                  onClick={(e) => deleteSprintTask(month.id, sprint.id, task.id, e)}
+                                                  className="p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors cursor-pointer"
+                                                  title="Удалить задачу"
+                                                >
+                                                  <Trash2 size={15} />
+                                                </button>
+                                              </div>
+                                            </div>
+                                          ))}
                                         </div>
                                       )}
                                     </div>
