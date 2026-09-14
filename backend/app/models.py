@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Date, Enum, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 import enum
 from app.database import Base
 
@@ -181,4 +181,20 @@ class RnpItem(Base):
     project = relationship("Project")
 
 
+class ProjectTask(Base):
+    __tablename__ = "project_tasks"
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    parent_id = Column(Integer, ForeignKey("project_tasks.id", ondelete="CASCADE"), nullable=True, index=True)
+    type = Column(String, default="TASK")  # EPIC, SPRINT, DAILY, TASK
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    status = Column(String, default="Not Done")  # Not Done, In Progress, Done
+    creator = Column(String, default="Азамат")
+    creator_initial = Column(String, default="A")
+    creator_color = Column(String, default="bg-[#818cf8]")
+    date = Column(String, nullable=True)
+    order_index = Column(Integer, default=0)
 
+    project = relationship("Project")
+    children = relationship("ProjectTask", cascade="all, delete-orphan", backref=backref("parent", remote_side=[id]), order_by="ProjectTask.order_index")

@@ -582,6 +582,16 @@ const normalizeCompany = (c: any) => ({
   )
 })
 
+const normalizeTaskNode = (n: any): any => ({
+  ...n,
+  id: String(n.id),
+  isOpen: n.isOpen ?? true,
+  creatorInitial: n.creator_initial || n.creatorInitial || (n.creator ? n.creator[0] : 'A'),
+  creator: n.creator || 'Азамат',
+  creatorColor: n.creator_color || n.creatorColor || 'bg-[#818cf8]',
+  children: n.children && n.children.length > 0 ? n.children.map(normalizeTaskNode) : (n.type !== 'TASK' ? [] : undefined)
+})
+
 export default function ProjectView() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -619,6 +629,15 @@ export default function ProjectView() {
       .then(res => {
         if (isMounted && Array.isArray(res.data)) {
           setProjectMembers(res.data)
+        }
+      })
+      .catch(() => {})
+
+    // Load tasks from backend API
+    api.get(`/projects/${projectId}/tasks`)
+      .then(res => {
+        if (isMounted && Array.isArray(res.data) && res.data.length > 0) {
+          setTasksData(res.data.map(normalizeTaskNode))
         }
       })
       .catch(() => {})
@@ -1318,12 +1337,13 @@ export default function ProjectView() {
     setTasksData(toggleNode(tasksData))
   }
 
-  const cycleTaskStatus = (nodeId: string, e: React.MouseEvent) => {
+  const cycleTaskStatus = async (nodeId: string, e: React.MouseEvent) => {
     e.stopPropagation()
+    let nextStatus = 'Not Done'
     const updateNodeStatus = (nodes: any[]): any[] => {
       return nodes.map(node => {
         if (node.id === nodeId) {
-          const nextStatus = 
+          nextStatus = 
             node.status === 'Not Done' ? 'In Progress' :
             node.status === 'In Progress' ? 'Done' : 'Not Done'
           return { ...node, status: nextStatus }
@@ -1333,9 +1353,18 @@ export default function ProjectView() {
       })
     }
     setTasksData(updateNodeStatus(tasksData))
+
+    const numId = parseInt(nodeId, 10)
+    if (!isNaN(numId)) {
+      try {
+        await api.put(`/tasks/${numId}`, { status: nextStatus })
+      } catch (err) {
+        console.error('Failed to update task status in API:', err)
+      }
+    }
   }
 
-  const deleteTaskNode = (nodeId: string, e: React.MouseEvent) => {
+  const deleteTaskNode = async (nodeId: string, e: React.MouseEvent) => {
     e.stopPropagation()
     const removeNode = (nodes: any[]): any[] => {
       return nodes
@@ -1343,6 +1372,16 @@ export default function ProjectView() {
         .map(n => n.children ? { ...n, children: removeNode(n.children) } : n)
     }
     setTasksData(removeNode(tasksData))
+    if (selectedDetailItem?.id === nodeId) setSelectedDetailItem(null)
+
+    const numId = parseInt(nodeId, 10)
+    if (!isNaN(numId)) {
+      try {
+        await api.delete(`/tasks/${numId}`)
+      } catch (err) {
+        console.error('Failed to delete task in API:', err)
+      }
+    }
   }
 
   // Quick inline rename helper for Plans
@@ -1357,7 +1396,7 @@ export default function ProjectView() {
   }
 
   // Update Detail Item for both Tasks and Plans
-  const handleSaveDetail = (updatedItem: any) => {
+  const handleSaveDetail = async (updatedItem: any) => {
     // 1. Update in tasksData (Epic -> Sprint -> Daily -> Task)
     const updateTreeItem = (nodes: any[]): any[] => {
       return nodes.map(n => {
@@ -1371,6 +1410,21 @@ export default function ProjectView() {
       })
     }
     setTasksData(updateTreeItem(tasksData))
+
+    const numId = parseInt(updatedItem.id, 10)
+    if (!isNaN(numId)) {
+      try {
+        await api.put(`/tasks/${numId}`, {
+          name: updatedItem.name,
+          description: updatedItem.description,
+          status: updatedItem.status,
+          date: updatedItem.date,
+          creator: updatedItem.creator
+        })
+      } catch (err) {
+        console.error('Failed to save task detail in API:', err)
+      }
+    }
 
     // 2. Update in plansData (Month -> Plan Item -> Sprint)
     setPlansData(data => data.map(m => {
@@ -1465,12 +1519,13 @@ export default function ProjectView() {
   }, [tasksData, searchQuery, typeFilter, statusFilter])
 
   // Handle Create Item (Epic, Sprint, Daily, Task)
-  const handleCreateTaskItem = (e: React.FormEvent) => {
+  const handleCreateTaskItem = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!modalName.trim()) return
 
+    const tempId = `custom_${Date.now()}`
     const newItem = {
-      id: `custom_${Date.now()}`,
+      id: tempId,
       type: modalType,
       name: modalName.trim(),
       description: modalDesc.trim() || 'Без описания',
@@ -1501,9 +1556,41 @@ export default function ProjectView() {
       setTasksData(addToParent(tasksData))
     }
 
+    const currentParentId = modalParentId
     setModalName('')
     setModalDesc('')
     setIsModalOpen(false)
+
+    // Persist to backend
+    try {
+      const parentNumId = currentParentId ? parseInt(currentParentId, 10) : null
+      const res = await api.post(`/projects/${projectId}/tasks`, {
+        project_id: projectId,
+        parent_id: !isNaN(parentNumId as any) ? parentNumId : null,
+        type: modalType,
+        name: newItem.name,
+        description: newItem.description,
+        status: newItem.status,
+        creator: newItem.creator,
+        creator_initial: newItem.creatorInitial,
+        creator_color: newItem.creatorColor,
+        date: newItem.date
+      })
+      if (res.data && res.data.id) {
+        const replaceTemp = (nodes: any[]): any[] => {
+          return nodes.map(n => {
+            if (n.id === tempId) {
+              return { ...n, id: String(res.data.id) }
+            }
+            if (n.children) return { ...n, children: replaceTemp(n.children) }
+            return n
+          })
+        }
+        setTasksData(prev => replaceTemp(prev))
+      }
+    } catch (err) {
+      console.error('Failed to create task in API:', err)
+    }
   }
 
   const renderStatus = (status: string, nodeId: string) => {

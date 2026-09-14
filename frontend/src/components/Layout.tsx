@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { api } from '../lib/api'
 import { 
-  Menu, Search, Bell, LayoutDashboard, FolderKanban, FileText, Zap, ChevronDown, LogOut, User as UserIcon, Shield, Moon, Sun
+  Menu, Search, Bell, LayoutDashboard, FolderKanban, FileText, Zap, ChevronDown, LogOut, User as UserIcon, Moon, Sun,
+  Building2, CheckCircle2, X, Sparkles, Shield
 } from 'lucide-react'
 
 export default function Layout() {
@@ -49,6 +51,62 @@ export default function Layout() {
     setUserMenuOpen(false)
     navigate('/login')
   }
+
+  // Global Search State
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const searchContainerRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // Keyboard shortcut: Cmd+K / Ctrl+K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+        setSearchOpen(true)
+      } else if (e.key === 'Escape') {
+        setSearchOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  // Debounced live search
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      setIsSearching(false)
+      return
+    }
+    setIsSearching(true)
+    const timeout = setTimeout(() => {
+      api.get('/search', { params: { q: searchQuery.trim() } })
+        .then(res => {
+          if (Array.isArray(res.data)) {
+            setSearchResults(res.data)
+          }
+        })
+        .catch(() => {})
+        .finally(() => setIsSearching(false))
+    }, 200)
+
+    return () => clearTimeout(timeout)
+  }, [searchQuery])
+
+  // Click outside search container
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setSearchOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
 
   return (
@@ -130,18 +188,95 @@ export default function Layout() {
             >
               <Menu size={20} />
             </button>
-            <div className="relative w-full max-w-xl">
+            <div className="relative w-full max-w-xl" ref={searchContainerRef}>
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <Search size={18} className="text-gray-400" />
               </div>
               <input 
+                ref={searchInputRef}
                 type="text" 
-                placeholder="Поиск проектов, задач, пользователей..." 
+                value={searchQuery}
+                onFocus={() => setSearchOpen(true)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  setSearchOpen(true)
+                }}
+                placeholder="Поиск проектов, задач, блогеров, компаний..." 
                 className="block w-full pl-11 pr-12 py-2.5 border-none rounded-xl bg-[#F3F4F6] dark:bg-[#1c1f26] text-sm text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0052cc]/30 transition-colors"
               />
-              <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                <kbd className="text-[10px] font-sans font-semibold text-gray-400 dark:text-gray-500 bg-white dark:bg-[#282d37] px-2 py-0.5 rounded shadow-xs">⌘ K</kbd>
+              <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                {searchQuery ? (
+                  <button 
+                    onClick={() => { setSearchQuery(''); setSearchResults([]); }}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-0.5 cursor-pointer"
+                  >
+                    <X size={14} />
+                  </button>
+                ) : (
+                  <kbd className="text-[10px] font-sans font-semibold text-gray-400 dark:text-gray-500 bg-white dark:bg-[#282d37] px-2 py-0.5 rounded shadow-xs pointer-events-none">⌘ K</kbd>
+                )}
               </div>
+
+              {/* Floating Live Search Dropdown */}
+              {searchOpen && searchQuery.trim() && (
+                <div className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-[#181b20] rounded-2xl shadow-2xl border border-gray-100 dark:border-[#262932] overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 max-h-[420px] overflow-y-auto">
+                  <div className="p-3 border-b border-gray-100 dark:border-[#222630] flex items-center justify-between text-xs text-gray-400">
+                    <span>Результаты поиска для: <strong className="text-gray-800 dark:text-gray-200">"{searchQuery}"</strong></span>
+                    {isSearching && <span className="animate-pulse text-[#0052cc]">Поиск...</span>}
+                  </div>
+
+                  {searchResults.length === 0 && !isSearching ? (
+                    <div className="p-8 text-center text-xs text-gray-400">
+                      Ничего не найдено по вашему запросу
+                    </div>
+                  ) : (
+                    <div className="py-2 divide-y divide-gray-50 dark:divide-[#20242c]">
+                      {searchResults.map((item, idx) => {
+                        const typeLabels: Record<string, { label: string; badge: string; icon: any }> = {
+                          project: { label: 'Проект', badge: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400', icon: FolderKanban },
+                          blogger: { label: 'Блогер', badge: 'bg-pink-50 text-pink-700 dark:bg-pink-950/40 dark:text-pink-400', icon: Sparkles },
+                          company: { label: 'Партнер B2B', badge: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400', icon: Building2 },
+                          task: { label: 'Задача', badge: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400', icon: CheckCircle2 },
+                          user: { label: 'Команда', badge: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400', icon: UserIcon },
+                        }
+                        const info = typeLabels[item.type] || { label: item.type, badge: 'bg-gray-100 text-gray-700', icon: FolderKanban }
+                        const IconComponent = info.icon
+
+                        return (
+                          <Link
+                            key={`${item.type}_${item.id}_${idx}`}
+                            to={item.url}
+                            onClick={() => {
+                              setSearchOpen(false)
+                              setSearchQuery('')
+                            }}
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#20242c] transition-colors group cursor-pointer text-left"
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-[#262a34] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 group-hover:bg-[#0052cc] group-hover:text-white transition-colors">
+                              <IconComponent size={16} />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-bold text-gray-900 dark:text-white truncate">
+                                  {item.title}
+                                </span>
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 ${info.badge}`}>
+                                  {info.label}
+                                </span>
+                              </div>
+                              {item.subtitle && (
+                                <p className="text-xs text-gray-400 truncate mt-0.5 font-sans">
+                                  {item.subtitle}
+                                </p>
+                              )}
+                            </div>
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           

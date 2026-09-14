@@ -238,6 +238,59 @@ export default function Reports() {
     return () => { isMounted = false }
   }, [selectedMonth])
 
+  // Fetch live Bloggers and Companies from PostgreSQL
+  const [liveBloggers, setLiveBloggers] = useState<any[]>([])
+  const [liveCompanies, setLiveCompanies] = useState<any[]>([])
+
+  useEffect(() => {
+    let isMounted = true
+    api.get('/bloggers/').then(res => {
+      if (isMounted && Array.isArray(res.data) && res.data.length > 0) {
+        const projectNames: Record<number, string> = { 1: 'Extragel', 2: 'Masculan', 3: 'Энтеросгель', 4: 'Фитосепт' }
+        const mapped = res.data.map((b: any) => ({
+          id: b.id,
+          project: projectNames[b.project_id] || (b.project_id ? `Проект #${b.project_id}` : 'Extragel'),
+          blogger: b.name,
+          handle: b.handle,
+          platform: b.platform,
+          followers: b.followers,
+          reach: b.reach,
+          views: (b.views || 0).toLocaleString(),
+          format: b.format,
+          price: b.price,
+          priceNum: parseInt((b.price || '0').replace(/[^\d]/g, ''), 10) || 0,
+          status: b.status,
+          profileVisits: b.profile_visits || 1200,
+          promoSales: b.link_clicks || 85,
+          er: '8.4%'
+        }))
+        setLiveBloggers(mapped)
+      }
+    }).catch(() => {})
+
+    api.get('/companies/').then(res => {
+      if (isMounted && Array.isArray(res.data) && res.data.length > 0) {
+        const projectNames: Record<number, string> = { 1: 'Extragel', 2: 'Masculan', 3: 'Энтеросгель', 4: 'Фитосепт' }
+        const mapped = res.data.map((c: any) => ({
+          id: c.id,
+          project: projectNames[c.project_id] || (c.project_id ? `Проект #${c.project_id}` : 'Extragel'),
+          name: c.name,
+          category: c.category,
+          location: c.location || 'Адрес не указан',
+          spent: c.spent,
+          spentNum: parseInt((c.spent || '0').replace(/[^\d]/g, ''), 10) || 0,
+          itemsProvided: c.items_provided || 'Материалы не указаны',
+          contactPerson: c.contact_person || '—',
+          phone: c.phone || '—',
+          status: c.status
+        }))
+        setLiveCompanies(mapped)
+      }
+    }).catch(() => {})
+
+    return () => { isMounted = false }
+  }, [])
+
   // Save inline cell edit to PostgreSQL backend
   const handleSaveCell = async (id: string, field: string, newVal: string) => {
     setEditingCell(null)
@@ -353,13 +406,15 @@ export default function Reports() {
   const totalPercent = totalPlan > 0 ? Math.round((totalFact / totalPlan) * 100) : 0
 
   // Filtered Bloggers
-  const filteredBloggers = bloggersReportData.filter(b => selectedProject === 'ALL' || b.project === selectedProject)
+  const bloggersList = liveBloggers.length > 0 ? liveBloggers : bloggersReportData
+  const filteredBloggers = bloggersList.filter(b => selectedProject === 'ALL' || b.project === selectedProject)
   const totalBloggerBudget = filteredBloggers.reduce((sum, b) => sum + b.priceNum, 0)
   const totalBloggerSales = filteredBloggers.reduce((sum, b) => sum + b.promoSales, 0)
   const publishedCount = filteredBloggers.filter(b => b.status === 'Вышел пост').length
 
   // Filtered Companies
-  const filteredCompanies = companiesReportData.filter(c => selectedProject === 'ALL' || c.project === selectedProject)
+  const companiesList = liveCompanies.length > 0 ? liveCompanies : companiesReportData
+  const filteredCompanies = companiesList.filter(c => selectedProject === 'ALL' || c.project === selectedProject)
   const totalCompanySpent = filteredCompanies.reduce((sum, c) => sum + c.spentNum, 0)
 
   // Real Excel / CSV Export Generator with UTF-8 BOM

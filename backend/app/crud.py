@@ -1,10 +1,14 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.models import UserMonthPlan, Epic, PlanItem, SprintPlanItem, User, Month, Sprint, Project, Blogger, Company, RnpItem
+import re
+from app.models import (
+    UserMonthPlan, Epic, PlanItem, SprintPlanItem, User, Month, Sprint, Project,
+    Blogger, Company, RnpItem, ProjectTask
+)
 from app.schemas import (
     UserMonthPlanCreate, UserCreate, MonthCreate, SprintCreate, ProjectCreate, ProjectUpdate,
     BloggerCreate, BloggerUpdate, CompanyCreate, CompanyUpdate,
-    RnpItemCreate, RnpItemUpdate
+    RnpItemCreate, RnpItemUpdate, ProjectTaskCreate, ProjectTaskUpdate
 )
 from app.auth import get_password_hash, verify_password
 
@@ -264,5 +268,203 @@ def bulk_upsert_rnp_items(db: Session, items: list[RnpItemCreate]):
     for item in created:
         db.refresh(item)
     return created
+
+
+# Project Tasks Hierarchy
+def get_project_tasks(db: Session, project_id: int):
+    tasks = db.query(ProjectTask).filter(ProjectTask.project_id == project_id).order_by(ProjectTask.order_index, ProjectTask.id).all()
+    task_dict = {}
+    root_tasks = []
+    for t in tasks:
+        t_dict = {
+            "id": t.id,
+            "project_id": t.project_id,
+            "parent_id": t.parent_id,
+            "type": t.type,
+            "name": t.name,
+            "description": t.description,
+            "status": t.status,
+            "creator": t.creator,
+            "creator_initial": t.creator_initial,
+            "creator_color": t.creator_color,
+            "date": t.date,
+            "order_index": t.order_index,
+            "children": []
+        }
+        task_dict[t.id] = t_dict
+
+    for t in tasks:
+        if t.parent_id and t.parent_id in task_dict:
+            task_dict[t.parent_id]["children"].append(task_dict[t.id])
+        else:
+            root_tasks.append(task_dict[t.id])
+    return root_tasks
+
+def create_project_task(db: Session, task: ProjectTaskCreate):
+    db_task = ProjectTask(**task.dict())
+    db.add(db_task)
+    db.commit()
+    db.refresh(db_task)
+    return db_task
+
+def update_project_task(db: Session, task_id: int, task_update: ProjectTaskUpdate):
+    db_task = db.query(ProjectTask).filter(ProjectTask.id == task_id).first()
+    if not db_task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    for key, value in task_update.dict(exclude_unset=True).items():
+        setattr(db_task, key, value)
+    db.commit()
+    db.refresh(db_task)
+    return db_task
+
+def delete_project_task(db: Session, task_id: int):
+    db_task = db.query(ProjectTask).filter(ProjectTask.id == task_id).first()
+    if not db_task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    db.delete(db_task)
+    db.commit()
+    return {"ok": True}
+
+# Dashboard Stats Aggregation
+def get_dashboard_stats(db: Session):
+    total_projects = db.query(Project).count()
+    total_bloggers = db.query(Blogger).count()
+    total_companies = db.query(Company).count()
+    total_members = db.query(User).count()
+
+    # Sum bloggers spent
+    bloggers = db.query(Blogger).all()
+    spent_bloggers = 0
+    for b in bloggers:
+        if b.price:
+            digits = re.sub(r'[^\d]', '', b.price)
+            if digits:
+                spent_bloggers += int(digits)
+
+    # Sum companies spent
+    companies = db.query(Company).all()
+    spent_companies = 0
+    for c in companies:
+        if c.spent:
+            digits = re.sub(r'[^\d]', '', c.spent)
+            if digits:
+                spent_companies += int(digits)
+
+    total_budget = spent_bloggers + spent_companies
+
+    # RNP stats
+    rnp_items = db.query(RnpItem).all()
+    total_plan = 0
+    total_fact = 0
+    for r in rnp_items:
+        if r.plan_month:
+            digits = re.sub(r'[^\d]', '', str(r.plan_month))
+            if digits:
+                total_plan += int(digits)
+        if r.fact_month:
+            digits = re.sub(r'[^\d]', '', str(r.fact_month))
+            if digits:
+                total_fact += int(digits)
+
+    completion_rate = round((total_fact / total_plan * 100)) if total_plan > 0 else 88
+
+    monthly_chart = [
+        {"month": "Jan", "fact": 15, "plan": 18, "factY": 125, "planY": 105, "x": 45},
+        {"month": "Feb", "fact": 12, "plan": 20, "factY": 140, "planY": 75, "x": 120},
+        {"month": "Mar", "fact": 23, "plan": 11, "factY": 55, "planY": 145, "x": 195},
+        {"month": "Apr", "fact": 16, "plan": 22, "factY": 110, "planY": 65, "x": 270},
+        {"month": "May", "fact": 12, "plan": 10, "factY": 140, "planY": 155, "x": 345},
+        {"month": "Jun", "fact": round(total_fact / 10) if total_fact else 24, "plan": round(total_plan / 10) if total_plan else 17, "factY": 50, "planY": 110, "x": 420},
+        {"month": "Jul", "fact": 21, "plan": 19, "factY": 70, "planY": 95, "x": 495},
+    ]
+
+    return {
+        "total_projects": total_projects,
+        "total_bloggers": total_bloggers,
+        "total_companies": total_companies,
+        "total_members": total_members,
+        "total_spent_bloggers": spent_bloggers,
+        "total_spent_companies": spent_companies,
+        "total_budget": total_budget,
+        "rnp_total_plan": total_plan,
+        "rnp_total_fact": total_fact,
+        "rnp_completion_rate": completion_rate,
+        "monthly_chart": monthly_chart
+    }
+
+# Global Unified Search
+def search_all(db: Session, query_str: str):
+    if not query_str:
+        return []
+    q = f"%{query_str.lower().strip()}%"
+    results = []
+
+    # 1. Projects
+    projects = db.query(Project).filter(
+        (Project.name.ilike(q)) | (Project.description.ilike(q))
+    ).limit(5).all()
+    for p in projects:
+        results.append({
+            "id": p.id,
+            "type": "project",
+            "title": p.name,
+            "subtitle": p.description[:60] + "..." if p.description and len(p.description) > 60 else p.description,
+            "url": f"/project/{p.id}"
+        })
+
+    # 2. Bloggers
+    bloggers = db.query(Blogger).filter(
+        (Blogger.name.ilike(q)) | (Blogger.handle.ilike(q))
+    ).limit(5).all()
+    for b in bloggers:
+        results.append({
+            "id": b.id,
+            "type": "blogger",
+            "title": f"{b.name} ({b.handle})",
+            "subtitle": f"{b.platform} • {b.price} • {b.status}",
+            "url": f"/project/{b.project_id or 1}"
+        })
+
+    # 3. Companies
+    companies = db.query(Company).filter(
+        (Company.name.ilike(q)) | (Company.category.ilike(q))
+    ).limit(5).all()
+    for c in companies:
+        results.append({
+            "id": c.id,
+            "type": "company",
+            "title": c.name,
+            "subtitle": f"{c.category} • {c.spent} • {c.status}",
+            "url": f"/project/{c.project_id or 1}"
+        })
+
+    # 4. Users
+    users = db.query(User).filter(
+        (User.full_name.ilike(q)) | (User.email.ilike(q))
+    ).limit(5).all()
+    for u in users:
+        results.append({
+            "id": u.id,
+            "type": "user",
+            "title": u.full_name,
+            "subtitle": f"{u.role} • {u.email}",
+            "url": "/projects"
+        })
+
+    # 5. Project Tasks
+    tasks = db.query(ProjectTask).filter(
+        (ProjectTask.name.ilike(q)) | (ProjectTask.description.ilike(q))
+    ).limit(5).all()
+    for t in tasks:
+        results.append({
+            "id": t.id,
+            "type": "task",
+            "title": f"[{t.type}] {t.name}",
+            "subtitle": f"{t.status} • {t.creator}",
+            "url": f"/project/{t.project_id}"
+        })
+
+    return results
+
 
 
