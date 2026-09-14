@@ -5,7 +5,7 @@ import {
   ChevronRight, ChevronDown, Plus, Search, ArrowLeft, ChevronLeft,
   Calendar, CheckCircle2, Circle, LayoutList, Grip, X, Trash2, 
   Check, Sparkles, SlidersHorizontal, CalendarDays,
-  ExternalLink, Edit3, User, Users, Eye, DollarSign, Share2,
+  ExternalLink, User, Users, Eye, DollarSign, Share2,
   Building2, MapPin, Package, Phone, Zap, RefreshCw, Heart, MessageCircle, Bookmark, TrendingUp,
   Save, AlertTriangle, Mail, Table, Layers
 } from 'lucide-react'
@@ -1529,14 +1529,6 @@ export default function ProjectView() {
         console.error('Failed to delete task in API:', err)
       }
     }
-  }
-
-  // Quick inline rename helper for Plans
-  const renamePlanSprint = (monthId: string, sprintId: string, newName: string) => {
-    setPlansData(data => data.map(m => m.id === monthId ? {
-      ...m,
-      sprints: (m.sprints || []).map((sp: any) => sp.id === sprintId ? { ...sp, name: newName } : sp)
-    } : m))
   }
 
   // Update Detail Item for both Tasks and Plans
@@ -4049,78 +4041,45 @@ export default function ProjectView() {
                   key={month.id} 
                   className="bg-white dark:bg-[#181b20] rounded-2xl border border-gray-100 dark:border-[#262932] shadow-sm overflow-hidden"
                 >
-                  {/* MONTH HEADER BAR */}
+                  {/* MONTH HEADER BAR - MINIMAL: DATE, STATUS, PROGRESS % */}
                   <div 
-                    className="flex flex-wrap items-center justify-between p-5 bg-slate-50/60 dark:bg-[#1b1f27] border-b border-gray-100 dark:border-[#262932] cursor-pointer hover:bg-slate-100/60 dark:hover:bg-[#202530] transition-colors"
+                    className="flex items-center justify-between p-4 px-6 bg-slate-50/70 dark:bg-[#1b1f27] border-b border-gray-100 dark:border-[#262932] cursor-pointer hover:bg-slate-100/70 dark:hover:bg-[#202530] transition-colors"
                     onClick={() => togglePlanOpen(month.id)}
                   >
                     <div className="flex items-center gap-3">
                       <button className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                        {month.isOpen ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                        {month.isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                       </button>
-                      <span className="bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 text-xs font-extrabold px-3 py-1 rounded-lg tracking-wide">
-                        MONTH
-                      </span>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span 
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setSelectedDetailItem({ ...month, type: 'MONTH', description: month.description || '' })
-                            }}
-                            className="font-extrabold text-gray-900 dark:text-white text-base hover:text-[#4f46e5] dark:hover:text-indigo-400 transition-colors"
-                            title="Переименовать месяц"
-                          >
-                            {month.name}
-                          </span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setSelectedDetailItem({ ...month, type: 'MONTH', description: month.description || '' })
-                            }}
-                            className="text-gray-400 hover:text-[#4f46e5] dark:hover:text-indigo-400 p-0.5 rounded"
-                            title="Редактировать месяц"
-                          >
-                            <Edit3 size={13} />
-                          </button>
-                          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                            ({month.period})
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                            {monthSprints.length} спринтов
-                          </span>
-                          <span>•</span>
-                          <span>
-                            {totalTasksCount} задач ({doneTasksCount} выполнено)
-                          </span>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <span 
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedDetailItem({ ...month, type: 'MONTH', description: month.description || '' })
+                          }}
+                          className="font-bold text-gray-900 dark:text-white text-[15px] hover:text-[#4f46e5] dark:hover:text-indigo-400 transition-colors"
+                        >
+                          {month.name}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                          ({month.period})
+                        </span>
                       </div>
                     </div>
 
-                    {/* Month Metrics and Controls */}
-                    <div className="flex items-center gap-6" onClick={(e) => e.stopPropagation()}>
-                      <div className="text-right">
-                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">План месяца</div>
-                        <div className="text-sm font-extrabold text-gray-900 dark:text-white">
-                          {totalMonthPlan} <span className="text-xs font-medium text-gray-400">ед.</span>
-                        </div>
-                      </div>
+                    {/* Minimal Right side: Status and Progress % */}
+                    <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                        monthProgress >= 100
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/40'
+                          : monthProgress > 0
+                          ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-800/40'
+                          : 'bg-gray-100 dark:bg-[#202530] text-gray-500 dark:text-gray-400'
+                      }`}>
+                        {monthProgress >= 100 ? 'Выполнено' : monthProgress > 0 ? 'В процессе' : 'Не начато'}
+                      </span>
 
-                      <div className="text-right">
-                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Факт месяца</div>
-                        <div className="text-sm font-extrabold text-[#4f46e5] dark:text-indigo-400">
-                          {totalMonthFact} <span className="text-xs font-medium text-gray-400">ед.</span>
-                        </div>
-                      </div>
-
-                      <div className="w-36">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Выполнение</span>
-                          <span className="text-xs font-extrabold text-gray-800 dark:text-gray-200">{monthProgress}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 dark:bg-[#2b303c] rounded-full h-2 overflow-hidden">
+                      <div className="flex items-center gap-2.5 w-36">
+                        <div className="flex-1 bg-gray-200 dark:bg-[#2b303c] rounded-full h-2 overflow-hidden">
                           <div 
                             className={`h-2 rounded-full transition-all duration-500 ${
                               monthProgress >= 100 ? 'bg-emerald-500' : monthProgress > 0 ? 'bg-[#4f46e5]' : 'bg-gray-300 dark:bg-gray-600'
@@ -4128,34 +4087,58 @@ export default function ProjectView() {
                             style={{ width: `${monthProgress}%` }}
                           />
                         </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 pl-2 border-l border-gray-200 dark:border-[#262932]">
-                        <button
-                          onClick={() => {
-                            setTargetMonthForSprintId(month.id)
-                            setIsAddSprintOpen(true)
-                          }}
-                          className="px-3 py-1.5 text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-[#4f46e5] text-[#4f46e5] dark:text-indigo-300 hover:text-white rounded-xl transition-colors cursor-pointer flex items-center gap-1"
-                          title="Добавить еще один спринт в этот месяц"
-                        >
-                          <Plus size={13} strokeWidth={2.5} /> Спринт
-                        </button>
-
-                        <button
-                          onClick={(e) => deleteMonth(month.id, e)}
-                          className="p-1.5 text-gray-400 hover:text-rose-500 rounded-lg transition-colors cursor-pointer"
-                          title="Удалить месяц"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <span className="text-xs font-extrabold text-gray-800 dark:text-gray-200 min-w-[32px] text-right">
+                          {monthProgress}%
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* EXPANDED CONTENT: VIEW 1 (SPRINTS) OR VIEW 2 (MATRIX) */}
+                  {/* EXPANDED CONTENT: ALL DETAILS ARE INSIDE */}
                   {month.isOpen && (
                     <div className="p-6">
+                      {/* MONTH INTERNAL SUMMARY BAR ("остальное внутри его") */}
+                      <div className="flex flex-wrap items-center justify-between gap-4 p-4 mb-5 bg-slate-50/70 dark:bg-[#15181f] rounded-xl border border-gray-100 dark:border-[#262932]">
+                        <div className="flex flex-wrap items-center gap-5 text-xs text-gray-600 dark:text-gray-300">
+                          <div>
+                            <span className="text-gray-400">План месяца: </span>
+                            <span className="font-bold text-gray-900 dark:text-white">{totalMonthPlan} ед.</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Факт месяца: </span>
+                            <span className="font-bold text-[#4f46e5] dark:text-indigo-400">{totalMonthFact} ед.</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Спринтов: </span>
+                            <span className="font-bold text-gray-900 dark:text-white">{monthSprints.length}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Задач: </span>
+                            <span className="font-bold text-gray-900 dark:text-white">{totalTasksCount}</span>
+                            <span className="text-gray-400"> ({doneTasksCount} выполнено)</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setTargetMonthForSprintId(month.id)
+                              setIsAddSprintOpen(true)
+                            }}
+                            className="px-3 py-1.5 text-xs font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
+                          >
+                            <Plus size={13} strokeWidth={2.5} /> Добавить спринт
+                          </button>
+                          <button
+                            onClick={(e) => deleteMonth(month.id, e)}
+                            className="p-1.5 text-gray-400 hover:text-rose-500 rounded-lg transition-colors cursor-pointer"
+                            title="Удалить месяц"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </div>
+
                       {/* VIEW 1: SPRINTS CARDS & TASKS */}
                       {plansViewMode === 'sprints' && (
                         <div className="space-y-6">
@@ -4173,7 +4156,7 @@ export default function ProjectView() {
                               </button>
                             </div>
                           ) : (
-                            monthSprints.map((sprint: any, sprintIdx: number) => {
+                            monthSprints.map((sprint: any, _sprintIdx: number) => {
                               const sprintTasks = sprint.tasks || []
                               const sprintPlan = sprintTasks.reduce((s: number, t: any) => s + Number(t.plan || 0), 0)
                               const sprintFact = sprintTasks.reduce((s: number, t: any) => s + Number(t.fact || 0), 0)
@@ -4184,75 +4167,84 @@ export default function ProjectView() {
                                   key={sprint.id}
                                   className="border border-gray-100 dark:border-[#262932] rounded-xl overflow-hidden bg-slate-50/30 dark:bg-[#14171d]"
                                 >
-                                  {/* SPRINT HEADER */}
-                                  <div className="flex flex-wrap items-center justify-between p-4 bg-white dark:bg-[#181b20] border-b border-gray-100 dark:border-[#262932]">
-                                    <div className="flex items-center gap-3">
-                                      <button 
-                                        onClick={() => togglePlanOpen(sprint.id)}
-                                        className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                                      >
-                                        {sprint.isOpen !== false ? <ChevronDown size={17} /> : <ChevronRight size={17} />}
+                                  {/* SPRINT HEADER - MINIMAL: DATE / PERIOD, STATUS, PROGRESS % */}
+                                  <div 
+                                    className="flex items-center justify-between p-3.5 px-5 bg-white dark:bg-[#181b20] border-b border-gray-100 dark:border-[#262932] cursor-pointer hover:bg-slate-50 dark:hover:bg-[#1c2028] transition-colors"
+                                    onClick={() => togglePlanOpen(sprint.id)}
+                                  >
+                                    <div className="flex items-center gap-2.5">
+                                      <button className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                                        {sprint.isOpen !== false ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                                       </button>
-                                      <span className="bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-md tracking-wider">
-                                        СПРИНТ {sprintIdx + 1}
-                                      </span>
-                                      <input
-                                        type="text"
-                                        value={sprint.name}
-                                        onChange={(e) => renamePlanSprint(month.id, sprint.id, e.target.value)}
-                                        className="text-sm font-bold text-gray-900 dark:text-white bg-transparent hover:bg-slate-100 dark:hover:bg-[#202530] focus:bg-white dark:focus:bg-[#1f232b] px-2 py-1 rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-[#2b303c] outline-none transition-colors max-w-sm"
-                                        title="Кликните для быстрого переименования спринта"
-                                      />
-                                      <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
-                                        ({sprint.period})
+                                      <span className="font-bold text-gray-900 dark:text-white text-sm">
+                                        {sprint.name.includes(sprint.period) ? sprint.name : `${sprint.name} (${sprint.period})`}
                                       </span>
                                     </div>
 
-                                    <div className="flex items-center gap-5">
-                                      <div className="text-xs text-gray-600 dark:text-gray-300 font-medium">
-                                        Задач: <span className="font-bold text-gray-900 dark:text-white">{sprintTasks.length}</span>
-                                      </div>
-                                      <div className="text-xs text-gray-600 dark:text-gray-300 font-medium">
-                                        План: <span className="font-bold text-gray-900 dark:text-white">{sprintPlan}</span>
-                                      </div>
-                                      <div className="text-xs text-gray-600 dark:text-gray-300 font-medium">
-                                        Факт: <span className="font-bold text-[#4f46e5] dark:text-indigo-400">{sprintFact}</span>
-                                      </div>
-                                      <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                                    {/* Minimal Right side: Status and Progress % */}
+                                    <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+                                      <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
                                         sprintProgress >= 100
                                           ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
                                           : sprintProgress > 0
                                           ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
-                                          : 'bg-gray-100 dark:bg-[#20242c] text-gray-500'
+                                          : 'bg-gray-100 dark:bg-[#20242c] text-gray-500 dark:text-gray-400'
                                       }`}>
-                                        {sprintProgress}%
+                                        {sprintProgress >= 100 ? 'Выполнено' : sprintProgress > 0 ? 'В процессе' : 'Не начато'}
                                       </span>
 
-                                      <button
-                                        onClick={() => {
-                                          setTargetSprintMonthId(month.id)
-                                          setTargetSprintId(sprint.id)
-                                          setTargetSprintName(sprint.name)
-                                          setIsAddTaskToSprintOpen(true)
-                                        }}
-                                        className="px-3 py-1.5 bg-[#4f46e5] hover:bg-[#4338ca] text-white text-xs font-bold rounded-xl flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
-                                      >
-                                        <Plus size={14} /> Добавить задачу
-                                      </button>
-
-                                      <button
-                                        onClick={(e) => deleteSprint(month.id, sprint.id, e)}
-                                        className="p-1 text-gray-400 hover:text-rose-500 rounded transition-colors cursor-pointer"
-                                        title="Удалить спринт"
-                                      >
-                                        <Trash2 size={15} />
-                                      </button>
+                                      <div className="flex items-center gap-2 w-28">
+                                        <div className="flex-1 bg-gray-200 dark:bg-[#2b303c] rounded-full h-1.5 overflow-hidden">
+                                          <div 
+                                            className={`h-1.5 rounded-full transition-all duration-500 ${
+                                              sprintProgress >= 100 ? 'bg-emerald-500' : sprintProgress > 0 ? 'bg-[#4f46e5]' : 'bg-gray-300 dark:bg-gray-600'
+                                            }`}
+                                            style={{ width: `${sprintProgress}%` }}
+                                          />
+                                        </div>
+                                        <span className={`text-xs font-bold min-w-[28px] text-right ${
+                                          sprintProgress >= 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-800 dark:text-gray-200'
+                                        }`}>
+                                          {sprintProgress}%
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
 
-                                  {/* SPRINT TASKS BODY */}
+                                  {/* SPRINT BODY: DETAILED INFO & ACTIONS INSIDE */}
                                   {sprint.isOpen !== false && (
                                     <div>
+                                      <div className="flex items-center justify-between px-5 py-2.5 bg-slate-50/60 dark:bg-[#15181f] border-b border-gray-100 dark:border-[#262932] text-xs">
+                                        <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400">
+                                          <span>Задач: <strong className="text-gray-800 dark:text-gray-200">{sprintTasks.length}</strong></span>
+                                          <span>•</span>
+                                          <span>План: <strong className="text-gray-800 dark:text-gray-200">{sprintPlan}</strong></span>
+                                          <span>•</span>
+                                          <span>Факт: <strong className="text-[#4f46e5] dark:text-indigo-400">{sprintFact}</strong></span>
+                                        </div>
+
+                                        <div className="flex items-center gap-3">
+                                          <button
+                                            onClick={() => {
+                                              setTargetSprintMonthId(month.id)
+                                              setTargetSprintId(sprint.id)
+                                              setTargetSprintName(sprint.name)
+                                              setIsAddTaskToSprintOpen(true)
+                                            }}
+                                            className="px-2.5 py-1 bg-[#4f46e5] hover:bg-[#4338ca] text-white text-xs font-bold rounded-lg flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
+                                          >
+                                            <Plus size={13} /> Добавить задачу
+                                          </button>
+                                          <button
+                                            onClick={(e) => deleteSprint(month.id, sprint.id, e)}
+                                            className="p-1 text-gray-400 hover:text-rose-500 rounded transition-colors cursor-pointer"
+                                            title="Удалить спринт"
+                                          >
+                                            <Trash2 size={14} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                      {/* SPRINT TASKS TABLE */}
                                       {sprintTasks.length === 0 ? (
                                         <div className="p-5 text-center text-xs text-gray-400 dark:text-gray-500">
                                           В этом спринте пока нет задач. Нажмите «+ Добавить задачу», чтобы зафиксировать целевой показатель.
