@@ -1205,7 +1205,6 @@ export default function ProjectView() {
   const [newTaskName, setNewTaskName] = useState('')
   const [newTaskPlan, setNewTaskPlan] = useState<number>(30)
   const [newTaskFact, setNewTaskFact] = useState<number>(0)
-  const [newTaskUnit, setNewTaskUnit] = useState('визитов')
   const [newTaskAssignee, setNewTaskAssignee] = useState('Азамат')
   const [newTaskStatus, setNewTaskStatus] = useState<'Not Done' | 'In Progress' | 'Done'>('Not Done')
 
@@ -1311,7 +1310,7 @@ export default function ProjectView() {
       name: newTaskName.trim(),
       plan: Number(newTaskPlan) || 0,
       fact: Number(newTaskFact) || 0,
-      unit: newTaskUnit.trim() || 'шт',
+      unit: '',
       status: newTaskStatus,
       assignee: newTaskAssignee.trim() || 'Не назначен'
     }
@@ -3219,25 +3218,14 @@ export default function ProjectView() {
             )}
 
             {selectedDetailItem.type === 'PLAN_ITEM' && (
-              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Целевой план на месяц</label>
-                  <input
-                    type="number"
-                    value={selectedDetailItem.monthPlan || 0}
-                    onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, monthPlan: Number(e.target.value) })}
-                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Единица измерения</label>
-                  <input
-                    type="text"
-                    value={selectedDetailItem.unit || 'шт'}
-                    onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, unit: e.target.value })}
-                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
-                  />
-                </div>
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Целевой план на месяц</label>
+                <input
+                  type="number"
+                  value={selectedDetailItem.monthPlan || 0}
+                  onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, monthPlan: Number(e.target.value) })}
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
               </div>
             )}
 
@@ -3248,24 +3236,24 @@ export default function ProjectView() {
                   type="number"
                   value={selectedDetailItem.plan || 0}
                   onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, plan: Number(e.target.value) })}
-                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
             )}
 
-            {(selectedDetailItem.plan !== undefined || selectedDetailItem.fact !== undefined || selectedDetailItem.unit !== undefined) && (
+            {(selectedDetailItem.plan !== undefined || selectedDetailItem.fact !== undefined) && (
               <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm space-y-4">
                 <h3 className="text-sm font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider">
                   Целевые показатели задачи
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">План</label>
                     <input
                       type="number"
                       value={selectedDetailItem.plan ?? 0}
                       onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, plan: Number(e.target.value) })}
-                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
+                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
                   <div>
@@ -3274,17 +3262,7 @@ export default function ProjectView() {
                       type="number"
                       value={selectedDetailItem.fact ?? 0}
                       onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, fact: Number(e.target.value) })}
-                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Единица измерения</label>
-                    <input
-                      type="text"
-                      placeholder="визиты, шт, звонки..."
-                      value={selectedDetailItem.unit || ''}
-                      onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, unit: e.target.value })}
-                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
+                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
                 </div>
@@ -3673,7 +3651,7 @@ export default function ProjectView() {
               <input
                 type="text"
                 required
-                placeholder="Например: Визиты к кардиологам и терапевтам"
+                placeholder="Например: 30 визитов к врачам или 15 аптек"
                 value={newTaskName}
                 onChange={(e) => setNewTaskName(e.target.value)}
                 className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
@@ -3689,7 +3667,7 @@ export default function ProjectView() {
                   min="1"
                   value={newTaskPlan}
                   onChange={(e) => setNewTaskPlan(Number(e.target.value))}
-                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
 
@@ -3700,36 +3678,9 @@ export default function ProjectView() {
                   min="0"
                   value={newTaskFact}
                   onChange={(e) => setNewTaskFact(Number(e.target.value))}
-                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Единица измерения</label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {['визитов', 'аптек', 'звонков', 'продаж', 'договоров', 'шт'].map((u) => (
-                  <button
-                    key={u}
-                    type="button"
-                    onClick={() => setNewTaskUnit(u)}
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-                      newTaskUnit === u
-                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-[#4f46e5] text-[#4f46e5] dark:text-indigo-300'
-                        : 'border-gray-200 dark:border-[#2b303c] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#202530]'
-                    }`}
-                  >
-                    {u}
-                  </button>
-                ))}
-              </div>
-              <input
-                type="text"
-                placeholder="Или укажите свою единицу"
-                value={newTaskUnit}
-                onChange={(e) => setNewTaskUnit(e.target.value)}
-                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white dark:focus:bg-[#181b20] outline-none"
-              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
