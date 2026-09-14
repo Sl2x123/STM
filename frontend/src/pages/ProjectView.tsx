@@ -1599,7 +1599,7 @@ export default function ProjectView() {
         <div 
           onClick={(e) => cycleTaskStatus(nodeId, e)}
           title="Нажмите, чтобы сменить статус"
-          className="flex items-center text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-3 py-1 rounded-full text-xs font-semibold w-max transition-colors cursor-pointer"
+          className="flex items-center text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 px-3 py-1 rounded-full text-xs font-semibold w-max transition-colors cursor-pointer"
         >
           <CheckCircle2 size={14} className="mr-1.5" /> Done
         </div>
@@ -1610,7 +1610,7 @@ export default function ProjectView() {
         <div 
           onClick={(e) => cycleTaskStatus(nodeId, e)}
           title="Нажмите, чтобы сменить статус"
-          className="flex items-center text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-full text-xs font-semibold w-max transition-colors cursor-pointer"
+          className="flex items-center text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-3 py-1 rounded-full text-xs font-semibold w-max transition-colors cursor-pointer"
         >
           <Circle size={14} className="mr-1.5" /> In Progress
         </div>
@@ -1620,7 +1620,7 @@ export default function ProjectView() {
       <div 
         onClick={(e) => cycleTaskStatus(nodeId, e)}
         title="Нажмите, чтобы сменить статус"
-        className="flex items-center text-gray-500 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full text-xs font-semibold w-max transition-colors cursor-pointer"
+        className="flex items-center text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#20242c] hover:bg-gray-200 dark:hover:bg-[#282d38] px-3 py-1 rounded-full text-xs font-semibold w-max transition-colors cursor-pointer"
       >
         <Circle size={14} className="mr-1.5" /> Not Done
       </div>
@@ -1629,17 +1629,17 @@ export default function ProjectView() {
 
   const renderBadge = (type: string) => {
     if (type === 'EPIC') {
-      return <span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded ml-2 mr-3 tracking-wide shrink-0">EPIC</span>
+      return <span className="bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-bold px-2.5 py-0.5 rounded-md ml-2 mr-3 tracking-wide shrink-0">EPIC</span>
     }
     if (type === 'SPRINT') {
-      return <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded ml-2 mr-3 tracking-wide shrink-0">SPRINT</span>
+      return <span className="bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold px-2.5 py-0.5 rounded-md ml-2 mr-3 tracking-wide shrink-0">SPRINT</span>
     }
     if (type === 'DAILY') {
-      return <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded ml-2 mr-3 tracking-wide shrink-0">DAILY</span>
+      return <span className="bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xs font-bold px-2.5 py-0.5 rounded-md ml-2 mr-3 tracking-wide shrink-0">DAILY</span>
     }
     return (
-      <span className="flex items-center text-gray-500 text-[10px] font-bold px-2 py-0.5 ml-2 mr-3 tracking-wide bg-gray-100 rounded border border-gray-200 shrink-0">
-        <CheckCircle2 size={10} className="mr-1" /> TASK
+      <span className="flex items-center text-gray-600 dark:text-gray-300 text-xs font-bold px-2.5 py-0.5 ml-2 mr-3 tracking-wide bg-gray-100 dark:bg-[#20242c] rounded-md border border-gray-200 dark:border-[#2b303c] shrink-0">
+        <CheckCircle2 size={12} className="mr-1" /> TASK
       </span>
     )
   }
@@ -1652,13 +1652,13 @@ export default function ProjectView() {
     return (
       <div key={node.id}>
         <div 
-          className="flex items-center border-b border-gray-100 hover:bg-slate-50 transition-colors bg-white group select-none"
+          className="flex items-center border-b border-gray-100 dark:border-[#262932] hover:bg-slate-50 dark:hover:bg-[#1e222a] transition-colors bg-white dark:bg-[#181b20] group select-none"
         >
           {/* Name column */}
           <div className="flex-1 py-3.5 flex items-center min-w-[300px]" style={{ paddingLeft: `${paddingLeft}px` }}>
             <div className="w-5 flex items-center justify-center shrink-0 cursor-pointer" onClick={() => hasChildren && toggleTaskOpen(node.id)}>
               {hasChildren ? (
-                <button className="text-gray-400 hover:text-gray-700">
+                <button className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
                   {node.isOpen ? <ChevronDown size={17} /> : <ChevronRight size={17} />}
                 </button>
               ) : (
@@ -1671,7 +1671,7 @@ export default function ProjectView() {
             {/* Clickable name opens detailed view modal */}
             <span 
               onClick={() => setSelectedDetailItem(node)}
-              className="font-semibold text-gray-900 text-[14px] hover:text-[#4f46e5] cursor-pointer transition-colors truncate"
+              className="font-semibold text-gray-900 dark:text-white text-[14px] hover:text-[#4f46e5] dark:hover:text-indigo-400 cursor-pointer transition-colors truncate"
               title="Нажмите, чтобы открыть подробное описание"
             >
               {node.name}
@@ -1686,7 +1686,7 @@ export default function ProjectView() {
                   setModalParentId(node.id)
                   setIsModalOpen(true)
                 }}
-                className="ml-2.5 w-5 h-5 rounded-md bg-purple-50 hover:bg-[#4f46e5] text-purple-600 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
+                className="ml-2.5 w-5 h-5 rounded-md bg-purple-50 dark:bg-purple-950/60 hover:bg-[#4f46e5] text-purple-600 dark:text-purple-300 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
                 title="Добавить Спринт в этот Epic"
               >
                 <Plus size={13} strokeWidth={2.5} />
@@ -1702,7 +1702,7 @@ export default function ProjectView() {
                   setModalParentId(node.id)
                   setIsModalOpen(true)
                 }}
-                className="ml-2.5 w-5 h-5 rounded-md bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
+                className="ml-2.5 w-5 h-5 rounded-md bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-600 text-blue-600 dark:text-blue-300 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
                 title="Добавить Делик в этот Спринт"
               >
                 <Plus size={13} strokeWidth={2.5} />
@@ -1718,7 +1718,7 @@ export default function ProjectView() {
                   setModalParentId(node.id)
                   setIsModalOpen(true)
                 }}
-                className="ml-2.5 w-5 h-5 rounded-md bg-amber-50 hover:bg-amber-600 text-amber-700 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
+                className="ml-2.5 w-5 h-5 rounded-md bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-600 text-amber-700 dark:text-amber-300 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
                 title="Добавить Задачу в этот Делик"
               >
                 <Plus size={13} strokeWidth={2.5} />
@@ -1729,7 +1729,7 @@ export default function ProjectView() {
           {/* Description */}
           <div 
             onClick={() => setSelectedDetailItem(node)}
-            className="w-[300px] py-3.5 pr-6 text-[13px] text-gray-500 truncate shrink-0 cursor-pointer hover:text-gray-800" 
+            className="w-[300px] py-3.5 pr-6 text-[13px] text-gray-500 dark:text-gray-400 truncate shrink-0 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200" 
             title={node.description}
           >
             {node.description}
@@ -1745,16 +1745,16 @@ export default function ProjectView() {
             <div className={`w-6 h-6 rounded-full ${node.creatorColor} text-white flex items-center justify-center text-[10px] font-bold mr-2 shrink-0`}>
               {node.creatorInitial}
             </div>
-            <span className="text-[13px] text-gray-700 font-medium truncate">{node.creator}</span>
+            <span className="text-[13px] text-gray-700 dark:text-gray-300 font-medium truncate">{node.creator}</span>
           </div>
 
           {/* Date */}
-          <div className="w-[140px] py-3.5 pr-2 text-[13px] text-gray-500 font-medium shrink-0">
+          <div className="w-[140px] py-3.5 pr-2 text-[13px] text-gray-500 dark:text-gray-400 font-medium shrink-0">
             {node.date}
           </div>
           
           {/* Actions */}
-          <div className="w-[120px] py-3.5 pr-4 flex items-center justify-end gap-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+          <div className="w-[120px] py-3.5 pr-4 flex items-center justify-end gap-1 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
             {node.type === 'EPIC' && (
               <button 
                 onClick={(e) => {
@@ -1763,7 +1763,7 @@ export default function ProjectView() {
                   setModalParentId(node.id)
                   setIsModalOpen(true)
                 }}
-                className="w-6 h-6 rounded-lg bg-indigo-50 hover:bg-[#4f46e5] text-[#4f46e5] hover:text-white flex items-center justify-center transition-all"
+                className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-[#4f46e5] text-[#4f46e5] dark:text-indigo-300 hover:text-white flex items-center justify-center transition-all"
                 title="Добавить Спринт в этот Epic"
               >
                 <Plus size={14} />
@@ -1777,7 +1777,7 @@ export default function ProjectView() {
                   setModalParentId(node.id)
                   setIsModalOpen(true)
                 }}
-                className="w-6 h-6 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white flex items-center justify-center transition-all"
+                className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-600 text-blue-600 dark:text-blue-300 hover:text-white flex items-center justify-center transition-all"
                 title="Добавить Делик в этот Спринт"
               >
                 <Plus size={14} />
@@ -1791,7 +1791,7 @@ export default function ProjectView() {
                   setModalParentId(node.id)
                   setIsModalOpen(true)
                 }}
-                className="w-6 h-6 rounded-lg bg-amber-50 hover:bg-amber-600 text-amber-700 hover:text-white flex items-center justify-center transition-all"
+                className="w-6 h-6 rounded-lg bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-600 text-amber-700 dark:text-amber-300 hover:text-white flex items-center justify-center transition-all"
                 title="Добавить Задачу в этот Делик"
               >
                 <Plus size={14} />
@@ -1799,14 +1799,14 @@ export default function ProjectView() {
             )}
             <button 
               onClick={() => setSelectedDetailItem(node)}
-              className="p-1 hover:text-[#4f46e5] hover:bg-indigo-50 rounded" 
+              className="p-1 hover:text-[#4f46e5] dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 rounded" 
               title="Подробнее"
             >
               <ExternalLink size={14} />
             </button>
             <button 
               onClick={(e) => deleteTaskNode(node.id, e)}
-              className="p-1 hover:text-red-500 hover:bg-red-50 rounded" 
+              className="p-1 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/60 rounded" 
               title="Удалить"
             >
               <Trash2 size={14} />
@@ -1853,7 +1853,7 @@ export default function ProjectView() {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <button
             onClick={() => setSelectedCompany(null)}
-            className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
+            className="inline-flex items-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-semibold transition-colors cursor-pointer group"
           >
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
             Назад к списку компаний и партнеров
@@ -1868,14 +1868,14 @@ export default function ProjectView() {
                   setSelectedCompany(null)
                 }
               }}
-              className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-4 py-2.5 rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
+              className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-4 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
             >
               <Trash2 size={15} /> Удалить компанию
             </button>
             <button
               type="button"
               onClick={() => setSelectedCompany(null)}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+              className="px-5 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#262932] rounded-xl transition-colors cursor-pointer"
             >
               Закрыть
             </button>
@@ -1893,47 +1893,47 @@ export default function ProjectView() {
         </div>
 
         {/* Hero Header */}
-        <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
+        <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-2xl shadow-sm shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 flex items-center justify-center font-bold text-2xl shadow-sm shrink-0">
               <Building2 size={32} />
             </div>
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
                   {selectedCompany.name}
                 </h1>
-                <span className="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700">
+                <span className="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
                   {selectedCompany.category}
                 </span>
                 <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${
                   selectedCompany.status === 'Завершено'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
                     : selectedCompany.status === 'Предоставлено'
-                    ? 'bg-blue-50 text-blue-700 border-blue-200'
+                    ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
                     : selectedCompany.status === 'В процессе'
-                    ? 'bg-purple-50 text-purple-700 border-purple-200'
-                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                    ? 'bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+                    : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
                 }`}>
                   {selectedCompany.status}
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500 mt-2 font-medium">
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium">
                 <MapPin size={16} className="text-gray-400 shrink-0" />
                 <span>{selectedCompany.location || 'Адрес не указан'}</span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-6 bg-gray-50 px-6 py-4 rounded-2xl border border-gray-100">
+          <div className="flex items-center gap-6 bg-gray-50 dark:bg-[#121418] px-6 py-4 rounded-2xl border border-gray-100 dark:border-[#262932]">
             <div>
               <span className="text-xs text-gray-400 font-bold uppercase block mb-0.5">Бюджет / Расходы</span>
-              <span className="text-2xl font-black text-emerald-600">{selectedCompany.spent}</span>
+              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{selectedCompany.spent}</span>
             </div>
-            <div className="w-px h-10 bg-gray-200"></div>
+            <div className="w-px h-10 bg-gray-200 dark:bg-[#262932]"></div>
             <div>
               <span className="text-xs text-gray-400 font-bold uppercase block mb-0.5">Спринт</span>
-              <span className="text-base font-bold text-indigo-700">{selectedCompany.sprint}</span>
+              <span className="text-base font-bold text-indigo-700 dark:text-indigo-400">{selectedCompany.sprint}</span>
             </div>
           </div>
         </div>
@@ -1943,38 +1943,38 @@ export default function ProjectView() {
           {/* Main Column (8 Cols) */}
           <div className="lg:col-span-8 space-y-6">
             {/* Card: Basic Information */}
-            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-              <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
-                <Building2 size={20} className="text-indigo-600" /> Основные данные компании
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
+                <Building2 size={20} className="text-indigo-600 dark:text-indigo-400" /> Основные данные компании
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                     Название компании *
                   </label>
                   <input
                     type="text"
                     value={selectedCompany.name}
                     onChange={(e) => setSelectedCompany({ ...selectedCompany, name: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-all"
+                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                     Категория / Сфера бизнеса *
                   </label>
                   <input
                     type="text"
                     value={selectedCompany.category}
                     onChange={(e) => setSelectedCompany({ ...selectedCompany, category: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-all"
+                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none transition-all"
                   />
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                     Локация / Физический адрес объекта
                   </label>
                   <div className="relative">
@@ -1984,7 +1984,7 @@ export default function ProjectView() {
                       value={selectedCompany.location || ''}
                       onChange={(e) => setSelectedCompany({ ...selectedCompany, location: e.target.value })}
                       placeholder="г. Ташкент, ул. ..."
-                      className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none transition-all"
+                      className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -1992,16 +1992,16 @@ export default function ProjectView() {
             </div>
 
             {/* Card: Provided Materials & Items (Prominent full space) */}
-            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-indigo-100 shadow-sm bg-gradient-to-b from-indigo-50/20 to-white">
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-indigo-100 dark:border-[#262932] shadow-sm bg-gradient-to-b from-indigo-50/20 to-white dark:from-[#181b20] dark:to-[#181b20]">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <Package size={20} className="text-indigo-600" /> Предоставленные предметы и промо-материалы
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Package size={20} className="text-indigo-600 dark:text-indigo-400" /> Предоставленные предметы и промо-материалы
                 </h2>
-                <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-lg">
+                <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-lg">
                   Учет переданных ТМЦ
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
                 Укажите подробный список всех предоставленных предметов: диспенсеры, брендированная полиграфия, тестеры, подарки персоналу, образцы продукции с указанием количества.
               </p>
 
@@ -2010,16 +2010,16 @@ export default function ProjectView() {
                 value={selectedCompany.itemsProvided || ''}
                 onChange={(e) => setSelectedCompany({ ...selectedCompany, itemsProvided: e.target.value })}
                 placeholder="Например: Диспенсеры в SPA и фитнес-зону (6 шт.), 400 саше Extragel, брендированные полотенца (50 шт.), тейбл-тенты на ресепшн"
-                className="w-full bg-white border border-indigo-200 rounded-2xl p-4 text-base font-medium text-gray-800 focus:ring-2 focus:ring-indigo-200 focus:border-[#4f46e5] outline-none leading-relaxed transition-all shadow-inner"
+                className="w-full bg-white dark:bg-[#121418] border border-indigo-200 dark:border-[#2b303c] rounded-2xl p-4 text-base font-medium text-gray-800 dark:text-white focus:ring-2 focus:ring-indigo-200 focus:border-[#4f46e5] outline-none leading-relaxed transition-all shadow-inner"
               />
             </div>
 
             {/* Card: Terms & Conditions */}
-            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-              <h2 className="text-lg font-bold text-gray-900 mb-3">
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
                 Условия размещения, договоренности и примечания
               </h2>
-              <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
                 Фиксируйте сценарий интеграции, зоны размещения (стойка ресепшн, гостевые санузлы, раздевалки), график пополнения материалов и договоренности с руководством.
               </p>
 
@@ -2028,7 +2028,7 @@ export default function ProjectView() {
                 value={selectedCompany.notes || ''}
                 onChange={(e) => setSelectedCompany({ ...selectedCompany, notes: e.target.value })}
                 placeholder="Размещение продукции в премиум-зоне СПА и тренажерном зале отеля. Персонал проинструктирован по свойствам охлаждающего геля."
-                className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-sm font-medium text-gray-800 focus:bg-white focus:border-[#4f46e5] outline-none leading-relaxed transition-all"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl p-4 text-sm font-medium text-gray-800 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none leading-relaxed transition-all"
               />
             </div>
           </div>
@@ -2036,14 +2036,14 @@ export default function ProjectView() {
           {/* Sidebar Column (4 Cols) */}
           <div className="lg:col-span-4 space-y-6">
             {/* Status Card */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-3">
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-3">
                 Статус интеграции
               </label>
               <select
                 value={selectedCompany.status}
                 onChange={(e) => setSelectedCompany({ ...selectedCompany, status: e.target.value })}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 outline-none focus:bg-white focus:border-[#4f46e5] cursor-pointer mb-3"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-sm font-bold text-gray-800 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] cursor-pointer mb-3"
               >
                 <option value="Договорились">Договорились</option>
                 <option value="Предоставлено">Предоставлено</option>
@@ -2056,8 +2056,8 @@ export default function ProjectView() {
             </div>
 
             {/* Financials */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                 Потрачено расходов ($ / сум)
               </label>
               <div className="relative mb-3">
@@ -2066,7 +2066,7 @@ export default function ProjectView() {
                   type="text"
                   value={selectedCompany.spent}
                   onChange={(e) => setSelectedCompany({ ...selectedCompany, spent: e.target.value })}
-                  className="w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-lg font-bold text-emerald-600 focus:bg-white focus:border-[#4f46e5] outline-none transition-all"
+                  className="w-full pl-9 pr-4 py-3 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl text-lg font-bold text-emerald-600 dark:text-emerald-400 focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none transition-all"
                 />
               </div>
               <p className="text-xs text-gray-400 leading-relaxed">
@@ -2075,21 +2075,21 @@ export default function ProjectView() {
             </div>
 
             {/* Sprint & Date */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                   Спринт
                 </label>
                 <input
                   type="text"
                   value={selectedCompany.sprint}
                   onChange={(e) => setSelectedCompany({ ...selectedCompany, sprint: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                   Дата договоренности / поставки
                 </label>
                 <div className="relative">
@@ -2098,20 +2098,20 @@ export default function ProjectView() {
                     type="text"
                     value={selectedCompany.date}
                     onChange={(e) => setSelectedCompany({ ...selectedCompany, date: e.target.value })}
-                    className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none"
                   />
                 </div>
               </div>
             </div>
 
             {/* Contacts Card */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
-              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                <Phone size={16} className="text-indigo-600" /> Контактное лицо и связь
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <Phone size={16} className="text-indigo-600 dark:text-indigo-400" /> Контактное лицо и связь
               </h3>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">
                   ФИО / Должность
                 </label>
                 <input
@@ -2119,12 +2119,12 @@ export default function ProjectView() {
                   value={selectedCompany.contactPerson || ''}
                   onChange={(e) => setSelectedCompany({ ...selectedCompany, contactPerson: e.target.value })}
                   placeholder="Улугбек (Wellness & SPA Manager)"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">
                   Телефон / Telegram
                 </label>
                 <div className="relative">
@@ -2134,7 +2134,7 @@ export default function ProjectView() {
                     value={selectedCompany.phone || ''}
                     onChange={(e) => setSelectedCompany({ ...selectedCompany, phone: e.target.value })}
                     placeholder="+998 71 210 88 88"
-                    className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white outline-none"
+                    className="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                   />
                 </div>
               </div>
@@ -2154,31 +2154,31 @@ export default function ProjectView() {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <button
             onClick={() => setIsAddCompanyOpen(false)}
-            className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
+            className="inline-flex items-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-semibold transition-colors cursor-pointer group"
           >
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
             Назад к списку компаний и партнеров
           </button>
         </div>
 
-        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm mb-8 flex items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-2xl shrink-0">
+        <div className="bg-white dark:bg-[#181b20] rounded-3xl p-8 border border-gray-100 dark:border-[#262932] shadow-sm mb-8 flex items-center gap-5">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 flex items-center justify-center font-bold text-2xl shrink-0">
             <Building2 size={32} />
           </div>
           <div>
-            <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Добавить компанию / партнера</h1>
-            <p className="text-sm text-gray-500 mt-1">Внесите данные об организации, локации, бюджете и переданных материалах</p>
+            <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white">Добавить компанию / партнера</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Внесите данные об организации, локации, бюджете и переданных материалах</p>
           </div>
         </div>
 
         <form onSubmit={(e) => { handleAddCompany(e); setIsAddCompanyOpen(false); }}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 space-y-6">
-              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-                <h2 className="text-lg font-bold text-gray-900 mb-5">Основные сведения</h2>
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">Основные сведения</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                    <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                       Название компании *
                     </label>
                     <input
@@ -2187,12 +2187,12 @@ export default function ProjectView() {
                       placeholder="Например: Hilton Tashkent City"
                       value={cName}
                       onChange={(e) => setCName(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none"
+                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                    <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                       Категория / Тип заведения *
                     </label>
                     <input
@@ -2201,12 +2201,12 @@ export default function ProjectView() {
                       placeholder="Гостиница, Бар, Фитнес, Клиника..."
                       value={cCategory}
                       onChange={(e) => setCCategory(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none"
+                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none"
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                    <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                       Локация / Адрес объекта
                     </label>
                     <div className="relative">
@@ -2216,18 +2216,18 @@ export default function ProjectView() {
                         placeholder="ул. Амира Темура, 4"
                         value={cLocation}
                         onChange={(e) => setCLocation(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                        className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none"
                       />
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-indigo-100 shadow-sm bg-gradient-to-b from-indigo-50/20 to-white">
-                <h2 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
-                  <Package size={20} className="text-indigo-600" /> Предоставленные предметы / промо-материалы
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-indigo-100 dark:border-[#262932] shadow-sm bg-gradient-to-b from-indigo-50/20 to-white dark:from-[#181b20] dark:to-[#181b20]">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                  <Package size={20} className="text-indigo-600 dark:text-indigo-400" /> Предоставленные предметы / промо-материалы
                 </h2>
-                <p className="text-xs text-gray-500 mb-4">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                   Перечислите все переданные ТМЦ: диспенсеры, фирменные салфетки, тестеры крема, сувениры.
                 </p>
                 <textarea
@@ -2235,25 +2235,25 @@ export default function ProjectView() {
                   placeholder="Например: Диспенсеры антисептика (6 шт), салфетки (500 уп), пробники (200 шт)"
                   value={cItemsProvided}
                   onChange={(e) => setCItemsProvided(e.target.value)}
-                  className="w-full bg-white border border-indigo-200 rounded-2xl p-4 text-base font-medium focus:border-[#4f46e5] outline-none shadow-inner"
+                  className="w-full bg-white dark:bg-[#121418] border border-indigo-200 dark:border-[#2b303c] rounded-2xl p-4 text-base font-medium text-gray-900 dark:text-white focus:border-[#4f46e5] outline-none shadow-inner"
                 />
               </div>
 
-              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-                <h2 className="text-lg font-bold text-gray-900 mb-2">Условия сотрудничества и примечания</h2>
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Условия сотрудничества и примечания</h2>
                 <textarea
                   rows={4}
                   placeholder="Размещение на стойке ресепшн, брендинг в санитарных зонах, график пополнения..."
                   value={cNotes}
                   onChange={(e) => setCNotes(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-sm font-medium focus:bg-white focus:border-[#4f46e5] outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl p-4 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none"
                 />
               </div>
             </div>
 
             <div className="lg:col-span-4 space-y-6">
-              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm">
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                   Потрачено средств ($)
                 </label>
                 <div className="relative">
@@ -2263,14 +2263,14 @@ export default function ProjectView() {
                     placeholder="250"
                     value={cSpent}
                     onChange={(e) => setCSpent(e.target.value)}
-                    className="w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-lg font-bold text-emerald-600 focus:bg-white focus:border-[#4f46e5] outline-none"
+                    className="w-full pl-9 pr-4 py-3 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl text-lg font-bold text-emerald-600 dark:text-emerald-400 focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none"
                   />
                 </div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                     Спринт
                   </label>
                   <input
@@ -2278,12 +2278,12 @@ export default function ProjectView() {
                     placeholder="Спринт 1"
                     value={cSprint}
                     onChange={(e) => setCSprint(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
                     Дата договоренности / поставки
                   </label>
                   <input
@@ -2291,17 +2291,17 @@ export default function ProjectView() {
                     placeholder="15 Окт 2026"
                     value={cDate}
                     onChange={(e) => setCDate(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                   />
                 </div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
-                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                  <Phone size={16} className="text-indigo-600" /> Контактное лицо
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm space-y-4">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Phone size={16} className="text-indigo-600 dark:text-indigo-400" /> Контактное лицо
                 </h3>
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">
                     ФИО / Должность
                   </label>
                   <input
@@ -2309,12 +2309,12 @@ export default function ProjectView() {
                     placeholder="Фарход (Управляющий)"
                     value={cContactPerson}
                     onChange={(e) => setCContactPerson(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">
+                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">
                     Телефон / Мессенджер
                   </label>
                   <input
@@ -2322,7 +2322,7 @@ export default function ProjectView() {
                     placeholder="+998 90 123-45-67"
                     value={cPhone}
                     onChange={(e) => setCPhone(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                   />
                 </div>
               </div>
@@ -2331,7 +2331,7 @@ export default function ProjectView() {
                 <button
                   type="button"
                   onClick={() => setIsAddCompanyOpen(false)}
-                  className="flex-1 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer text-center"
+                  className="flex-1 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#262932] rounded-xl transition-colors cursor-pointer text-center"
                 >
                   Отмена
                 </button>
@@ -2358,7 +2358,7 @@ export default function ProjectView() {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <button
             onClick={() => setSelectedBlogger(null)}
-            className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
+            className="inline-flex items-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-semibold transition-colors cursor-pointer group"
           >
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
             Назад к списку блогеров
@@ -2373,14 +2373,14 @@ export default function ProjectView() {
                   setSelectedBlogger(null)
                 }
               }}
-              className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-4 py-2.5 rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
+              className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1.5 px-4 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
             >
               <Trash2 size={15} /> Удалить блогера
             </button>
             <button
               type="button"
               onClick={() => setSelectedBlogger(null)}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+              className="px-5 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#262932] rounded-xl transition-colors cursor-pointer"
             >
               Закрыть
             </button>
@@ -2398,32 +2398,32 @@ export default function ProjectView() {
         </div>
 
         {/* Header */}
-        <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
+        <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
           <div className="flex items-center gap-5">
             <div className={`w-16 h-16 rounded-2xl ${selectedBlogger.avatarColor} text-white flex items-center justify-center font-bold text-2xl shadow-sm shrink-0`}>
               {selectedBlogger.avatarChar}
             </div>
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">{selectedBlogger.name}</h1>
-                <span className="px-3 py-1 rounded-lg text-xs font-bold bg-pink-50 text-pink-700">
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white">{selectedBlogger.name}</h1>
+                <span className="px-3 py-1 rounded-lg text-xs font-bold bg-pink-50 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300">
                   {selectedBlogger.platform}
                 </span>
-                <span className="font-mono text-sm text-gray-500">{selectedBlogger.handle}</span>
+                <span className="font-mono text-sm text-gray-500 dark:text-gray-400">{selectedBlogger.handle}</span>
               </div>
-              <p className="text-sm text-gray-500 mt-1">Формат интеграции: <strong>{selectedBlogger.format}</strong></p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Формат интеграции: <strong>{selectedBlogger.format}</strong></p>
             </div>
           </div>
 
-          <div className="flex items-center gap-6 bg-gray-50 px-6 py-4 rounded-2xl border border-gray-100">
+          <div className="flex items-center gap-6 bg-gray-50 dark:bg-[#121418] px-6 py-4 rounded-2xl border border-gray-100 dark:border-[#262932]">
             <div>
               <span className="text-xs text-gray-400 font-bold uppercase block mb-0.5">Гонорар</span>
-              <span className="text-2xl font-black text-emerald-600">{selectedBlogger.cost}</span>
+              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{selectedBlogger.cost}</span>
             </div>
-            <div className="w-px h-10 bg-gray-200"></div>
+            <div className="w-px h-10 bg-gray-200 dark:bg-[#262932]"></div>
             <div>
               <span className="text-xs text-gray-400 font-bold uppercase block mb-0.5">Статус</span>
-              <span className="text-base font-bold text-indigo-700">{selectedBlogger.status}</span>
+              <span className="text-base font-bold text-indigo-700 dark:text-indigo-400">{selectedBlogger.status}</span>
             </div>
           </div>
         </div>
@@ -2431,33 +2431,33 @@ export default function ProjectView() {
         {/* 2 Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-6">
-            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-              <h2 className="text-lg font-bold text-gray-900 mb-5">Бриф и тезисы интеграции</h2>
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">Бриф и тезисы интеграции</h2>
               <textarea
                 rows={8}
                 value={selectedBlogger.notes || ''}
                 onChange={(e) => setSelectedBlogger({ ...selectedBlogger, notes: e.target.value })}
                 placeholder="Сценарий интеграции, ключевые посылы бренда, ограничения, призыв к действию..."
-                className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-base font-medium focus:bg-white focus:border-[#4f46e5] outline-none leading-relaxed transition-all"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl p-4 text-base font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none leading-relaxed transition-all"
               />
             </div>
 
-            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-              <h2 className="text-lg font-bold text-gray-900 mb-2">Ссылка на вышедший пост / видео</h2>
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Ссылка на вышедший пост / видео</h2>
               <div className="flex gap-3">
                 <input
                   type="text"
                   value={selectedBlogger.postUrl || ''}
                   onChange={(e) => setSelectedBlogger({ ...selectedBlogger, postUrl: e.target.value })}
                   placeholder="https://instagram.com/p/... или https://t.me/..."
-                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono focus:bg-white outline-none"
+                  className="flex-1 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-sm font-mono text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                 />
                 {selectedBlogger.postUrl && (
                   <a
                     href={selectedBlogger.postUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-5 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-sm flex items-center gap-2 transition-colors"
+                    className="px-5 py-3 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 font-bold rounded-xl text-sm flex items-center gap-2 transition-colors"
                   >
                     <ExternalLink size={16} /> Открыть
                   </a>
@@ -2485,20 +2485,20 @@ export default function ProjectView() {
               const roi = Math.round((estimatedRevenue / priceNum) * 100)
 
               return (
-                <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm space-y-6">
-                  <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100">
+                <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm space-y-6">
+                  <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-[#262932]">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 flex items-center justify-center font-bold">
                         <TrendingUp size={20} />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-base font-bold text-gray-900">Аналитика публикации & Meta Insights</h3>
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-100 text-pink-700">
+                          <h3 className="text-base font-bold text-gray-900 dark:text-white">Аналитика публикации & Meta Insights</h3>
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-pink-100 dark:bg-pink-950/80 text-pink-700 dark:text-pink-300">
                             {selectedBlogger.platform} API
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-0.5">Данные охватов, вовлечения и конверсий по интеграции</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Данные охватов, вовлечения и конверсий по интеграции</p>
                       </div>
                     </div>
 
@@ -2506,7 +2506,7 @@ export default function ProjectView() {
                       type="button"
                       onClick={handleSyncMeta}
                       disabled={isSyncingMeta}
-                      className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-[#4f46e5] text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      className="px-4 py-2 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-[#4f46e5] dark:text-indigo-400 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                     >
                       <RefreshCw size={14} className={isSyncingMeta ? 'animate-spin' : ''} />
                       {isSyncingMeta ? 'Синхронизация...' : 'Синхронизировать'}
@@ -2514,117 +2514,117 @@ export default function ProjectView() {
                   </div>
 
                   {syncFeedback && (
-                    <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-semibold rounded-xl border border-emerald-200 animate-in fade-in duration-150 flex items-center gap-2">
-                      <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                    <div className="p-3 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 text-xs font-semibold rounded-xl border border-emerald-200 dark:border-emerald-800 animate-in fade-in duration-150 flex items-center gap-2">
+                      <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                       {syncFeedback}
                     </div>
                   )}
 
                   {/* Primary Video Metrics Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mb-1">
+                    <div className="bg-gray-50 dark:bg-[#121418] rounded-2xl p-4 border border-gray-100 dark:border-[#262932]">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">
                         <Eye size={14} className="text-indigo-500" /> Просмотры ролика
                       </div>
-                      <span className="text-xl font-extrabold text-gray-900">{plays.toLocaleString()}</span>
-                      <p className="text-[10px] text-gray-400 mt-0.5">Reels / Video Plays</p>
+                      <span className="text-xl font-extrabold text-gray-900 dark:text-white">{plays.toLocaleString()}</span>
+                      <p className="text-xs text-gray-400 dark:text-gray-400 mt-0.5">Reels / Video Plays</p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mb-1">
+                    <div className="bg-gray-50 dark:bg-[#121418] rounded-2xl p-4 border border-gray-100 dark:border-[#262932]">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">
                         <Users size={14} className="text-pink-500" /> Уникальный охват
                       </div>
-                      <span className="text-xl font-extrabold text-gray-900">{uniqueReach.toLocaleString()}</span>
-                      <p className="text-[10px] text-emerald-600 font-semibold mt-0.5">~{Math.round(uniqueReach / (followersCount * 10))}% от базы</p>
+                      <span className="text-xl font-extrabold text-gray-900 dark:text-white">{uniqueReach.toLocaleString()}</span>
+                      <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">~{Math.round(uniqueReach / (followersCount * 10))}% от базы</p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mb-1">
+                    <div className="bg-gray-50 dark:bg-[#121418] rounded-2xl p-4 border border-gray-100 dark:border-[#262932]">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">
                         <TrendingUp size={14} className="text-purple-500" /> Вовлеченность (ER)
                       </div>
-                      <span className="text-xl font-extrabold text-purple-700">{er}%</span>
-                      <p className="text-[10px] text-gray-400 mt-0.5">Выше среднего по фарме</p>
+                      <span className="text-xl font-extrabold text-purple-700 dark:text-purple-400">{er}%</span>
+                      <p className="text-xs text-gray-400 dark:text-gray-400 mt-0.5">Выше среднего по фарме</p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mb-1">
+                    <div className="bg-gray-50 dark:bg-[#121418] rounded-2xl p-4 border border-gray-100 dark:border-[#262932]">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">
                         <DollarSign size={14} className="text-emerald-500" /> Факт CPV (просмотр)
                       </div>
-                      <span className="text-xl font-extrabold text-emerald-600">${cpv}</span>
-                      <p className="text-[10px] text-gray-400 mt-0.5">Бюджет: {selectedBlogger.price || selectedBlogger.cost}</p>
+                      <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">${cpv}</span>
+                      <p className="text-xs text-gray-400 dark:text-gray-400 mt-0.5">Бюджет: {selectedBlogger.price || selectedBlogger.cost}</p>
                     </div>
                   </div>
 
                   {/* Secondary Social Interactions */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-pink-50/30 p-4 rounded-2xl border border-pink-100/60">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-pink-50/30 dark:bg-[#121418] p-4 rounded-2xl border border-pink-100/60 dark:border-[#262932]">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-pink-100 dark:bg-pink-950/80 text-pink-600 dark:text-pink-400 flex items-center justify-center">
                         <Heart size={15} />
                       </div>
                       <div>
-                        <span className="text-xs font-bold text-gray-900 block">{likes.toLocaleString()}</span>
-                        <span className="text-[10px] text-gray-400">Лайки</span>
+                        <span className="text-sm font-bold text-gray-900 dark:text-white block">{likes.toLocaleString()}</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-400">Лайки</span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                         <MessageCircle size={15} />
                       </div>
                       <div>
-                        <span className="text-xs font-bold text-gray-900 block">{comments.toLocaleString()}</span>
-                        <span className="text-[10px] text-gray-400">Комментарии</span>
+                        <span className="text-sm font-bold text-gray-900 dark:text-white block">{comments.toLocaleString()}</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-400">Комментарии</span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                         <Share2 size={15} />
                       </div>
                       <div>
-                        <span className="text-xs font-bold text-gray-900 block">{shares.toLocaleString()}</span>
-                        <span className="text-[10px] text-gray-400">Репосты</span>
+                        <span className="text-sm font-bold text-gray-900 dark:text-white block">{shares.toLocaleString()}</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-400">Репосты</span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                         <Bookmark size={15} />
                       </div>
                       <div>
-                        <span className="text-xs font-bold text-gray-900 block">{saves.toLocaleString()}</span>
-                        <span className="text-[10px] text-gray-400">Сохранения</span>
+                        <span className="text-sm font-bold text-gray-900 dark:text-white block">{saves.toLocaleString()}</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-400">Сохранения</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Direct Conversions: Profile Visits, Link Clicks, Promo Sales */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="p-4 bg-gradient-to-br from-indigo-50/60 to-purple-50/60 rounded-2xl border border-indigo-100">
-                      <span className="text-[11px] font-bold uppercase text-indigo-900 block mb-1">
+                    <div className="p-4 bg-gradient-to-br from-indigo-50/60 to-purple-50/60 dark:from-[#1e2029] dark:to-[#171922] rounded-2xl border border-indigo-100 dark:border-[#262932]">
+                      <span className="text-xs font-bold uppercase text-indigo-900 dark:text-indigo-300 block mb-1">
                         Переходы в профиль бренда
                       </span>
-                      <span className="text-2xl font-black text-indigo-700">{profileVisits.toLocaleString()}</span>
-                      <p className="text-[10px] text-gray-500 mt-1">Клики на @extragel.uz в посте и Stories</p>
+                      <span className="text-2xl font-black text-indigo-700 dark:text-indigo-400">{profileVisits.toLocaleString()}</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Клики на @extragel.uz в посте и Stories</p>
                     </div>
 
-                    <div className="p-4 bg-gradient-to-br from-blue-50/60 to-sky-50/60 rounded-2xl border border-blue-100">
-                      <span className="text-[11px] font-bold uppercase text-blue-900 block mb-1">
+                    <div className="p-4 bg-gradient-to-br from-blue-50/60 to-sky-50/60 dark:from-[#17202d] dark:to-[#141a24] rounded-2xl border border-blue-100 dark:border-[#262932]">
+                      <span className="text-xs font-bold uppercase text-blue-900 dark:text-blue-300 block mb-1">
                         Клики по ссылке / стикеру
                       </span>
-                      <span className="text-2xl font-black text-blue-700">{linkClicks.toLocaleString()}</span>
-                      <p className="text-[10px] text-gray-500 mt-1">Переходы на витрину сети аптек</p>
+                      <span className="text-2xl font-black text-blue-700 dark:text-blue-400">{linkClicks.toLocaleString()}</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Переходы на витрину сети аптек</p>
                     </div>
 
-                    <div className="p-4 bg-gradient-to-br from-emerald-50/60 to-teal-50/60 rounded-2xl border border-emerald-100">
-                      <span className="text-[11px] font-bold uppercase text-emerald-900 block mb-1">
+                    <div className="p-4 bg-gradient-to-br from-emerald-50/60 to-teal-50/60 dark:from-[#15241f] dark:to-[#121c18] rounded-2xl border border-emerald-100 dark:border-[#262932]">
+                      <span className="text-xs font-bold uppercase text-emerald-900 dark:text-emerald-300 block mb-1">
                         Промокод ({selectedBlogger.name?.split(' ')[0]?.toUpperCase() || 'BLOGGER'})
                       </span>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-black text-emerald-700">{promoCodesUsed}</span>
-                        <span className="text-xs font-bold text-emerald-600">покупок в аптеках</span>
+                        <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{promoCodesUsed}</span>
+                        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">покупок в аптеках</span>
                       </div>
-                      <p className="text-[10px] text-gray-500 mt-1">Оценка выручки: ~${estimatedRevenue} (ROI: {roi}%)</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Оценка выручки: ~${estimatedRevenue} (ROI: {roi}%)</p>
                     </div>
                   </div>
                 </div>
@@ -2633,12 +2633,12 @@ export default function ProjectView() {
           </div>
 
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-3">Статус публикации</label>
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-3">Статус публикации</label>
               <select
                 value={selectedBlogger.status}
                 onChange={(e) => setSelectedBlogger({ ...selectedBlogger, status: e.target.value })}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 outline-none focus:bg-white cursor-pointer"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-sm font-bold text-gray-800 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
               >
                 <option value="Договорились">Договорились</option>
                 <option value="Согласовано">Согласовано</option>
@@ -2647,46 +2647,46 @@ export default function ProjectView() {
               </select>
             </div>
 
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Гонорар ($)</label>
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Гонорар ($)</label>
               <input
                 type="text"
                 value={selectedBlogger.price || selectedBlogger.cost || ''}
                 onChange={(e) => setSelectedBlogger({ ...selectedBlogger, cost: e.target.value, price: e.target.value })}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-emerald-600 focus:bg-white outline-none"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-lg font-bold text-emerald-600 dark:text-emerald-400 focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
 
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Спринт</label>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Спринт</label>
                 <input
                   type="text"
                   value={selectedBlogger.sprint || ''}
                   onChange={(e) => setSelectedBlogger({ ...selectedBlogger, sprint: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Дата выхода</label>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Дата выхода</label>
                 <input
                   type="text"
                   value={selectedBlogger.publishDate || selectedBlogger.date || ''}
                   onChange={(e) => setSelectedBlogger({ ...selectedBlogger, date: e.target.value, publishDate: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                 />
               </div>
             </div>
 
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Контакт менеджера</label>
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Контакт менеджера</label>
               <input
                 type="text"
                 value={selectedBlogger.managerContact || ''}
                 onChange={(e) => setSelectedBlogger({ ...selectedBlogger, managerContact: e.target.value })}
                 placeholder="Telegram / Телефон"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
           </div>
@@ -2707,7 +2707,7 @@ export default function ProjectView() {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <button
             onClick={() => { setIsAddBloggerOpen(false); setShowManualBloggerFields(false); }}
-            className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
+            className="inline-flex items-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-semibold transition-colors cursor-pointer group"
           >
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
             Назад к списку блогеров
@@ -2715,19 +2715,19 @@ export default function ProjectView() {
         </div>
 
         {/* Hero Section */}
-        <div className="bg-gradient-to-br from-white via-indigo-50/20 to-purple-50/20 rounded-3xl p-8 border border-indigo-100 shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
+        <div className="bg-gradient-to-br from-white via-indigo-50/20 to-purple-50/20 dark:from-[#181b20] dark:via-[#1c1f27] dark:to-[#181b20] rounded-3xl p-8 border border-indigo-100 dark:border-[#262932] shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
           <div className="flex items-center gap-5">
             <div className="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-2xl shadow-lg shadow-indigo-200 shrink-0">
               <Sparkles size={32} />
             </div>
             <div>
               <div className="flex items-center gap-2.5">
-                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Добавить блогера</h1>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 flex items-center gap-1">
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white">Добавить блогера</h1>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 flex items-center gap-1">
                   <Zap size={13} /> Авто-подтяг данных
                 </span>
               </div>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Достаточно написать только <strong>Имя</strong> и <strong>Никнейм</strong> — система сама определит охваты, подписчиков, оптимальный формат, стоимость и бриф!
               </p>
             </div>
@@ -2739,10 +2739,10 @@ export default function ProjectView() {
             {/* Left Column: The 2 Core Inputs & Live Preview */}
             <div className="lg:col-span-8 space-y-6">
               {/* Primary 2-Input Card */}
-              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <User size={20} className="text-[#4f46e5]" />
+                  <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <User size={20} className="text-[#4f46e5] dark:text-indigo-400" />
                     Основные данные блогера
                   </h2>
                   <span className="text-xs text-gray-400 font-medium">Только 2 обязательных поля</span>
@@ -2750,7 +2750,7 @@ export default function ProjectView() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-700 mb-2">
+                    <label className="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-2">
                       Имя / Псевдоним блогера *
                     </label>
                     <input
@@ -2760,13 +2760,13 @@ export default function ProjectView() {
                       placeholder="Например: Мадина Саидова"
                       value={bName}
                       onChange={(e) => setBName(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-all shadow-xs"
+                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl px-5 py-4 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none transition-all shadow-xs"
                     />
                     <p className="text-[11px] text-gray-400 mt-1.5">Личное имя или название канала/проекта</p>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-700 mb-2">
+                    <label className="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-2">
                       Никнейм или ссылка на профиль *
                     </label>
                     <div className="relative">
@@ -2776,7 +2776,7 @@ export default function ProjectView() {
                         placeholder="@madina_lifestyle или https://instagram.com/..."
                         value={bHandle}
                         onChange={(e) => setBHandle(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-base font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-all shadow-xs"
+                        className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl px-5 py-4 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none transition-all shadow-xs"
                       />
                     </div>
                     <p className="text-[11px] text-gray-400 mt-1.5">Поддерживает Instagram, Telegram, TikTok, YouTube</p>
@@ -2784,11 +2784,11 @@ export default function ProjectView() {
                 </div>
 
                 {/* Submit Action Right Under Core Inputs */}
-                <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
+                <div className="mt-8 pt-6 border-t border-gray-100 dark:border-[#262932] flex flex-wrap items-center justify-between gap-4">
                   <button
                     type="button"
                     onClick={() => setShowManualBloggerFields(!showManualBloggerFields)}
-                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition-colors cursor-pointer py-2"
+                    className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1.5 transition-colors cursor-pointer py-2"
                   >
                     <SlidersHorizontal size={15} />
                     {showManualBloggerFields ? 'Скрыть ручные параметры' : 'Скорректировать параметры вручную (необязательно)'}
@@ -2798,7 +2798,7 @@ export default function ProjectView() {
                     <button
                       type="button"
                       onClick={() => { setIsAddBloggerOpen(false); setShowManualBloggerFields(false); }}
-                      className="px-6 py-3.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-2xl transition-colors cursor-pointer"
+                      className="px-6 py-3.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#262932] rounded-2xl transition-colors cursor-pointer"
                     >
                       Отмена
                     </button>
@@ -2888,10 +2888,10 @@ export default function ProjectView() {
 
               {/* Optional Collapsible Manual Override Fields */}
               {showManualBloggerFields && (
-                <div className="bg-white rounded-3xl p-6 lg:p-8 border border-indigo-100 shadow-sm space-y-6 animate-in fade-in duration-200">
-                  <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-                    <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                      <SlidersHorizontal size={18} className="text-indigo-600" />
+                <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-indigo-100 dark:border-[#262932] shadow-sm space-y-6 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-[#262932]">
+                    <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      <SlidersHorizontal size={18} className="text-indigo-600 dark:text-indigo-400" />
                       Ручная корректировка параметров
                     </h3>
                     <span className="text-xs text-gray-400">Переопределяет автоматические расчеты</span>
@@ -2899,11 +2899,11 @@ export default function ProjectView() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Платформа</label>
+                      <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">Платформа</label>
                       <select
                         value={bPlatform}
                         onChange={(e) => setBPlatform(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold outline-none focus:bg-white cursor-pointer"
+                        className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-900 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
                       >
                         <option value="Instagram">Instagram</option>
                         <option value="Telegram">Telegram</option>
@@ -2913,71 +2913,71 @@ export default function ProjectView() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Стоимость ($)</label>
+                      <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">Стоимость ($)</label>
                       <input
                         type="text"
                         value={bPrice}
                         onChange={(e) => setBPrice(e.target.value)}
                         placeholder="$250"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-emerald-600 focus:bg-white outline-none"
+                        className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-bold text-emerald-600 dark:text-emerald-400 focus:bg-white dark:focus:bg-[#181b20] outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Спринт</label>
+                      <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">Спринт</label>
                       <input
                         type="text"
                         value={bSprint}
                         onChange={(e) => setBSprint(e.target.value)}
                         placeholder="Спринт 2"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                        className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Формат интеграции</label>
+                      <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">Формат интеграции</label>
                       <input
                         type="text"
                         value={bFormat}
                         onChange={(e) => setBFormat(e.target.value)}
                         placeholder="Reels + 2 Stories"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                        className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Дата публикации</label>
+                      <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">Дата публикации</label>
                       <input
                         type="text"
                         value={bDate}
                         onChange={(e) => setBDate(e.target.value)}
                         placeholder="18.09.2026"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                        className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Контакт для связи / Менеджер</label>
+                    <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">Контакт для связи / Менеджер</label>
                     <input
                       type="text"
                       value={bContact}
                       onChange={(e) => setBContact(e.target.value)}
                       placeholder="Direct / +998 90 123-45-67"
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white outline-none"
+                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Индивидуальный бриф / Заметки</label>
+                    <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5">Индивидуальный бриф / Заметки</label>
                     <textarea
                       rows={4}
                       value={bNotes}
                       onChange={(e) => setBNotes(e.target.value)}
                       placeholder="Кастомный сценарий или промокод..."
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-medium focus:bg-white outline-none"
+                      className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl p-3 text-sm font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                     />
                   </div>
                 </div>
@@ -2986,36 +2986,36 @@ export default function ProjectView() {
 
             {/* Right Column: Quick Tips & Platform Info */}
             <div className="lg:col-span-4 space-y-6">
-              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
-                <div className="flex items-center gap-3 text-indigo-700 font-bold text-sm">
-                  <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm space-y-4">
+                <div className="flex items-center gap-3 text-indigo-700 dark:text-indigo-400 font-bold text-sm">
+                  <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                     <Zap size={18} />
                   </div>
                   Как работает авто-подтяг?
                 </div>
-                <div className="space-y-3 text-xs text-gray-500 leading-relaxed">
+                <div className="space-y-3 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                   <p>
-                    <strong className="text-gray-800">1. Платформа:</strong> распознается по нику или ссылке (<code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700">@handle</code>, <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700">t.me/</code>, <code className="bg-gray-100 px-1 py-0.5 rounded text-gray-700">tiktok.com</code>).
+                    <strong className="text-gray-800 dark:text-gray-200">1. Платформа:</strong> распознается по нику или ссылке (<code className="bg-gray-100 dark:bg-[#121418] px-1 py-0.5 rounded text-gray-700 dark:text-gray-300">@handle</code>, <code className="bg-gray-100 dark:bg-[#121418] px-1 py-0.5 rounded text-gray-700 dark:text-gray-300">t.me/</code>, <code className="bg-gray-100 dark:bg-[#121418] px-1 py-0.5 rounded text-gray-700 dark:text-gray-300">tiktok.com</code>).
                   </p>
                   <p>
-                    <strong className="text-gray-800">2. Охваты и аудитория:</strong> определяются на основе тематики блогера (спорт, бьюти, медицина, лайфстайл).
+                    <strong className="text-gray-800 dark:text-gray-200">2. Охваты и аудитория:</strong> определяются на основе тематики блогера (спорт, бьюти, медицина, лайфстайл).
                   </p>
                   <p>
-                    <strong className="text-gray-800">3. Гонорар и формат:</strong> рассчитываются по актуальным рыночным бенчмаркам CPM и CPV для рынка Ташкента и ЦА.
+                    <strong className="text-gray-800 dark:text-gray-200">3. Гонорар и формат:</strong> рассчитываются по актуальным рыночным бенчмаркам CPM и CPV для рынка Ташкента и ЦА.
                   </p>
                   <p>
-                    <strong className="text-gray-800">4. Готовый бриф:</strong> формулирует целевое позиционирование для бренда <strong className="text-indigo-600">Extragel</strong>.
+                    <strong className="text-gray-800 dark:text-gray-200">4. Готовый бриф:</strong> формулирует целевое позиционирование для бренда <strong className="text-indigo-600 dark:text-indigo-400">Extragel</strong>.
                   </p>
                 </div>
               </div>
 
-              <div className="bg-indigo-50/50 rounded-3xl p-6 border border-indigo-100/70">
-                <h4 className="text-xs font-bold uppercase text-indigo-900 mb-2">Быстрое добавление</h4>
-                <p className="text-xs text-gray-600 leading-relaxed mb-4">
-                  Нажатие кнопки <strong>«Добавить блогера»</strong> или клавиши <kbd className="bg-white px-1.5 py-0.5 rounded border border-gray-200 text-gray-700 font-mono text-[10px]">Enter</kbd> мгновенно сохранит блогера в список со всеми заполненными метриками.
+              <div className="bg-indigo-50/50 dark:bg-[#151922] rounded-3xl p-6 border border-indigo-100/70 dark:border-[#262932]">
+                <h4 className="text-xs font-bold uppercase text-indigo-900 dark:text-indigo-300 mb-2">Быстрое добавление</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                  Нажатие кнопки <strong>«Добавить блогера»</strong> или клавиши <kbd className="bg-white dark:bg-[#121418] px-1.5 py-0.5 rounded border border-gray-200 dark:border-[#2b303c] text-gray-700 dark:text-gray-300 font-mono text-[10px]">Enter</kbd> мгновенно сохранит блогера в список со всеми заполненными метриками.
                 </p>
-                <div className="flex items-center gap-2 text-xs font-bold text-indigo-700">
-                  <CheckCircle2 size={16} className="text-indigo-600" />
+                <div className="flex items-center gap-2 text-xs font-bold text-indigo-700 dark:text-indigo-400">
+                  <CheckCircle2 size={16} className="text-indigo-600 dark:text-indigo-400" />
                   Полная автоматизация процесса
                 </div>
               </div>
@@ -3035,7 +3035,7 @@ export default function ProjectView() {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <button
             onClick={() => setSelectedDetailItem(null)}
-            className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold transition-colors cursor-pointer group"
+            className="inline-flex items-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-semibold transition-colors cursor-pointer group"
           >
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
             Назад к задачам и планам проекта
@@ -3045,7 +3045,7 @@ export default function ProjectView() {
             <button
               type="button"
               onClick={() => setSelectedDetailItem(null)}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+              className="px-5 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#262932] rounded-xl transition-colors cursor-pointer"
             >
               Закрыть
             </button>
@@ -3063,17 +3063,17 @@ export default function ProjectView() {
         </div>
 
         {/* Hero Header */}
-        <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
+        <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-2xl shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 flex items-center justify-center font-bold text-2xl shrink-0">
               {renderBadge(selectedDetailItem.type)}
             </div>
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">{selectedDetailItem.name}</h1>
+                <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white">{selectedDetailItem.name}</h1>
                 <span className="text-xs text-gray-400 font-mono">ID: {selectedDetailItem.id}</span>
               </div>
-              <p className="text-sm text-gray-500 mt-1">Тип элемента: <strong>{selectedDetailItem.type}</strong></p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Тип элемента: <strong>{selectedDetailItem.type}</strong></p>
             </div>
           </div>
 
@@ -3082,7 +3082,7 @@ export default function ProjectView() {
             <select
               value={selectedDetailItem.status || 'Not Done'}
               onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, status: e.target.value })}
-              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 outline-none focus:bg-white cursor-pointer"
+              className="bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
             >
               <option value="Not Done">Not Done</option>
               <option value="In Progress">In Progress</option>
@@ -3093,87 +3093,87 @@ export default function ProjectView() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-6">
-            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Название</label>
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Название</label>
               <input
                 type="text"
                 value={selectedDetailItem.name}
                 onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, name: e.target.value })}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-900 focus:bg-white outline-none"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-lg font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
 
             {selectedDetailItem.type === 'MONTH' && (
-              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Период месяца</label>
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Период месяца</label>
                 <input
                   type="text"
                   value={selectedDetailItem.period || ''}
                   onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, period: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                 />
               </div>
             )}
 
             {selectedDetailItem.type === 'PLAN_ITEM' && (
-              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm grid grid-cols-2 gap-4">
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Целевой план на месяц</label>
+                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Целевой план на месяц</label>
                   <input
                     type="number"
                     value={selectedDetailItem.monthPlan || 0}
                     onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, monthPlan: Number(e.target.value) })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Единица измерения</label>
+                  <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Единица измерения</label>
                   <input
                     type="text"
                     value={selectedDetailItem.unit || 'шт'}
                     onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, unit: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                   />
                 </div>
               </div>
             )}
 
             {selectedDetailItem.type === 'SPRINT' && selectedDetailItem.plan !== undefined && (
-              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">План спринта</label>
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">План спринта</label>
                 <input
                   type="number"
                   value={selectedDetailItem.plan || 0}
                   onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, plan: Number(e.target.value) })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-base font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none"
                 />
               </div>
             )}
 
-            <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Подробное описание и инструкции</label>
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Подробное описание и инструкции</label>
               <textarea
                 rows={8}
                 value={selectedDetailItem.description || ''}
                 onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, description: e.target.value })}
                 placeholder="Опишите требования, шаги выполнения, критерии приемки..."
-                className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-base font-medium focus:bg-white outline-none leading-relaxed"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl p-4 text-base font-medium text-gray-900 dark:text-white focus:bg-white dark:focus:bg-[#181b20] outline-none leading-relaxed"
               />
             </div>
 
             {selectedDetailItem.children && selectedDetailItem.children.length > 0 && (
-              <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-                <h3 className="text-base font-bold text-gray-900 mb-4">
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">
                   Вложенные элементы ({selectedDetailItem.children.length})
                 </h3>
                 <div className="space-y-2">
                   {selectedDetailItem.children.map((child: any) => (
-                    <div key={child.id} className="p-3 bg-gray-50 rounded-xl flex items-center justify-between">
+                    <div key={child.id} className="p-3 bg-gray-50 dark:bg-[#121418] rounded-xl flex items-center justify-between border border-transparent dark:border-[#262932]">
                       <div className="flex items-center gap-3">
                         {renderBadge(child.type)}
-                        <span className="text-sm font-semibold text-gray-800">{child.name}</span>
+                        <span className="text-sm font-semibold text-gray-800 dark:text-white">{child.name}</span>
                       </div>
-                      <span className="text-xs font-bold px-2.5 py-1 bg-white rounded-lg border border-gray-200 text-gray-700">
+                      <span className="text-xs font-bold px-2.5 py-1 bg-white dark:bg-[#181b20] rounded-lg border border-gray-200 dark:border-[#262932] text-gray-700 dark:text-gray-300">
                         {child.status}
                       </span>
                     </div>
@@ -3184,21 +3184,21 @@ export default function ProjectView() {
           </div>
 
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
-              <h3 className="text-sm font-bold text-gray-900">Метаданные</h3>
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white">Метаданные</h3>
               <div>
                 <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Создатель / Ответственный</label>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="w-7 h-7 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">
                     {selectedDetailItem.creatorInitial || 'A'}
                   </div>
-                  <span className="text-sm font-semibold text-gray-800">{selectedDetailItem.creator || 'Азамат'}</span>
+                  <span className="text-sm font-semibold text-gray-800 dark:text-white">{selectedDetailItem.creator || 'Азамат'}</span>
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Дата создания</label>
-                <span className="text-sm font-medium text-gray-600">{selectedDetailItem.date || '01.09.2026'}</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{selectedDetailItem.date || '01.09.2026'}</span>
               </div>
             </div>
           </div>
@@ -3215,26 +3215,26 @@ export default function ProjectView() {
       <div className="max-w-4xl mx-auto font-sans pb-16 animate-in fade-in duration-150">
         <button
           onClick={() => setIsModalOpen(false)}
-          className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold mb-6 transition-colors cursor-pointer group"
+          className="inline-flex items-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-semibold mb-6 transition-colors cursor-pointer group"
         >
           <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
           Назад к задачам проекта
         </button>
 
-        <div className="bg-white rounded-3xl p-8 lg:p-10 border border-gray-100 shadow-sm">
-          <div className="flex items-center gap-5 mb-8 pb-6 border-b border-gray-100">
-            <div className="w-16 h-16 bg-indigo-50 text-[#4f46e5] rounded-2xl flex items-center justify-center font-bold text-2xl shrink-0">
+        <div className="bg-white dark:bg-[#181b20] rounded-3xl p-8 lg:p-10 border border-gray-100 dark:border-[#262932] shadow-sm">
+          <div className="flex items-center gap-5 mb-8 pb-6 border-b border-gray-100 dark:border-[#262932]">
+            <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 rounded-2xl flex items-center justify-center font-bold text-2xl shrink-0">
               <Plus size={32} />
             </div>
             <div>
-              <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Создать элемент проекта</h1>
-              <p className="text-sm text-gray-500 mt-1">Выберите тип сущности (Epic, Sprint, Daily или Task) и укажите параметры</p>
+              <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white">Создать элемент проекта</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Выберите тип сущности (Epic, Sprint, Daily или Task) и укажите параметры</p>
             </div>
           </div>
 
           <form onSubmit={handleCreateTaskItem} className="space-y-6">
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Тип элемента</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Тип элемента</label>
               <div className="grid grid-cols-4 gap-3">
                 {(['EPIC', 'SPRINT', 'DAILY', 'TASK'] as const).map(type => (
                   <button
@@ -3244,7 +3244,7 @@ export default function ProjectView() {
                     className={`py-3 text-sm font-bold rounded-xl border transition-all cursor-pointer ${
                       modalType === type 
                         ? 'bg-[#4f46e5] text-white border-[#4f46e5] shadow-md' 
-                        : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                        : 'bg-gray-50 dark:bg-[#121418] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-[#2b303c] hover:bg-gray-100 dark:hover:bg-[#1e222a]'
                     }`}
                   >
                     {type}
@@ -3255,11 +3255,11 @@ export default function ProjectView() {
 
             {modalType === 'SPRINT' && (
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">В какой Epic добавить?</label>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">В какой Epic добавить?</label>
                 <select
                   value={modalParentId}
                   onChange={(e) => setModalParentId(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white cursor-pointer"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
                 >
                   <option value="">Выберите Epic...</option>
                   {availableEpics.map((e: any) => (
@@ -3271,11 +3271,11 @@ export default function ProjectView() {
 
             {modalType === 'DAILY' && (
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">В какой Sprint добавить?</label>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">В какой Sprint добавить?</label>
                 <select
                   value={modalParentId}
                   onChange={(e) => setModalParentId(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white cursor-pointer"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
                 >
                   <option value="">Выберите Sprint...</option>
                   {availableSprints.map((s: any) => (
@@ -3287,11 +3287,11 @@ export default function ProjectView() {
 
             {modalType === 'TASK' && (
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">В какой Daily план добавить?</label>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">В какой Daily план добавить?</label>
                 <select
                   value={modalParentId}
                   onChange={(e) => setModalParentId(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white cursor-pointer"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
                 >
                   <option value="">Выберите Daily...</option>
                   {availableDailies.map((d: any) => (
@@ -3302,33 +3302,33 @@ export default function ProjectView() {
             )}
 
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Название *</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Название *</label>
               <input
                 type="text"
                 required
                 placeholder="Введите название элемента"
                 value={modalName}
                 onChange={(e) => setModalName(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Описание</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Описание</label>
               <textarea
                 rows={5}
                 placeholder="Подробное описание задачи или направления..."
                 value={modalDesc}
                 onChange={(e) => setModalDesc(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 text-sm font-medium focus:bg-white outline-none"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-2xl p-4 text-sm font-medium focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
 
-            <div className="flex justify-between items-center pt-6 border-t border-gray-100">
+            <div className="flex justify-between items-center pt-6 border-t border-gray-100 dark:border-[#262932]">
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="px-6 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+                className="px-6 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#262932] rounded-xl transition-colors cursor-pointer"
               >
                 Отмена
               </button>
@@ -3353,41 +3353,41 @@ export default function ProjectView() {
       <div className="max-w-2xl mx-auto font-sans pb-16 animate-in fade-in duration-150">
         <button
           onClick={() => setIsAddMonthOpen(false)}
-          className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold mb-6 transition-colors cursor-pointer group"
+          className="inline-flex items-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-semibold mb-6 transition-colors cursor-pointer group"
         >
           <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
           Назад к планам
         </button>
 
-        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-6">Добавить месяц в расписание</h1>
+        <div className="bg-white dark:bg-[#181b20] rounded-3xl p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6">Добавить месяц в расписание</h1>
           <form onSubmit={handleAddMonth} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Название месяца</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Название месяца</label>
               <input
                 type="text"
                 required
                 placeholder="Октябрь 2026"
                 value={newMonthName}
                 onChange={(e) => setNewMonthName(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Период дат</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Период дат</label>
               <input
                 type="text"
                 placeholder="01.10.2026 — 31.10.2026"
                 value={newMonthPeriod}
                 onChange={(e) => setNewMonthPeriod(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:bg-white outline-none"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-medium focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-[#262932]">
               <button
                 type="button"
                 onClick={() => setIsAddMonthOpen(false)}
-                className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+                className="px-5 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#262932] rounded-xl cursor-pointer"
               >
                 Отмена
               </button>
@@ -3412,53 +3412,53 @@ export default function ProjectView() {
       <div className="max-w-2xl mx-auto font-sans pb-16 animate-in fade-in duration-150">
         <button
           onClick={() => setIsAddPlanItemOpen(false)}
-          className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold mb-6 transition-colors cursor-pointer group"
+          className="inline-flex items-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-semibold mb-6 transition-colors cursor-pointer group"
         >
           <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
           Назад к планам
         </button>
 
-        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-6">Добавить целевой план / показатель</h1>
+        <div className="bg-white dark:bg-[#181b20] rounded-3xl p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6">Добавить целевой план / показатель</h1>
           <form onSubmit={handleAddPlanItem} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Название показателя</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Название показателя</label>
               <input
                 type="text"
                 required
                 placeholder="Например: Визиты к врачам-урологам"
                 value={newPlanItemName}
                 onChange={(e) => setNewPlanItemName(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">План на месяц (число)</label>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">План на месяц (число)</label>
                 <input
                   type="number"
                   required
                   value={newPlanItemTarget}
                   onChange={(e) => setNewPlanItemTarget(Number(e.target.value))}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Единица измерения</label>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Единица измерения</label>
                 <input
                   type="text"
                   placeholder="визитов, аптек, продаж, постов"
                   value={newPlanItemUnit}
                   onChange={(e) => setNewPlanItemUnit(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
                 />
               </div>
             </div>
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-[#262932]">
               <button
                 type="button"
                 onClick={() => setIsAddPlanItemOpen(false)}
-                className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+                className="px-5 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#262932] rounded-xl cursor-pointer"
               >
                 Отмена
               </button>
@@ -3483,41 +3483,41 @@ export default function ProjectView() {
       <div className="max-w-2xl mx-auto font-sans pb-16 animate-in fade-in duration-150">
         <button
           onClick={() => setIsAddSprintOpen(false)}
-          className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold mb-6 transition-colors cursor-pointer group"
+          className="inline-flex items-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-semibold mb-6 transition-colors cursor-pointer group"
         >
           <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
           Назад к планам
         </button>
 
-        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-6">Добавить спринт в план</h1>
+        <div className="bg-white dark:bg-[#181b20] rounded-3xl p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6">Добавить спринт в план</h1>
           <form onSubmit={handleAddSprint} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Название спринта</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Название спринта</label>
               <input
                 type="text"
                 required
                 placeholder="Спринт 1 (1–7 число)"
                 value={newSprintName}
                 onChange={(e) => setNewSprintName(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Плановое значение на спринт</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Плановое значение на спринт</label>
               <input
                 type="number"
                 required
                 value={newSprintPlan}
                 onChange={(e) => setNewSprintPlan(Number(e.target.value))}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white outline-none"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-[#262932]">
               <button
                 type="button"
                 onClick={() => setIsAddSprintOpen(false)}
-                className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+                className="px-5 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#262932] rounded-xl cursor-pointer"
               >
                 Отмена
               </button>
@@ -3538,45 +3538,45 @@ export default function ProjectView() {
     <div className="max-w-[1400px] mx-auto font-sans pb-12">
       
       {/* Breadcrumb / Back */}
-      <Link to="/projects" className="inline-flex items-center text-gray-500 hover:text-gray-800 text-sm font-medium mb-6 transition-colors">
+      <Link to="/projects" className="inline-flex items-center text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-sm font-medium mb-6 transition-colors">
         <ArrowLeft size={16} className="mr-2" /> Назад к проектам
       </Link>
 
       {/* Header Area */}
       <div className="flex flex-wrap lg:flex-nowrap justify-between items-start mb-8 gap-6">
         <div className="flex items-center">
-          <div className="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center mr-5 shrink-0">
-            <span className="text-4xl font-bold text-[#4f46e5]">{projectInitial}</span>
+          <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-950/60 rounded-2xl flex items-center justify-center mr-5 shrink-0">
+            <span className="text-4xl font-bold text-[#4f46e5] dark:text-indigo-400">{projectInitial}</span>
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-1 tracking-tight">{projectName}</h1>
-            <p className="text-gray-500 text-sm font-medium">Все задачи, декомпозиция и прогресс проекта</p>
+            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-1 tracking-tight">{projectName}</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Все задачи, декомпозиция и прогресс проекта</p>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-4">
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4 min-w-[280px]">
-            <div className="text-gray-400">
+          <div className="bg-white dark:bg-[#181b20] rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-[#262932] flex items-center gap-4 min-w-[280px]">
+            <div className="text-gray-400 dark:text-gray-500">
               <Calendar size={24} strokeWidth={1.5} />
             </div>
             <div>
-              <div className="font-bold text-gray-900 text-[15px]">1 сент. 2026 — 30 сент. 2026</div>
-              <div className="text-xs text-gray-500 font-medium">Период проекта</div>
+              <div className="font-bold text-gray-900 dark:text-white text-[15px]">1 сент. 2026 — 30 сент. 2026</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Период проекта</div>
             </div>
           </div>
           
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-[320px]">
+          <div className="bg-white dark:bg-[#181b20] rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-[#262932] min-w-[320px]">
             <div className="flex justify-between items-center mb-3">
-              <div className="font-bold text-gray-900 text-[15px]">Прогресс проекта</div>
-              <div className="font-bold text-gray-900 text-sm">{progressPercent}%</div>
+              <div className="font-bold text-gray-900 dark:text-white text-[15px]">Прогресс проекта</div>
+              <div className="font-bold text-gray-900 dark:text-white text-sm">{progressPercent}%</div>
             </div>
-            <div className="w-full bg-gray-100 rounded-full h-2.5 mb-3 overflow-hidden">
+            <div className="w-full bg-gray-100 dark:bg-[#262932] rounded-full h-2.5 mb-3 overflow-hidden">
               <div 
                 className="bg-[#4f46e5] h-2.5 rounded-full transition-all duration-500" 
                 style={{ width: `${progressPercent}%` }}
               ></div>
             </div>
-            <div className="text-xs text-gray-500 font-medium">{completedTasksCount} из {totalTasksCount} задач завершено</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">{completedTasksCount} из {totalTasksCount} задач завершено</div>
           </div>
         </div>
       </div>
@@ -3584,11 +3584,11 @@ export default function ProjectView() {
       {/* ========================================================================= */}
       {/* TABS NAVIGATION                                                           */}
       {/* ========================================================================= */}
-      <div className="flex border-b border-gray-200 mb-6">
+      <div className="flex border-b border-gray-200 dark:border-[#262932] mb-6">
         <button 
           onClick={() => setActiveTab('tasks')}
           className={`flex items-center font-bold pb-4 border-b-2 px-2 mr-8 transition-colors ${
-            activeTab === 'tasks' ? 'text-[#4f46e5] border-[#4f46e5]' : 'text-gray-500 border-transparent hover:text-gray-800'
+            activeTab === 'tasks' ? 'text-[#4f46e5] dark:text-indigo-400 border-[#4f46e5] dark:border-indigo-400' : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-800 dark:hover:text-white'
           }`}
         >
           <LayoutList size={18} className="mr-2" /> Задачи (Декомпозиция)
@@ -3597,7 +3597,7 @@ export default function ProjectView() {
         <button 
           onClick={() => setActiveTab('plans')}
           className={`flex items-center font-bold pb-4 border-b-2 px-2 mr-8 transition-colors ${
-            activeTab === 'plans' ? 'text-[#4f46e5] border-[#4f46e5]' : 'text-gray-500 border-transparent hover:text-gray-800'
+            activeTab === 'plans' ? 'text-[#4f46e5] dark:text-indigo-400 border-[#4f46e5] dark:border-indigo-400' : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-800 dark:hover:text-white'
           }`}
         >
           <CalendarDays size={18} className="mr-2" /> Расписание и Планы
@@ -3606,12 +3606,12 @@ export default function ProjectView() {
         <button 
           onClick={() => setActiveTab('bloggers')}
           className={`flex items-center font-bold pb-4 border-b-2 px-2 mr-8 transition-colors ${
-            activeTab === 'bloggers' ? 'text-[#4f46e5] border-[#4f46e5]' : 'text-gray-500 border-transparent hover:text-gray-800'
+            activeTab === 'bloggers' ? 'text-[#4f46e5] dark:text-indigo-400 border-[#4f46e5] dark:border-indigo-400' : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-800 dark:hover:text-white'
           }`}
         >
           <Users size={18} className="mr-2" /> Блогеры
           <span className={`ml-2 px-2 py-0.5 text-xs rounded-full font-semibold ${
-            activeTab === 'bloggers' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'
+            activeTab === 'bloggers' ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300' : 'bg-gray-100 dark:bg-[#262932] text-gray-600 dark:text-gray-400'
           }`}>
             {bloggersData.length}
           </span>
@@ -3620,12 +3620,12 @@ export default function ProjectView() {
         <button 
           onClick={() => setActiveTab('companies')}
           className={`flex items-center font-bold pb-4 border-b-2 px-2 mr-8 transition-colors ${
-            activeTab === 'companies' ? 'text-[#4f46e5] border-[#4f46e5]' : 'text-gray-500 border-transparent hover:text-gray-800'
+            activeTab === 'companies' ? 'text-[#4f46e5] dark:text-indigo-400 border-[#4f46e5] dark:border-indigo-400' : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-800 dark:hover:text-white'
           }`}
         >
           <Building2 size={18} className="mr-2" /> Компании и Партнеры
           <span className={`ml-2 px-2 py-0.5 text-xs rounded-full font-semibold ${
-            activeTab === 'companies' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'
+            activeTab === 'companies' ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300' : 'bg-gray-100 dark:bg-[#262932] text-gray-600 dark:text-gray-400'
           }`}>
             {companiesData.length}
           </span>
@@ -3634,7 +3634,7 @@ export default function ProjectView() {
         <button 
           onClick={() => setActiveTab('members')}
           className={`flex items-center font-medium pb-4 border-b-2 px-2 mr-8 transition-colors ${
-            activeTab === 'members' ? 'text-[#4f46e5] border-[#4f46e5]' : 'text-gray-500 border-transparent hover:text-gray-800'
+            activeTab === 'members' ? 'text-[#4f46e5] dark:text-indigo-400 border-[#4f46e5] dark:border-indigo-400' : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-800 dark:hover:text-white'
           }`}
         >
            Участники
@@ -3643,7 +3643,7 @@ export default function ProjectView() {
         <button 
           onClick={() => setActiveTab('settings')}
           className={`flex items-center font-medium pb-4 border-b-2 px-2 transition-colors ${
-            activeTab === 'settings' ? 'text-[#4f46e5] border-[#4f46e5]' : 'text-gray-500 border-transparent hover:text-gray-800'
+            activeTab === 'settings' ? 'text-[#4f46e5] dark:text-indigo-400 border-[#4f46e5] dark:border-indigo-400' : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-800 dark:hover:text-white'
           }`}
         >
            Настройки
@@ -3657,22 +3657,22 @@ export default function ProjectView() {
         <div className="space-y-6">
           <div className="flex flex-wrap justify-between items-center gap-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Месячные планы и Спринты</h2>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Месячные планы и Спринты</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 Иерархическая структура: Месяц → Показатели плана → Распределение по спринтам
               </p>
             </div>
 
             <button 
               onClick={() => setIsAddMonthOpen(true)}
-              className="bg-[#5b52f6] hover:bg-[#4f46e5] text-white px-5 py-2.5 text-sm font-bold flex items-center rounded-xl transition-all shadow-sm"
+              className="bg-[#5b52f6] hover:bg-[#4f46e5] text-white px-5 py-2.5 text-sm font-bold flex items-center rounded-xl transition-all shadow-sm cursor-pointer"
             >
               <Plus size={18} className="mr-2" /> Добавить месяц
             </button>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-            <div className="flex bg-white border-b border-gray-100 text-[11px] uppercase font-bold text-gray-400 tracking-wider min-w-[1000px]">
+          <div className="bg-white dark:bg-[#181b20] rounded-2xl shadow-sm border border-gray-100 dark:border-[#262932] overflow-x-auto">
+            <div className="flex bg-white dark:bg-[#181b20] border-b border-gray-100 dark:border-[#262932] text-[11px] uppercase font-bold text-gray-400 dark:text-gray-400 tracking-wider min-w-[1000px]">
               <div className="flex-1 py-4 px-6 min-w-[320px]">Иерархия (Месяц / Показатель плана / Спринт)</div>
               <div className="w-[180px] py-4 pr-6 text-right">План</div>
               <div className="w-[160px] py-4 pr-6 text-right">Распределено / Факт</div>
@@ -3680,23 +3680,23 @@ export default function ProjectView() {
               <div className="w-[120px] py-4 pr-6 text-right">Действия</div>
             </div>
 
-            <div className="min-w-[1000px] divide-y divide-gray-100">
+            <div className="min-w-[1000px] divide-y divide-gray-100 dark:divide-[#262932]">
               {plansData.map(month => {
                 const monthExact = month.allocated === month.totalPlan
                 const monthDiff = month.totalPlan - month.allocated
 
                 return (
-                  <div key={month.id} className="bg-white">
+                  <div key={month.id} className="bg-white dark:bg-[#181b20]">
                     {/* LEVEL 1: MONTH ROW */}
                     <div 
-                      className="flex items-center hover:bg-slate-50 transition-colors py-4 px-6 cursor-pointer bg-slate-50/50 font-sans"
+                      className="flex items-center hover:bg-slate-50 dark:hover:bg-[#202532] transition-colors py-4 px-6 cursor-pointer bg-slate-50/50 dark:bg-[#1c2028] font-sans"
                       onClick={() => togglePlanOpen(month.id)}
                     >
                       <div className="flex-1 flex items-center">
-                        <button className="text-gray-400 hover:text-gray-700 mr-2">
+                        <button className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mr-2">
                           {month.isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                         </button>
-                        <span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded mr-3 tracking-wide">
+                        <span className="bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-bold px-2.5 py-0.5 rounded-md mr-3 tracking-wide">
                           MONTH
                         </span>
                         <div className="flex items-center">
@@ -3705,7 +3705,7 @@ export default function ProjectView() {
                               e.stopPropagation()
                               setSelectedDetailItem({ ...month, type: 'MONTH', description: month.description || '' })
                             }}
-                            className="font-bold text-gray-900 text-[15px] mr-1.5 hover:text-[#4f46e5] cursor-pointer transition-colors"
+                            className="font-bold text-gray-900 dark:text-white text-[15px] mr-1.5 hover:text-[#4f46e5] dark:hover:text-indigo-400 cursor-pointer transition-colors"
                             title="Нажмите, чтобы переименовать месяц"
                           >
                             {month.name}
@@ -3715,12 +3715,12 @@ export default function ProjectView() {
                               e.stopPropagation()
                               setSelectedDetailItem({ ...month, type: 'MONTH', description: month.description || '' })
                             }}
-                            className="mr-2 text-gray-300 hover:text-[#4f46e5] p-0.5 rounded"
+                            className="mr-2 text-gray-300 dark:text-gray-600 hover:text-[#4f46e5] dark:hover:text-indigo-400 p-0.5 rounded"
                             title="Переименовать месяц"
                           >
                             <Edit3 size={13} />
                           </button>
-                          <span className="text-xs text-gray-400 font-medium mr-2">
+                          <span className="text-xs text-gray-400 dark:text-gray-500 font-medium mr-2">
                             ({month.period})
                           </span>
                           <button
@@ -3729,7 +3729,7 @@ export default function ProjectView() {
                               setTargetMonthId(month.id)
                               setIsAddPlanItemOpen(true)
                             }}
-                            className="w-5 h-5 rounded-md bg-purple-50 hover:bg-[#4f46e5] text-purple-600 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
+                            className="w-5 h-5 rounded-md bg-purple-50 dark:bg-purple-950/60 hover:bg-[#4f46e5] text-purple-600 dark:text-purple-300 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
                             title="Добавить показатель в этот месяц"
                           >
                             <Plus size={13} strokeWidth={2.5} />
@@ -3737,21 +3737,21 @@ export default function ProjectView() {
                         </div>
                       </div>
 
-                      <div className="w-[180px] pr-6 text-right font-bold text-gray-900 text-sm">
+                      <div className="w-[180px] pr-6 text-right font-bold text-gray-900 dark:text-white text-sm">
                         {month.totalPlan} единиц
                       </div>
 
-                      <div className="w-[160px] pr-6 text-right font-bold text-[#4f46e5] text-sm">
+                      <div className="w-[160px] pr-6 text-right font-bold text-[#4f46e5] dark:text-indigo-400 text-sm">
                         {month.allocated} / {month.totalPlan}
                       </div>
 
                       <div className="w-[180px] pr-6 text-center">
                         {monthExact ? (
-                          <span className="inline-flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
+                          <span className="inline-flex items-center text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-full">
                             <Check size={12} className="mr-1" /> 100% сошлось
                           </span>
                         ) : (
-                          <span className="inline-flex items-center text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">
+                          <span className="inline-flex items-center text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/50 px-2.5 py-1 rounded-full">
                             Осталось {monthDiff}
                           </span>
                         )}
@@ -3763,7 +3763,7 @@ export default function ProjectView() {
                             setTargetMonthId(month.id)
                             setIsAddPlanItemOpen(true)
                           }}
-                          className="w-7 h-7 ml-auto rounded-lg bg-indigo-50 hover:bg-[#4f46e5] text-[#4f46e5] hover:text-white flex items-center justify-center transition-all"
+                          className="w-7 h-7 ml-auto rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-[#4f46e5] text-[#4f46e5] dark:text-indigo-300 hover:text-white flex items-center justify-center transition-all"
                           title="Добавить план"
                         >
                           <Plus size={16} />
@@ -3773,9 +3773,9 @@ export default function ProjectView() {
 
                     {/* LEVEL 2: PLAN ITEMS */}
                     {month.isOpen && (
-                      <div className="divide-y divide-gray-50">
+                      <div className="divide-y divide-gray-50 dark:divide-[#262932]">
                         {month.items.length === 0 ? (
-                          <div className="py-4 pl-16 text-xs text-gray-400 italic">
+                          <div className="py-4 pl-16 text-xs text-gray-400 dark:text-gray-500 italic">
                             В этом месяце пока нет показателей плана. Нажмите «+» чтобы добавить.
                           </div>
                         ) : (
@@ -3784,16 +3784,16 @@ export default function ProjectView() {
                             const itemDiff = item.monthPlan - item.allocated
 
                             return (
-                              <div key={item.id} className="bg-white">
+                              <div key={item.id} className="bg-white dark:bg-[#181b20]">
                                 <div 
-                                  className="flex items-center hover:bg-indigo-50/10 transition-colors py-3.5 px-6 pl-14 cursor-pointer"
+                                  className="flex items-center hover:bg-indigo-50/10 dark:hover:bg-[#202532] transition-colors py-3.5 px-6 pl-14 cursor-pointer"
                                   onClick={() => togglePlanOpen(item.id)}
                                 >
                                   <div className="flex-1 flex items-center">
-                                    <button className="text-gray-400 hover:text-gray-700 mr-2">
+                                    <button className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mr-2">
                                       {item.isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                                     </button>
-                                    <span className="bg-indigo-100 text-[#4f46e5] text-[10px] font-bold px-2 py-0.5 rounded mr-3 tracking-wide">
+                                    <span className="bg-indigo-100 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-300 text-xs font-bold px-2.5 py-0.5 rounded-md mr-3 tracking-wide">
                                       PLAN
                                     </span>
                                     <span 
@@ -3801,7 +3801,7 @@ export default function ProjectView() {
                                         e.stopPropagation()
                                         setSelectedDetailItem({ ...item, type: 'PLAN_ITEM', description: item.description || '' })
                                       }}
-                                      className="font-semibold text-gray-800 text-sm hover:text-[#4f46e5] cursor-pointer transition-colors"
+                                      className="font-semibold text-gray-800 dark:text-gray-200 text-sm hover:text-[#4f46e5] dark:hover:text-indigo-400 cursor-pointer transition-colors"
                                       title="Нажмите, чтобы переименовать показатель"
                                     >
                                       {item.name}
@@ -3811,12 +3811,12 @@ export default function ProjectView() {
                                         e.stopPropagation()
                                         setSelectedDetailItem({ ...item, type: 'PLAN_ITEM', description: item.description || '' })
                                       }}
-                                      className="ml-1 mr-1.5 text-gray-300 hover:text-[#4f46e5] p-0.5 rounded"
+                                      className="ml-1 mr-1.5 text-gray-300 dark:text-gray-600 hover:text-[#4f46e5] dark:hover:text-indigo-400 p-0.5 rounded"
                                       title="Переименовать показатель"
                                     >
                                       <Edit3 size={12} />
                                     </button>
-                                    <span className="text-xs text-gray-400 mr-2 font-normal">
+                                    <span className="text-xs text-gray-400 dark:text-gray-500 mr-2 font-normal">
                                       ({item.unit})
                                     </span>
                                     <button
@@ -3825,28 +3825,28 @@ export default function ProjectView() {
                                         setTargetPlanItemId(item.id)
                                         setIsAddSprintOpen(true)
                                       }}
-                                      className="w-5 h-5 rounded-md bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
+                                      className="w-5 h-5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-600 text-emerald-600 dark:text-emerald-300 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
                                       title="Добавить спринт к этому показателю"
                                     >
                                       <Plus size={13} strokeWidth={2.5} />
                                     </button>
                                   </div>
 
-                                  <div className="w-[180px] pr-6 text-right font-bold text-gray-700 text-sm">
+                                  <div className="w-[180px] pr-6 text-right font-bold text-gray-700 dark:text-gray-300 text-sm">
                                     {item.monthPlan} {item.unit}
                                   </div>
 
-                                  <div className="w-[160px] pr-6 text-right font-bold text-indigo-600 text-sm">
+                                  <div className="w-[160px] pr-6 text-right font-bold text-indigo-600 dark:text-indigo-400 text-sm">
                                     {item.allocated} / {item.monthPlan}
                                   </div>
 
                                   <div className="w-[180px] pr-6 text-center">
                                     {itemExact ? (
-                                      <span className="inline-flex items-center text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                                      <span className="inline-flex items-center text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full">
                                         <Check size={10} className="mr-1" /> Распределено
                                       </span>
                                     ) : (
-                                      <span className="inline-flex items-center text-[11px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
+                                      <span className="inline-flex items-center text-[11px] font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/50 px-2 py-0.5 rounded-full">
                                         Осталось {itemDiff}
                                       </span>
                                     )}
@@ -3858,7 +3858,7 @@ export default function ProjectView() {
                                         setTargetPlanItemId(item.id)
                                         setIsAddSprintOpen(true)
                                       }}
-                                      className="w-7 h-7 ml-auto rounded-lg bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white flex items-center justify-center transition-all"
+                                      className="w-7 h-7 ml-auto rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-600 text-emerald-600 dark:text-emerald-300 hover:text-white flex items-center justify-center transition-all"
                                       title="Добавить спринт"
                                     >
                                       <Plus size={16} />
@@ -3868,23 +3868,23 @@ export default function ProjectView() {
 
                                 {/* LEVEL 3: SPRINTS */}
                                 {item.isOpen && (
-                                  <div className="bg-slate-50/40 divide-y divide-gray-100/60 pl-24 pr-6 py-1">
+                                  <div className="bg-slate-50/40 dark:bg-[#13161c] divide-y divide-gray-100/60 dark:divide-[#262932] pl-24 pr-6 py-1">
                                     {item.sprints.length === 0 ? (
-                                      <div className="py-3 text-xs text-gray-400 italic">
+                                      <div className="py-3 text-xs text-gray-400 dark:text-gray-500 italic">
                                         Спринты еще не созданы. Нажмите «+» чтобы добавить.
                                       </div>
                                     ) : (
                                       item.sprints.map((sp: any) => (
-                                        <div key={sp.id} className="flex items-center py-2.5 hover:bg-white transition-colors rounded-lg px-3 my-0.5">
+                                        <div key={sp.id} className="flex items-center py-2.5 hover:bg-white dark:hover:bg-[#1c2028] transition-colors rounded-lg px-3 my-0.5">
                                           <div className="flex-1 flex items-center gap-1.5">
-                                            <span className="bg-blue-100 text-blue-700 text-[9px] font-bold px-1.5 py-0.5 rounded mr-2 tracking-wide">
+                                            <span className="bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[9px] font-bold px-1.5 py-0.5 rounded mr-2 tracking-wide">
                                               SPRINT
                                             </span>
                                             <input 
                                               type="text"
                                               value={sp.name}
                                               onChange={(e) => renamePlanSprint(month.id, item.id, sp.id, e.target.value)}
-                                              className="text-sm font-semibold text-gray-700 bg-transparent hover:bg-white focus:bg-white border border-transparent hover:border-gray-200 focus:border-[#4f46e5] rounded px-1.5 py-0.5 outline-none transition-colors max-w-xs"
+                                              className="text-sm font-semibold text-gray-700 dark:text-gray-200 bg-transparent hover:bg-white dark:hover:bg-[#1c2028] focus:bg-white dark:focus:bg-[#1c2028] border border-transparent hover:border-gray-200 dark:hover:border-[#2b303c] focus:border-[#4f46e5] rounded px-1.5 py-0.5 outline-none transition-colors max-w-xs"
                                               title="Кликните, чтобы сразу переименовать спринт"
                                             />
                                             <button
@@ -3892,7 +3892,7 @@ export default function ProjectView() {
                                                 e.stopPropagation()
                                                 setSelectedDetailItem({ ...sp, type: 'SPRINT', description: sp.description || '' })
                                               }}
-                                              className="text-gray-300 hover:text-[#4f46e5] p-1 rounded"
+                                              className="text-gray-300 dark:text-gray-600 hover:text-[#4f46e5] dark:hover:text-indigo-400 p-1 rounded"
                                               title="Подробнее и описание"
                                             >
                                               <Edit3 size={12} />
@@ -3901,32 +3901,32 @@ export default function ProjectView() {
 
                                           <div className="w-[180px] pr-6 text-right">
                                             <div className="inline-flex items-center gap-1.5">
-                                              <span className="text-xs text-gray-400 font-medium">План:</span>
+                                              <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">План:</span>
                                               <input 
                                                 type="number"
                                                 value={sp.plan}
                                                 onChange={(e) => updateSprintPlanValue(month.id, item.id, sp.id, Number(e.target.value))}
-                                                className="w-16 text-right font-bold text-gray-800 bg-white border border-gray-200 rounded px-2 py-0.5 text-xs focus:ring-1 focus:ring-[#4f46e5] outline-none"
+                                                className="w-16 text-right font-bold text-gray-800 dark:text-white bg-white dark:bg-[#181b20] border border-gray-200 dark:border-[#2b303c] rounded px-2 py-0.5 text-xs focus:ring-1 focus:ring-[#4f46e5] outline-none"
                                               />
-                                              <span className="text-[11px] text-gray-400">{item.unit}</span>
+                                              <span className="text-[11px] text-gray-400 dark:text-gray-500">{item.unit}</span>
                                             </div>
                                           </div>
 
-                                          <div className="w-[160px] pr-6 text-right text-xs font-semibold text-gray-600">
-                                            Факт: <span className="text-[#4f46e5] font-bold">{sp.fact}</span>
+                                          <div className="w-[160px] pr-6 text-right text-xs font-semibold text-gray-600 dark:text-gray-400">
+                                            Факт: <span className="text-[#4f46e5] dark:text-indigo-400 font-bold">{sp.fact}</span>
                                           </div>
 
                                           <div className="w-[180px] pr-6 text-center">
-                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                              sp.status === 'Done' ? 'bg-emerald-50 text-emerald-600' :
-                                              sp.status === 'In Progress' ? 'bg-blue-50 text-blue-600' :
-                                              'bg-gray-100 text-gray-500'
+                                            <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                                              sp.status === 'Done' ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300' :
+                                              sp.status === 'In Progress' ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-300' :
+                                              'bg-gray-100 dark:bg-[#20242c] text-gray-500 dark:text-gray-400'
                                             }`}>
                                               {sp.status}
                                             </span>
                                           </div>
 
-                                          <div className="w-[120px] pr-6 text-right text-xs text-gray-400">
+                                          <div className="w-[120px] pr-6 text-right text-xs text-gray-400 dark:text-gray-500">
                                             Синхронизировано
                                           </div>
                                         </div>
@@ -3963,12 +3963,12 @@ export default function ProjectView() {
                   placeholder="Поиск задач..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5]"
+                  className="w-full bg-white dark:bg-[#181b20] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
                 {searchQuery && (
                   <button 
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                   >
                     <X size={14} />
                   </button>
@@ -3978,7 +3978,7 @@ export default function ProjectView() {
               <select 
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 outline-none w-40 cursor-pointer focus:ring-2 focus:ring-[#4f46e5]/20"
+                className="bg-white dark:bg-[#181b20] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none w-40 cursor-pointer focus:ring-2 focus:ring-[#4f46e5]/20"
               >
                 <option value="ALL">Все типы</option>
                 <option value="EPIC">Только Epics</option>
@@ -3990,7 +3990,7 @@ export default function ProjectView() {
               <select 
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 outline-none w-40 cursor-pointer focus:ring-2 focus:ring-[#4f46e5]/20"
+                className="bg-white dark:bg-[#181b20] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none w-40 cursor-pointer focus:ring-2 focus:ring-[#4f46e5]/20"
               >
                 <option value="ALL">Все статусы</option>
                 <option value="Done">Done (Готово)</option>
@@ -4000,18 +4000,18 @@ export default function ProjectView() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="flex bg-white dark:bg-[#181b20] rounded-xl border border-gray-200 dark:border-[#2b303c] overflow-hidden">
                 <button 
                   onClick={() => setViewMode('list')}
                   title="Табличный вид"
-                  className={`p-2.5 transition-colors ${viewMode === 'list' ? 'text-[#4f46e5] bg-indigo-50' : 'text-gray-400 hover:text-gray-700'}`}
+                  className={`p-2.5 transition-colors cursor-pointer ${viewMode === 'list' ? 'text-[#4f46e5] dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                 >
                   <LayoutList size={18} />
                 </button>
                 <button 
                   onClick={() => setViewMode('board')}
                   title="Канбан доска"
-                  className={`p-2.5 transition-colors ${viewMode === 'board' ? 'text-[#4f46e5] bg-indigo-50' : 'text-gray-400 hover:text-gray-700'}`}
+                  className={`p-2.5 transition-colors cursor-pointer ${viewMode === 'board' ? 'text-[#4f46e5] dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                 >
                   <Grip size={18} />
                 </button>
@@ -4022,7 +4022,7 @@ export default function ProjectView() {
                   setModalType('EPIC')
                   setIsModalOpen(true)
                 }}
-                className="bg-[#5b52f6] hover:bg-[#4f46e5] text-white px-4 py-2.5 text-sm font-bold flex items-center rounded-xl transition-all shadow-sm"
+                className="bg-[#5b52f6] hover:bg-[#4f46e5] text-white px-4 py-2.5 text-sm font-bold flex items-center rounded-xl transition-all shadow-sm cursor-pointer"
               >
                 <Plus size={18} className="mr-1.5" /> Добавить Epic
               </button>
@@ -4032,7 +4032,7 @@ export default function ProjectView() {
                   setModalType('TASK')
                   setIsModalOpen(true)
                 }}
-                className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2.5 text-sm font-bold flex items-center rounded-xl transition-all shadow-xs"
+                className="bg-white dark:bg-[#181b20] border border-gray-200 dark:border-[#2b303c] hover:bg-gray-50 dark:hover:bg-[#202532] text-gray-700 dark:text-gray-200 px-4 py-2.5 text-sm font-bold flex items-center rounded-xl transition-all shadow-xs cursor-pointer"
               >
                 <Plus size={18} className="mr-1.5" /> Добавить задачу
               </button>
@@ -4041,8 +4041,8 @@ export default function ProjectView() {
 
           {/* Main View: Tree Table */}
           {viewMode === 'list' && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-              <div className="flex bg-white border-b border-gray-100 text-[11px] uppercase font-bold text-gray-400 tracking-wider min-w-[1050px]">
+            <div className="bg-white dark:bg-[#181b20] rounded-2xl shadow-sm border border-gray-100 dark:border-[#262932] overflow-x-auto">
+              <div className="flex bg-white dark:bg-[#181b20] border-b border-gray-100 dark:border-[#262932] text-[11px] uppercase font-bold text-gray-400 dark:text-gray-400 tracking-wider min-w-[1050px]">
                 <div className="flex-1 py-4 px-6 min-w-[300px]">Название (Epic / Sprint / Daily / Task)</div>
                 <div className="w-[300px] py-4 pr-6 shrink-0">Описание</div>
                 <div className="w-[140px] py-4 pr-6 shrink-0">Статус</div>
@@ -4053,7 +4053,7 @@ export default function ProjectView() {
 
               <div className="min-w-[1050px]">
                 {filteredTasksTree.length === 0 ? (
-                  <div className="text-center py-16 text-gray-400">
+                  <div className="text-center py-16 text-gray-400 dark:text-gray-500">
                     Ничего не найдено по заданным фильтрам
                   </div>
                 ) : (
@@ -4069,11 +4069,11 @@ export default function ProjectView() {
               {['Not Done', 'In Progress', 'Done'].map(status => {
                 const columnTasks = allTasks.filter(i => i.status === status && (typeFilter === 'ALL' || i.type === typeFilter))
                 return (
-                  <div key={status} className="bg-gray-100/70 rounded-2xl p-4 flex flex-col min-h-[400px]">
+                  <div key={status} className="bg-gray-100/70 dark:bg-[#14171d] rounded-2xl p-4 flex flex-col min-h-[400px] border border-transparent dark:border-[#262932]">
                     <div className="flex justify-between items-center mb-4 px-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-gray-800">{status}</span>
-                        <span className="text-xs bg-white text-gray-500 font-bold px-2 py-0.5 rounded-full shadow-sm">
+                        <span className="font-bold text-sm text-gray-800 dark:text-white">{status}</span>
+                        <span className="text-xs bg-white dark:bg-[#20242c] text-gray-500 dark:text-gray-300 font-bold px-2 py-0.5 rounded-full shadow-sm">
                           {columnTasks.length}
                         </span>
                       </div>
@@ -4084,21 +4084,21 @@ export default function ProjectView() {
                         <div 
                           key={task.id} 
                           onClick={() => setSelectedDetailItem(task)}
-                          className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
+                          className="bg-white dark:bg-[#181b20] rounded-xl p-4 shadow-sm border border-gray-100 dark:border-[#262932] hover:shadow-md dark:hover:border-indigo-500/40 transition-shadow cursor-pointer"
                         >
                           <div className="flex justify-between items-start mb-2">
                             {renderBadge(task.type)}
-                            <span className="text-xs text-gray-400">{task.date}</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">{task.date}</span>
                           </div>
-                          <h4 className="font-bold text-sm text-gray-900 mb-1 hover:text-[#4f46e5]">{task.name}</h4>
-                          <p className="text-xs text-gray-500 mb-4 line-clamp-2">{task.description}</p>
+                          <h4 className="font-bold text-sm text-gray-900 dark:text-white mb-1 hover:text-[#4f46e5] dark:hover:text-indigo-400">{task.name}</h4>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">{task.description}</p>
                           
-                          <div className="flex justify-between items-center border-t border-gray-50 pt-3">
+                          <div className="flex justify-between items-center border-t border-gray-50 dark:border-[#262932] pt-3">
                             <div className="flex items-center">
                               <div className={`w-5 h-5 rounded-full ${task.creatorColor} text-white flex items-center justify-center text-[10px] font-bold mr-1.5`}>
                                 {task.creatorInitial}
                               </div>
-                              <span className="text-xs text-gray-600">{task.creator}</span>
+                              <span className="text-xs text-gray-600 dark:text-gray-300">{task.creator}</span>
                             </div>
                             {renderStatus(task.status, task.id)}
                           </div>
@@ -4113,17 +4113,17 @@ export default function ProjectView() {
 
           {/* Pagination */}
           <div className="flex justify-between items-center mt-6 px-2">
-            <span className="text-sm text-gray-500 font-medium">
+            <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
               Показано {allTasks.length} элементов
             </span>
             <div className="flex items-center gap-2">
-              <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors">
+              <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 dark:hover:bg-[#262932] transition-colors cursor-pointer">
                 <ChevronLeft size={16} />
               </button>
-              <button className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-100 text-[#4f46e5] font-bold text-sm">
+              <button className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-100 dark:bg-indigo-950/70 text-[#4f46e5] dark:text-indigo-300 font-bold text-sm">
                 1
               </button>
-              <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors">
+              <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 dark:hover:bg-[#262932] transition-colors cursor-pointer">
                 <ChevronRight size={16} />
               </button>
             </div>
@@ -4139,8 +4139,8 @@ export default function ProjectView() {
           {/* Top Bar: Title & Primary Action */}
           <div className="flex flex-wrap justify-between items-center gap-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Список блогеров ({projectName})</h2>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Список блогеров ({projectName})</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 Нажмите на блогера в списке, чтобы открыть подробную информацию, бриф и ссылку на публикацию
               </p>
             </div>
@@ -4156,10 +4156,10 @@ export default function ProjectView() {
           {/* Quick Auto-Add Blogger Bar (Only Name + Nickname) */}
           <form 
             onSubmit={handleQuickAddBlogger}
-            className="bg-white rounded-2xl p-4 border border-indigo-100 shadow-sm flex flex-wrap items-center gap-3"
+            className="bg-white dark:bg-[#181b20] rounded-2xl p-4 border border-indigo-100 dark:border-[#262932] shadow-sm flex flex-wrap items-center gap-3"
           >
-            <div className="flex items-center gap-2 text-indigo-700 font-bold text-xs shrink-0 pr-2 border-r border-indigo-100">
-              <div className="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+            <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300 font-bold text-xs shrink-0 pr-2 border-r border-indigo-100 dark:border-[#262932]">
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                 <Sparkles size={14} className="animate-pulse" />
               </div>
               <span>Быстрое добавление:</span>
@@ -4171,7 +4171,7 @@ export default function ProjectView() {
                 placeholder="Имя блогера (например: Мадина)"
                 value={quickBloggerName}
                 onChange={(e) => setQuickBloggerName(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-colors"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-semibold focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
             </div>
 
@@ -4181,7 +4181,7 @@ export default function ProjectView() {
                 placeholder="Никнейм (например: @madina_beauty или ссылка)"
                 value={quickBloggerHandle}
                 onChange={(e) => setQuickBloggerHandle(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-semibold focus:bg-white focus:border-[#4f46e5] outline-none transition-colors"
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-semibold focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
             </div>
 
@@ -4195,7 +4195,7 @@ export default function ProjectView() {
           </form>
 
           {/* Search & Platform Filter Toolbar */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-white dark:bg-[#181b20] rounded-2xl p-4 border border-gray-100 dark:border-[#262932] shadow-sm flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-3 flex-1 min-w-[280px]">
               {/* Search Bar */}
               <div className="relative flex-1 min-w-[200px] max-w-md">
@@ -4205,7 +4205,7 @@ export default function ProjectView() {
                   placeholder="Поиск по имени, нику или заметкам..."
                   value={bloggerSearch}
                   onChange={(e) => setBloggerSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium focus:bg-white focus:border-[#4f46e5] outline-none transition-colors"
+                  className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
 
@@ -4216,10 +4216,10 @@ export default function ProjectView() {
                     key={platform}
                     type="button"
                     onClick={() => setBloggerPlatformFilter(platform)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                       bloggerPlatformFilter === platform
-                        ? 'bg-[#1a2332] text-white shadow-sm'
-                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                        ? 'bg-[#1a2332] dark:bg-indigo-600 text-white shadow-sm'
+                        : 'bg-gray-50 dark:bg-[#20242c] text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#282d38]'
                     }`}
                   >
                     {platform === 'ALL' ? 'Все' : platform}
@@ -4230,11 +4230,11 @@ export default function ProjectView() {
 
             {/* Status Filter */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400 font-medium">Статус:</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Статус:</span>
               <select
                 value={bloggerStatusFilter}
                 onChange={(e) => setBloggerStatusFilter(e.target.value)}
-                className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-gray-700 outline-none cursor-pointer focus:bg-white focus:border-[#4f46e5]"
+                className="bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 outline-none cursor-pointer focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5]"
               >
                 <option value="ALL">Все статусы</option>
                 <option value="Переговоры">Переговоры</option>
@@ -4248,10 +4248,10 @@ export default function ProjectView() {
           {/* Clean Bloggers List */}
           <div className="space-y-3">
             {filteredBloggers.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
-                <Users size={36} className="mx-auto mb-2 text-gray-300 stroke-[1.5]" />
-                <p className="font-semibold text-gray-600">Блогеры не найдены</p>
-                <p className="text-xs text-gray-400 mt-1">Попробуйте изменить поисковый запрос или фильтр</p>
+              <div className="bg-white dark:bg-[#181b20] rounded-2xl border border-gray-100 dark:border-[#262932] p-12 text-center text-gray-400 dark:text-gray-500">
+                <Users size={36} className="mx-auto mb-2 text-gray-300 dark:text-gray-600 stroke-[1.5]" />
+                <p className="font-semibold text-gray-600 dark:text-gray-300">Блогеры не найдены</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Попробуйте изменить поисковый запрос или фильтр</p>
               </div>
             ) : (
               filteredBloggers.map((blogger) => {
@@ -4263,7 +4263,7 @@ export default function ProjectView() {
                   <div 
                     key={blogger.id}
                     onClick={() => setSelectedBlogger(blogger)}
-                    className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer flex flex-wrap items-center justify-between gap-4 group"
+                    className="bg-white dark:bg-[#181b20] rounded-2xl p-4 border border-gray-100 dark:border-[#262932] shadow-sm hover:border-indigo-200 dark:hover:border-indigo-500/40 hover:shadow-md transition-all cursor-pointer flex flex-wrap items-center justify-between gap-4 group"
                   >
                     {/* Left: Identity & Platform */}
                     <div className="flex items-center gap-4 min-w-[280px]">
@@ -4272,60 +4272,60 @@ export default function ProjectView() {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-gray-900 text-base group-hover:text-[#4f46e5] transition-colors">
+                          <h4 className="font-bold text-gray-900 dark:text-white text-base group-hover:text-[#4f46e5] dark:group-hover:text-indigo-400 transition-colors">
                             {blogger.name}
                           </h4>
                           <span className={`px-2 py-0.5 rounded-md text-[11px] font-semibold ${
                             blogger.platform === 'Instagram'
-                              ? 'bg-pink-50 text-pink-700'
+                              ? 'bg-pink-50 dark:bg-pink-950/50 text-pink-700 dark:text-pink-300'
                               : blogger.platform === 'Telegram'
-                              ? 'bg-sky-50 text-sky-700'
+                              ? 'bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300'
                               : blogger.platform === 'TikTok'
-                              ? 'bg-neutral-100 text-neutral-800'
-                              : 'bg-red-50 text-red-700'
+                              ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200'
+                              : 'bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300'
                           }`}>
                             {blogger.platform}
                           </span>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-400 font-mono mt-0.5">
+                        <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500 font-mono mt-0.5">
                           <span>{blogger.handle}</span>
                           <span>•</span>
-                          <span className="text-gray-500 font-sans">{blogger.format}</span>
+                          <span className="text-gray-500 dark:text-gray-400 font-sans">{blogger.format}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Middle: Sprint & Date */}
                     <div className="flex items-center gap-4 text-xs">
-                      <div className="bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-lg">
+                      <div className="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold px-2.5 py-1 rounded-lg">
                         {blogger.sprint}
                       </div>
-                      <span className="text-gray-400 font-medium">{blogger.publishDate}</span>
+                      <span className="text-gray-400 dark:text-gray-500 font-medium">{blogger.publishDate}</span>
                     </div>
 
                     {/* Right: Price, Status & Detailed View CTA */}
                     <div className="flex items-center gap-3 ml-auto">
                       <div className="text-right">
-                        <span className="font-bold text-gray-900 font-mono text-sm">{blogger.price}</span>
-                        <p className="text-[10px] text-gray-400 font-medium">охват ~{blogger.reach}</p>
+                        <span className="font-bold text-gray-900 dark:text-white font-mono text-sm">{blogger.price}</span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">охват ~{blogger.reach}</p>
                       </div>
 
                       {/* Status Button */}
                       <button 
                         type="button"
                         onClick={(e) => cycleBloggerStatus(blogger.id, e)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all transform active:scale-95 shadow-sm border ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all transform active:scale-95 shadow-sm border cursor-pointer ${
                           isPublished
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
                             : isPaid
-                            ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                            ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60'
                             : isApproved
-                            ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'
-                            : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                            ? 'bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/60'
+                            : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60'
                         }`}
                         title="Нажмите для быстрой смены статуса"
                       >
-                        {isPublished && <CheckCircle2 size={13} className="text-emerald-600" />}
+                        {isPublished && <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />}
                         {blogger.status}
                       </button>
 
@@ -4336,7 +4336,7 @@ export default function ProjectView() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 flex items-center justify-center transition-colors"
+                          className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 flex items-center justify-center transition-colors"
                           title="Открыть опубликованный пост"
                         >
                           <ExternalLink size={14} />
@@ -4347,7 +4347,7 @@ export default function ProjectView() {
                       <button
                         type="button"
                         onClick={() => setSelectedBlogger(blogger)}
-                        className="px-3 py-1.5 bg-gray-50 hover:bg-indigo-50 hover:text-[#4f46e5] text-gray-600 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors"
+                        className="px-3 py-1.5 bg-gray-50 dark:bg-[#20242c] hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-[#4f46e5] dark:hover:text-indigo-300 text-gray-600 dark:text-gray-300 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
                       >
                         Подробнее <ChevronRight size={14} />
                       </button>
@@ -4361,7 +4361,7 @@ export default function ProjectView() {
                             deleteBlogger(blogger.id, e)
                           }
                         }}
-                        className="w-8 h-8 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
+                        className="w-8 h-8 rounded-xl text-gray-400 dark:text-gray-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center justify-center transition-colors cursor-pointer"
                         title="Удалить блогера"
                       >
                         <Trash2 size={15} />
@@ -4374,8 +4374,8 @@ export default function ProjectView() {
           </div>
 
           {/* Simple Footer Counter */}
-          <div className="flex justify-between items-center text-xs text-gray-400 px-2 pt-2">
-            <span>Всего в списке: <strong className="text-gray-700">{filteredBloggers.length}</strong> блогеров</span>
+          <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500 px-2 pt-2">
+            <span>Всего в списке: <strong className="text-gray-700 dark:text-gray-200">{filteredBloggers.length}</strong> блогеров</span>
             <span>Кликните на строку для открытия брифа, тезисов и контактов</span>
           </div>
         </div>
@@ -4388,45 +4388,45 @@ export default function ProjectView() {
         <div className="space-y-6">
           {/* Top Summary / KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+            <div className="bg-white dark:bg-[#181b20] p-5 rounded-2xl border border-gray-100 dark:border-[#262932] shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                 <Building2 size={24} />
               </div>
               <div>
-                <p className="text-xs text-gray-400 font-medium">Всего компаний / партнеров</p>
-                <h3 className="text-2xl font-bold text-gray-900">{companiesData.length}</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Всего компаний / партнеров</p>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{companiesData.length}</h3>
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <div className="bg-white dark:bg-[#181b20] p-5 rounded-2xl border border-gray-100 dark:border-[#262932] shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                 <DollarSign size={24} />
               </div>
               <div>
-                <p className="text-xs text-gray-400 font-medium">Потрачено на партнеров</p>
-                <h3 className="text-2xl font-bold text-emerald-600">${totalCompaniesSpent.toLocaleString()}</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Потрачено на партнеров</p>
+                <h3 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">${totalCompaniesSpent.toLocaleString()}</h3>
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <div className="bg-white dark:bg-[#181b20] p-5 rounded-2xl border border-gray-100 dark:border-[#262932] shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                 <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs text-gray-400 font-medium">Активных сотрудничеств</p>
-                <h3 className="text-2xl font-bold text-blue-600">
+                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Активных сотрудничеств</p>
+                <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {companiesData.filter(c => c.status === 'В процессе' || c.status === 'Договорились').length}
                 </h3>
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+            <div className="bg-white dark:bg-[#181b20] p-5 rounded-2xl border border-gray-100 dark:border-[#262932] shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                 <Package size={24} />
               </div>
               <div>
-                <p className="text-xs text-gray-400 font-medium">Категорий бизнеса</p>
-                <h3 className="text-2xl font-bold text-amber-600">
+                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Категорий бизнеса</p>
+                <h3 className="text-2xl font-bold text-amber-600 dark:text-amber-400">
                   {companyCategories.length}
                 </h3>
               </div>
@@ -4434,7 +4434,7 @@ export default function ProjectView() {
           </div>
 
           {/* Action & Filter Toolbar */}
-          <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+          <div className="bg-white dark:bg-[#181b20] p-4 rounded-2xl border border-gray-100 dark:border-[#262932] shadow-sm flex flex-wrap gap-4 items-center justify-between">
             <div className="flex flex-wrap items-center gap-3 flex-1 min-w-[300px]">
               {/* Search */}
               <div className="relative flex-1 min-w-[200px]">
@@ -4444,7 +4444,7 @@ export default function ProjectView() {
                   placeholder="Поиск по названию, локации, предметам, категории..."
                   value={companySearch}
                   onChange={(e) => setCompanySearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium focus:bg-white focus:border-[#4f46e5] outline-none transition-colors"
+                  className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] outline-none transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
               </div>
 
@@ -4453,7 +4453,7 @@ export default function ProjectView() {
                 <select
                   value={companyCategoryFilter}
                   onChange={(e) => setCompanyCategoryFilter(e.target.value)}
-                  className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 pr-8 text-xs font-semibold text-gray-700 outline-none hover:bg-gray-100 cursor-pointer"
+                  className="appearance-none bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-3 py-2 pr-8 text-xs font-semibold text-gray-700 dark:text-gray-200 outline-none hover:bg-gray-100 dark:hover:bg-[#20242c] cursor-pointer"
                 >
                   <option value="ALL">Все категории</option>
                   {companyCategories.map((cat) => (
@@ -4468,7 +4468,7 @@ export default function ProjectView() {
                 <select
                   value={companyStatusFilter}
                   onChange={(e) => setCompanyStatusFilter(e.target.value)}
-                  className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 pr-8 text-xs font-semibold text-gray-700 outline-none hover:bg-gray-100 cursor-pointer"
+                  className="appearance-none bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-3 py-2 pr-8 text-xs font-semibold text-gray-700 dark:text-gray-200 outline-none hover:bg-gray-100 dark:hover:bg-[#20242c] cursor-pointer"
                 >
                   <option value="ALL">Все статусы</option>
                   <option value="Договорились">Договорились</option>
@@ -4491,10 +4491,10 @@ export default function ProjectView() {
           {/* Companies List */}
           <div className="space-y-3">
             {filteredCompanies.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
-                <Building2 size={36} className="mx-auto mb-2 text-gray-300 stroke-[1.5]" />
-                <p className="font-semibold text-gray-600">Компании не найдены</p>
-                <p className="text-xs text-gray-400 mt-1">Попробуйте изменить поисковый запрос или добавьте нового партнера</p>
+              <div className="bg-white dark:bg-[#181b20] rounded-2xl border border-gray-100 dark:border-[#262932] p-12 text-center text-gray-400 dark:text-gray-500">
+                <Building2 size={36} className="mx-auto mb-2 text-gray-300 dark:text-gray-600 stroke-[1.5]" />
+                <p className="font-semibold text-gray-600 dark:text-gray-300">Компании не найдены</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Попробуйте изменить поисковый запрос или добавьте нового партнера</p>
               </div>
             ) : (
               filteredCompanies.map((company) => {
@@ -4506,24 +4506,24 @@ export default function ProjectView() {
                   <div
                     key={company.id}
                     onClick={() => setSelectedCompany(company)}
-                    className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer flex flex-wrap items-center justify-between gap-4 group"
+                    className="bg-white dark:bg-[#181b20] rounded-2xl p-4 border border-gray-100 dark:border-[#262932] shadow-sm hover:border-indigo-200 dark:hover:border-indigo-500/40 hover:shadow-md transition-all cursor-pointer flex flex-wrap items-center justify-between gap-4 group"
                   >
                     {/* Left: Identity & Category & Location */}
                     <div className="flex items-center gap-4 min-w-[280px] max-w-sm">
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#4f46e5] flex items-center justify-center font-bold text-base shadow-sm shrink-0">
+                      <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 flex items-center justify-center font-bold text-base shadow-sm shrink-0">
                         <Building2 size={22} />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-gray-900 text-base group-hover:text-[#4f46e5] transition-colors">
+                          <h4 className="font-bold text-gray-900 dark:text-white text-base group-hover:text-[#4f46e5] dark:group-hover:text-indigo-400 transition-colors">
                             {company.name}
                           </h4>
-                          <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 text-indigo-700">
+                          <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
                             {company.category}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
-                          <MapPin size={13} className="text-gray-400 shrink-0" />
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <MapPin size={13} className="text-gray-400 dark:text-gray-500 shrink-0" />
                           <span className="truncate">{company.location}</span>
                         </div>
                       </div>
@@ -4531,22 +4531,22 @@ export default function ProjectView() {
 
                     {/* Middle: Items & Materials Provided */}
                     <div className="flex-1 min-w-[240px] max-w-md">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-400 font-bold uppercase mb-1">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 font-bold uppercase mb-1">
                         <Package size={13} className="text-indigo-500" />
                         <span>Предоставленные материалы / предметы:</span>
                       </div>
-                      <p className="text-xs text-gray-700 font-medium line-clamp-2 bg-gray-50 rounded-xl p-2 border border-gray-100">
+                      <p className="text-xs text-gray-700 dark:text-gray-300 font-medium line-clamp-2 bg-gray-50 dark:bg-[#20242c] rounded-xl p-2 border border-gray-100 dark:border-[#262932]">
                         {company.itemsProvided || 'Не указано'}
                       </p>
                     </div>
 
                     {/* Sprint & Date */}
                     <div className="flex items-center gap-3 text-xs">
-                      <div className="bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-lg">
+                      <div className="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold px-2.5 py-1 rounded-lg">
                         {company.sprint}
                       </div>
-                      <div className="text-gray-500 flex items-center gap-1">
-                        <Calendar size={13} className="text-gray-400" />
+                      <div className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <Calendar size={13} className="text-gray-400 dark:text-gray-500" />
                         <span>{company.date}</span>
                       </div>
                     </div>
@@ -4555,10 +4555,10 @@ export default function ProjectView() {
                     <div className="flex items-center gap-3">
                       {/* Spent Amount */}
                       <div className="text-right min-w-[90px]">
-                        <div className="text-sm font-extrabold text-emerald-600">
+                        <div className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
                           {company.spent}
                         </div>
-                        <div className="text-[10px] text-gray-400 font-medium">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                           расходы
                         </div>
                       </div>
@@ -4572,16 +4572,16 @@ export default function ProjectView() {
                         }}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors flex items-center gap-1.5 cursor-pointer ${
                           isCompleted
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
                             : isProvided
-                            ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                            ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60'
                             : isInProgress
-                            ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'
-                            : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                            ? 'bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/60'
+                            : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60'
                         }`}
                         title="Нажмите для быстрой смены статуса"
                       >
-                        {isCompleted && <CheckCircle2 size={13} className="text-emerald-600" />}
+                        {isCompleted && <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />}
                         {company.status}
                       </button>
 
@@ -4589,7 +4589,7 @@ export default function ProjectView() {
                       <button
                         type="button"
                         onClick={() => setSelectedCompany(company)}
-                        className="px-3 py-1.5 bg-gray-50 hover:bg-indigo-50 hover:text-[#4f46e5] text-gray-600 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors"
+                        className="px-3 py-1.5 bg-gray-50 dark:bg-[#20242c] hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-[#4f46e5] dark:hover:text-indigo-300 text-gray-600 dark:text-gray-300 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
                       >
                         Подробнее <ChevronRight size={14} />
                       </button>
@@ -4603,7 +4603,7 @@ export default function ProjectView() {
                             deleteCompany(company.id, e)
                           }
                         }}
-                        className="w-8 h-8 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer"
+                        className="w-8 h-8 rounded-xl text-gray-400 dark:text-gray-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center justify-center transition-colors cursor-pointer"
                         title="Удалить компанию"
                       >
                         <Trash2 size={15} />
@@ -4616,8 +4616,8 @@ export default function ProjectView() {
           </div>
 
           {/* Simple Footer Counter */}
-          <div className="flex justify-between items-center text-xs text-gray-400 px-2 pt-2">
-            <span>Всего в списке: <strong className="text-gray-700">{filteredCompanies.length}</strong> партнеров</span>
+          <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500 px-2 pt-2">
+            <span>Всего в списке: <strong className="text-gray-700 dark:text-gray-200">{filteredCompanies.length}</strong> партнеров</span>
             <span>Кликните на карточку компании для просмотра деталей, расходов и предоставленных предметов</span>
           </div>
         </div>
@@ -4628,12 +4628,12 @@ export default function ProjectView() {
       {/* ========================================================================= */}
       {activeTab === 'members' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm flex items-center justify-between">
+          <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Команда проекта ({projectName})</h2>
-              <p className="text-sm text-gray-500 mt-1">Сотрудники, медицинские представители и маркетологи направления</p>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Команда проекта ({projectName})</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Сотрудники, медицинские представители и маркетологи направления</p>
             </div>
-            <div className="px-4 py-2 bg-indigo-50 text-[#4f46e5] font-bold rounded-2xl text-xs flex items-center gap-2">
+            <div className="px-4 py-2 bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 font-bold rounded-2xl text-xs flex items-center gap-2">
               <Users size={16} /> {projectMembers.length || 4} активных участников
             </div>
           </div>
@@ -4646,30 +4646,30 @@ export default function ProjectView() {
               { id: 4, full_name: 'Малика Каримова', email: 'malika@pharma.uz', role: 'lead' }
             ]).map((user: any) => {
               const roleLabels: Record<string, { label: string; bg: string }> = {
-                admin: { label: 'Администратор / PM', bg: 'bg-rose-50 text-rose-700 border-rose-100' },
-                marketing: { label: 'Маркетинг / PR', bg: 'bg-purple-50 text-purple-700 border-purple-100' },
-                medrep: { label: 'Медицинский представитель', bg: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
-                lead: { label: 'Бренд-менеджер', bg: 'bg-indigo-50 text-indigo-700 border-indigo-100' }
+                admin: { label: 'Администратор / PM', bg: 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border-rose-100 dark:border-rose-900/60' },
+                marketing: { label: 'Маркетинг / PR', bg: 'bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-100 dark:border-purple-900/60' },
+                medrep: { label: 'Медицинский представитель', bg: 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900/60' },
+                lead: { label: 'Бренд-менеджер', bg: 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border-indigo-100 dark:border-indigo-900/60' }
               }
-              const roleInfo = roleLabels[user.role] || { label: user.role || 'Участник', bg: 'bg-gray-100 text-gray-700 border-gray-200' }
+              const roleInfo = roleLabels[user.role] || { label: user.role || 'Участник', bg: 'bg-gray-100 dark:bg-[#20242c] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-[#2b303c]' }
               return (
-                <div key={user.id} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                <div key={user.id} className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#4f46e5] font-bold text-lg flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 font-bold text-lg flex items-center justify-center shrink-0">
                       {user.full_name ? user.full_name[0] : 'U'}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-gray-900 truncate">{user.full_name}</h3>
-                      <p className="text-xs text-gray-400 truncate flex items-center gap-1.5 mt-1 font-mono">
+                      <h3 className="font-bold text-gray-900 dark:text-white truncate">{user.full_name}</h3>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate flex items-center gap-1.5 mt-1 font-mono">
                         <Mail size={12} /> {user.email}
                       </p>
                     </div>
                   </div>
-                  <div className="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between">
+                  <div className="mt-5 pt-4 border-t border-gray-50 dark:border-[#262932] flex items-center justify-between">
                     <span className={`px-2.5 py-1 rounded-xl text-xs font-bold border ${roleInfo.bg}`}>
                       {roleInfo.label}
                     </span>
-                    <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
+                    <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> В сети
                     </span>
                   </div>
@@ -4685,14 +4685,14 @@ export default function ProjectView() {
       {/* ========================================================================= */}
       {activeTab === 'settings' && (
         <div className="space-y-6 max-w-3xl mx-auto">
-          <form onSubmit={handleUpdateProjectSettings} className="bg-white rounded-3xl p-6 lg:p-8 border border-gray-100 shadow-sm">
-            <div className="flex items-center justify-between pb-6 mb-6 border-b border-gray-100">
+          <form onSubmit={handleUpdateProjectSettings} className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
+            <div className="flex items-center justify-between pb-6 mb-6 border-b border-gray-100 dark:border-[#262932]">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Настройки проекта</h2>
-                <p className="text-sm text-gray-500 mt-1">Редактирование основных параметров и сроков проекта</p>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Настройки проекта</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Редактирование основных параметров и сроков проекта</p>
               </div>
               {projectSavedFeedback && (
-                <span className="px-3.5 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold flex items-center gap-1.5 animate-in fade-in">
+                <span className="px-3.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-bold flex items-center gap-1.5 animate-in fade-in">
                   <Check size={14} /> Сохранено!
                 </span>
               )}
@@ -4700,51 +4700,51 @@ export default function ProjectView() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Название проекта</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wider">Название проекта</label>
                 <input 
                   type="text" 
                   value={projectEditForm.name || projectName}
                   onChange={(e) => setProjectEditForm({ ...projectEditForm, name: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm font-semibold text-gray-900 outline-none focus:border-[#4f46e5] focus:bg-white transition-all"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white outline-none focus:border-[#4f46e5] focus:bg-white dark:focus:bg-[#181b20] transition-all"
                   placeholder="Например: Extragel"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Описание и цели направления</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wider">Описание и цели направления</label>
                 <textarea 
                   value={projectEditForm.description}
                   onChange={(e) => setProjectEditForm({ ...projectEditForm, description: e.target.value })}
                   rows={3}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-800 outline-none focus:border-[#4f46e5] focus:bg-white transition-all"
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none focus:border-[#4f46e5] focus:bg-white dark:focus:bg-[#181b20] transition-all"
                   placeholder="Опишите фармацевтическое направление, фокусные целевые группы..."
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Дата начала</label>
+                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wider">Дата начала</label>
                   <input 
-                    type="date"
+                    type="date" 
                     value={projectEditForm.start_date}
                     onChange={(e) => setProjectEditForm({ ...projectEditForm, start_date: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-2.5 text-sm font-semibold text-gray-900 outline-none focus:border-[#4f46e5] focus:bg-white transition-all"
+                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl px-4 py-2.5 text-sm font-semibold text-gray-900 dark:text-white outline-none focus:border-[#4f46e5] focus:bg-white dark:focus:bg-[#181b20] transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Дата завершения</label>
+                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wider">Дата завершения</label>
                   <input 
-                    type="date"
+                    type="date" 
                     value={projectEditForm.end_date}
                     onChange={(e) => setProjectEditForm({ ...projectEditForm, end_date: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-2.5 text-sm font-semibold text-gray-900 outline-none focus:border-[#4f46e5] focus:bg-white transition-all"
+                    className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl px-4 py-2.5 text-sm font-semibold text-gray-900 dark:text-white outline-none focus:border-[#4f46e5] focus:bg-white dark:focus:bg-[#181b20] transition-all"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end">
+            <div className="mt-8 pt-6 border-t border-gray-100 dark:border-[#262932] flex items-center justify-end">
               <button 
                 type="submit" 
                 disabled={isSavingProject}
@@ -4756,11 +4756,11 @@ export default function ProjectView() {
           </form>
 
           {/* Danger Zone */}
-          <div className="bg-red-50/50 rounded-3xl p-6 lg:p-8 border border-red-200">
-            <div className="flex items-center gap-3 text-red-700 font-bold mb-2">
+          <div className="bg-red-50/50 dark:bg-red-950/20 rounded-3xl p-6 lg:p-8 border border-red-200 dark:border-red-900/50">
+            <div className="flex items-center gap-3 text-red-700 dark:text-red-400 font-bold mb-2">
               <AlertTriangle size={20} /> Опасная зона
             </div>
-            <p className="text-xs text-red-600 mb-5">
+            <p className="text-xs text-red-600 dark:text-red-400 mb-5">
               Удаление проекта приведет к удалению всех связанных планов, спринтов, блогеров и партнеров.
             </p>
             <button 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any, Union
+from typing import List, Optional
 from datetime import date
 from app.models import RoleEnum, StatusEnum
 
@@ -309,60 +309,5 @@ class RnpItemResponse(RnpItemBase):
     class Config:
         from_attributes = True
 
-# Project Tasks Hierarchy
-class ProjectTaskBase(BaseModel):
-    project_id: int
-    parent_id: Optional[int] = None
-    type: str = "TASK"
-    name: str
-    description: Optional[str] = None
-    status: str = "Not Done"
-    creator: Optional[str] = "Азамат"
-    creator_initial: Optional[str] = "A"
-    creator_color: Optional[str] = "bg-[#818cf8]"
-    date: Optional[str] = None
-    order_index: Optional[int] = 0
 
-class ProjectTaskCreate(ProjectTaskBase):
-    pass
 
-class ProjectTaskUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    status: Optional[str] = None
-    creator: Optional[str] = None
-    creator_initial: Optional[str] = None
-    creator_color: Optional[str] = None
-    date: Optional[str] = None
-    order_index: Optional[int] = None
-    parent_id: Optional[int] = None
-
-class ProjectTaskResponse(ProjectTaskBase):
-    id: int
-    children: List['ProjectTaskResponse'] = []
-    class Config:
-        from_attributes = True
-
-ProjectTaskResponse.model_rebuild()
-
-# Dashboard Stats
-class DashboardStatsResponse(BaseModel):
-    total_projects: int
-    total_bloggers: int
-    total_companies: int
-    total_members: int
-    total_spent_bloggers: int
-    total_spent_companies: int
-    total_budget: int
-    rnp_total_plan: int
-    rnp_total_fact: int
-    rnp_completion_rate: int
-    monthly_chart: List[Dict[str, Any]]
-
-# Global Search
-class SearchResultItem(BaseModel):
-    id: Union[int, str]
-    type: str  # project, blogger, company, user, task
-    title: str
-    subtitle: Optional[str] = None
-    url: str

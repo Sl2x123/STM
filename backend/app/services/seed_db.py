@@ -462,50 +462,9 @@ def seed_all():
                 crud.bulk_upsert_rnp_items(db=db, items=parsed)
                 print(f"RNP items confirmed in DB: {len(parsed)}")
 
-        # 9. Project Tasks Hierarchy (Epics -> Sprints -> Dailies -> Tasks)
-        tasks_data = [
-            # Extragel (Project 1)
-            {"id": 1, "project_id": 1, "parent_id": None, "type": "EPIC", "name": "Запуск рекламной кампании", "description": "Масштабная кампания на ТВ, в интернете и по сетям аптек. Основная цель — повысить знание бренда Extragel до 65%.", "status": "In Progress", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "01.09.2026", "order_index": 1},
-            {"id": 2, "project_id": 1, "parent_id": 1, "type": "SPRINT", "name": "Спринт 1: Подготовка креативов", "description": "Съемка промо-роликов, дизайн баннеров для таргета и согласование скриптов визитов для медпредов.", "status": "Done", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "02.09.2026", "order_index": 1},
-            {"id": 3, "project_id": 1, "parent_id": 2, "type": "DAILY", "name": "Делик 02.09: Сценарий и кастинг", "description": "Подготовка первичного сценария для ролика 30 секунд и отбор актерского состава.", "status": "Done", "creator": "Дилрабо", "creator_initial": "Д", "creator_color": "bg-[#9ca3af]", "date": "02.09.2026", "order_index": 1},
-            {"id": 4, "project_id": 1, "parent_id": 3, "type": "TASK", "name": "Написать сценарий 30 сек", "description": "Сценарий с акцентом на быстрое снятие боли и безопасность.", "status": "Done", "creator": "Дилрабо", "creator_initial": "Д", "creator_color": "bg-[#9ca3af]", "date": "03.09.2026", "order_index": 1},
-            {"id": 5, "project_id": 1, "parent_id": 3, "type": "TASK", "name": "Найти актеров на главные роли", "description": "Кастинг 3 кандидатов для утверждения с бренд-менеджером.", "status": "Done", "creator": "Дилрабо", "creator_initial": "Д", "creator_color": "bg-[#9ca3af]", "date": "04.09.2026", "order_index": 2},
-            {"id": 6, "project_id": 1, "parent_id": 2, "type": "DAILY", "name": "Делик 05.09: Монтаж и озвучка", "description": "Постпродакшн, цветокоррекция и запись дикторской озвучки на узбекском и русском языках.", "status": "Done", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "05.09.2026", "order_index": 2},
-            {"id": 7, "project_id": 1, "parent_id": 6, "type": "TASK", "name": "Запись диктора в студии", "description": "Студия звукозаписи \"MuzLab\", 2 версии хронометража.", "status": "Done", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "06.09.2026", "order_index": 1},
-            {"id": 8, "project_id": 1, "parent_id": 1, "type": "SPRINT", "name": "Спринт 2: Запуск в таргет", "description": "Настройка кабинетов FB, Instagram, Google Ads. Старт рекламной выдачи и сбор лидов.", "status": "In Progress", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "08.09.2026", "order_index": 2},
-            {"id": 9, "project_id": 1, "parent_id": 8, "type": "DAILY", "name": "Делик 08.09: Пиксели и аудитории", "description": "Интеграция пикселей Meta, сбор баз Lookalike и ретаргетинга.", "status": "Done", "creator": "Дилрабо", "creator_initial": "Д", "creator_color": "bg-[#9ca3af]", "date": "08.09.2026", "order_index": 1},
-            {"id": 10, "project_id": 1, "parent_id": 9, "type": "TASK", "name": "Проверить разметку конверсий", "description": "События кликов по аптечным агрегаторам.", "status": "Done", "creator": "Дилрабо", "creator_initial": "Д", "creator_color": "bg-[#9ca3af]", "date": "09.09.2026", "order_index": 1},
-            {"id": 11, "project_id": 1, "parent_id": 8, "type": "DAILY", "name": "Делик 12.09: A/B тестирование креативов", "description": "Сравнение CTR между статичными баннерами и короткими видео 15 сек.", "status": "In Progress", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "12.09.2026", "order_index": 2},
-            {"id": 12, "project_id": 1, "parent_id": 11, "type": "TASK", "name": "Оптимизация стоимости клика (CPC)", "description": "Снизить CPC до $0.08 по городам Ташкент и Самарканд.", "status": "In Progress", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "13.09.2026", "order_index": 1},
-            {"id": 13, "project_id": 1, "parent_id": None, "type": "EPIC", "name": "Работа с медицинскими представителями", "description": "Визиты к врачам травматологам, хирургам, терапевтам. Обеспечение представленности в 200 ключевых аптеках.", "status": "In Progress", "creator": "Джамшид", "creator_initial": "Д", "creator_color": "bg-[#818cf8]", "date": "01.09.2026", "order_index": 2},
-            {"id": 14, "project_id": 1, "parent_id": 13, "type": "SPRINT", "name": "Спринт 1: Аудит аптечных сетей", "description": "Сбор данных по остаткам, выкладке и знанию препарата первостольниками.", "status": "Done", "creator": "Джамшид", "creator_initial": "Д", "creator_color": "bg-[#818cf8]", "date": "03.09.2026", "order_index": 1},
-            {"id": 15, "project_id": 1, "parent_id": 14, "type": "DAILY", "name": "Делик 04.09: Опрос фармацевтов Ташкента", "description": "50 аптек первой линии: сети Olam Farm, 36.6, Best Farm.", "status": "Done", "creator": "Джамшид", "creator_initial": "Д", "creator_color": "bg-[#818cf8]", "date": "04.09.2026", "order_index": 1},
-            {"id": 16, "project_id": 1, "parent_id": 15, "type": "TASK", "name": "Заполнить анкеты наличия", "description": "Проверить наличие всех форм выпуска и сроки годности на полках.", "status": "Done", "creator": "Джамшид", "creator_initial": "Д", "creator_color": "bg-[#818cf8]", "date": "05.09.2026", "order_index": 1},
-            {"id": 17, "project_id": 1, "parent_id": 13, "type": "SPRINT", "name": "Спринт 2: Фармкружки и мерчендайзинг", "description": "Проведение обучающих презентаций и предоставление рекламных POS-материалов.", "status": "In Progress", "creator": "Джамшид", "creator_initial": "Д", "creator_color": "bg-[#818cf8]", "date": "10.09.2026", "order_index": 2},
-            {"id": 18, "project_id": 1, "parent_id": 17, "type": "DAILY", "name": "Делик 14.09: Промостойки Olam Farm", "description": "Установка 20 стоек в флагманских аптеках.", "status": "In Progress", "creator": "Джамшид", "creator_initial": "Д", "creator_color": "bg-[#818cf8]", "date": "14.09.2026", "order_index": 1},
-            {"id": 19, "project_id": 1, "parent_id": 18, "type": "TASK", "name": "Мерчендайзинг в 30 аптеках", "description": "Выкладка на уровне глаз покупателя, установка воблеров.", "status": "Not Done", "creator": "Джамшид", "creator_initial": "Д", "creator_color": "bg-[#818cf8]", "date": "17.09.2026", "order_index": 1},
-
-            # Masculan (Project 2)
-            {"id": 20, "project_id": 2, "parent_id": None, "type": "EPIC", "name": "Федеральная дистрибуция Masculan", "description": "Расширение сети дистрибуции в супермаркетах и АЗС.", "status": "In Progress", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "01.09.2026", "order_index": 1},
-            {"id": 21, "project_id": 2, "parent_id": 20, "type": "SPRINT", "name": "Спринт 1: Контрактование сетей Korzinka", "description": "Согласование условий листинга и маркетингового сбора.", "status": "Done", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "05.09.2026", "order_index": 1},
-            {"id": 22, "project_id": 2, "parent_id": 21, "type": "DAILY", "name": "Делик 06.09: Согласование спецификаций", "description": "Передача сертификатов соответствия и штрихкодов.", "status": "Done", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "06.09.2026", "order_index": 1},
-            {"id": 23, "project_id": 2, "parent_id": 22, "type": "TASK", "name": "Подписать договор поставки", "description": "Финальная подпись в ЭДО.", "status": "Done", "creator": "Азамат", "creator_initial": "A", "creator_color": "bg-[#818cf8]", "date": "07.09.2026", "order_index": 1}
-        ]
-
-        for t_data in tasks_data:
-            existing_t = db.query(models.ProjectTask).filter(models.ProjectTask.id == t_data["id"]).first()
-            if not existing_t:
-                t = models.ProjectTask(**t_data)
-                db.add(t)
-            else:
-                for k, v in t_data.items():
-                    setattr(existing_t, k, v)
-        db.commit()
-        print(f"Project tasks seeded: {len(tasks_data)}")
-
         # Synchronize PostgreSQL serial sequences to highest assigned IDs
         from sqlalchemy import text
-        tables = ['projects', 'teams', 'users', 'months', 'sprints', 'sprint_plan_items', 'bloggers', 'companies', 'rnp_items', 'project_tasks']
+        tables = ['projects', 'teams', 'users', 'months', 'sprints', 'sprint_plan_items', 'bloggers', 'companies', 'rnp_items']
         for table in tables:
             try:
                 db.execute(text(f"SELECT setval(pg_get_serial_sequence('{table}', 'id'), COALESCE(MAX(id), 1)) FROM {table};"))

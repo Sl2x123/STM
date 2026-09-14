@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api } from '../lib/api'
 import { 
   Users, Ticket, MapPin, LineChart, TrendingUp, 
   ArrowRight, Search, ChevronDown, LucideIcon
@@ -80,12 +79,12 @@ function MetricKpiCard({ value, label, icon: Icon, percent, growth }: MetricCard
 // 2. REVENUE / EXECUTION DUAL-SPLINE CHART (Exact match to Reference "Revenue")
 // =========================================================================
 
-function SplineWaveChart({ selectedPeriod, chartData }: { selectedPeriod: string; chartData?: any[] }) {
+function SplineWaveChart({ selectedPeriod }: { selectedPeriod: string }) {
   const [periodType, setPeriodType] = useState<'monthly' | 'weekly'>('monthly')
   const [hoverIndex, setHoverIndex] = useState<number>(5) // default to Jun (index 5)
 
   // Monthly points matching the undulating wave geometry of the reference screenshot
-  const defaultMonthlyData = [
+  const monthlyData = [
     { month: 'Jan', fact: 15, plan: 18, factY: 125, planY: 105, x: 45 },
     { month: 'Feb', fact: 12, plan: 20, factY: 140, planY: 75, x: 120 },
     { month: 'Mar', fact: 23, plan: 11, factY: 55, planY: 145, x: 195 },
@@ -94,7 +93,6 @@ function SplineWaveChart({ selectedPeriod, chartData }: { selectedPeriod: string
     { month: 'Jun', fact: 24, plan: 17, factY: 50, planY: 110, x: 420 },
     { month: 'Jul', fact: 21, plan: 19, factY: 70, planY: 95, x: 495 },
   ]
-  const monthlyData = chartData && chartData.length > 0 ? chartData : defaultMonthlyData
 
   const factPoints = monthlyData.map(d => ({ x: d.x, y: d.factY }))
   const planPoints = monthlyData.map(d => ({ x: d.x, y: d.planY }))
@@ -617,19 +615,6 @@ function LatestBookingTable() {
 
 export default function Dashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Июнь 2026')
-  const [stats, setStats] = useState<any>(null)
-
-  useEffect(() => {
-    let isMounted = true
-    api.get('/dashboard/stats')
-      .then(res => {
-        if (isMounted && res.data) {
-          setStats(res.data)
-        }
-      })
-      .catch(() => {})
-    return () => { isMounted = false }
-  }, [])
 
   return (
     <div className="max-w-[1440px] mx-auto font-sans pb-16 space-y-6 text-slate-800 dark:text-slate-100 transition-colors duration-200">
@@ -668,38 +653,38 @@ export default function Dashboard() {
       {/* 2. Top 4 Metric KPI Cards (Exact Match to Reference Images 1, 2 & 3) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricKpiCard
-          value={stats ? `${(stats.total_members * 62500).toLocaleString()}` : "500k"}
-          label={`Total user (Сотрудники: ${stats?.total_members || 8})`}
+          value="500k"
+          label="Total user (Визиты врачи & аптеки)"
           icon={Users}
-          percent={stats ? stats.rnp_completion_rate : 75}
+          percent={55}
           growth={55}
         />
         <MetricKpiCard
-          value={stats ? String((stats.total_bloggers + stats.total_companies) * 20) : "250"}
-          label={`Today Booking (Блогеры: ${stats?.total_bloggers || 6}, B2B: ${stats?.total_companies || 6})`}
+          value="250"
+          label="Today Booking (Рецепты Энтеросгель)"
           icon={Ticket}
           percent={75}
           growth={75}
         />
         <MetricKpiCard
-          value={stats ? `${stats.total_projects} активных` : "4 активных"}
-          label="Available Spaces (Проекты STM)"
+          value="300"
+          label="Available Spaces (Охват точек & клиник)"
           icon={MapPin}
           percent={80}
           growth={80}
         />
         <MetricKpiCard
-          value={stats ? `$${stats.total_budget.toLocaleString()}` : "$5,780"}
-          label="Revenue day Ratio (Бюджет продвижения)"
+          value="350"
+          label="Revenue day Ratio (Коэффициент выручки)"
           icon={LineChart}
-          percent={stats ? stats.rnp_completion_rate : 75}
+          percent={75}
           growth={75}
         />
       </div>
 
       {/* 3. Middle Section: Revenue Spline Chart + Booking Summary Bar Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SplineWaveChart selectedPeriod={selectedPeriod} chartData={stats?.monthly_chart} />
+        <SplineWaveChart selectedPeriod={selectedPeriod} />
         <GroupedThreeBarChart />
       </div>
 

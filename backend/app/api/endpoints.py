@@ -244,30 +244,4 @@ async def upload_rnp_csv(
     items = crud.bulk_upsert_rnp_items(db=db, items=parsed)
     return {"message": f"Successfully imported {len(items)} items from uploaded CSV", "count": len(items)}
 
-# Project Tasks Hierarchy
-@router.get("/projects/{project_id}/tasks", response_model=List[schemas.ProjectTaskResponse])
-def read_project_tasks(project_id: int, db: Session = Depends(get_db)):
-    return crud.get_project_tasks(db=db, project_id=project_id)
 
-@router.post("/projects/{project_id}/tasks", response_model=schemas.ProjectTaskResponse)
-def create_project_task(project_id: int, task: schemas.ProjectTaskCreate, db: Session = Depends(get_db)):
-    task.project_id = project_id
-    return crud.create_project_task(db=db, task=task)
-
-@router.put("/tasks/{task_id}", response_model=schemas.ProjectTaskResponse)
-def update_project_task(task_id: int, task_update: schemas.ProjectTaskUpdate, db: Session = Depends(get_db)):
-    return crud.update_project_task(db=db, task_id=task_id, task_update=task_update)
-
-@router.delete("/tasks/{task_id}")
-def delete_project_task(task_id: int, db: Session = Depends(get_db)):
-    return crud.delete_project_task(db=db, task_id=task_id)
-
-# Dashboard Stats
-@router.get("/dashboard/stats", response_model=schemas.DashboardStatsResponse)
-def read_dashboard_stats(db: Session = Depends(get_db)):
-    return crud.get_dashboard_stats(db=db)
-
-# Global Unified Search
-@router.get("/search", response_model=List[schemas.SearchResultItem])
-def search(q: str = "", db: Session = Depends(get_db)):
-    return crud.search_all(db=db, query_str=q)

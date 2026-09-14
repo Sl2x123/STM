@@ -3,82 +3,85 @@ import { Link } from 'react-router-dom'
 import { FolderKanban, MoreVertical, Users, Plus, Calendar, ArrowUpRight, ArrowLeft } from 'lucide-react'
 import { api } from '../lib/api'
 
-const defaultFallbackProjects = [
-  { 
-    id: 1, 
-    name: 'Extragel', 
-    description: 'Продвижение и продажи Extragel, работа с аптеками и врачами', 
+const initialProjects = [
+  {
+    id: 1,
+    name: 'Extragel',
+    description: 'Продвижение и продажи Extragel, работа с аптеками и врачами',
     period: '01.06.2026 — 31.12.2026',
-    members: 4, 
-    tasksCount: 5, 
+    members: 4,
+    tasksCount: 5,
     progress: 86,
-    color: 'bg-indigo-50 text-[#0052cc]',
+    color: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300',
     avatarChar: 'E'
   },
-  { 
-    id: 2, 
-    name: 'Masculan', 
-    description: 'Задачи по направлению Masculan, рекламные кампании и дистрибуция', 
+  {
+    id: 2,
+    name: 'Masculan',
+    description: 'Маркетинг Masculan, рекламные кампании и дистрибуция',
     period: '01.06.2026 — 31.12.2026',
-    members: 6, 
-    tasksCount: 8, 
+    members: 6,
+    tasksCount: 8,
     progress: 75,
-    color: 'bg-blue-50 text-blue-600',
+    color: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300',
     avatarChar: 'M'
   },
-  { 
-    id: 3, 
-    name: 'Энтеросгель', 
-    description: 'Работа с ключевыми сетями аптек, фармкружки и мерчендайзинг', 
+  {
+    id: 3,
+    name: 'Энтеросгель',
+    description: 'Работа с аптечными сетями, фармкружки и мерчендайзинг',
     period: '01.06.2026 — 31.12.2026',
-    members: 3, 
-    tasksCount: 6, 
+    members: 3,
+    tasksCount: 6,
     progress: 80,
-    color: 'bg-emerald-50 text-emerald-600',
+    color: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300',
     avatarChar: 'Э'
   },
-  { 
-    id: 4, 
-    name: 'Фитосепт', 
-    description: 'Антисептические препараты, пастилки и спреи Фитосепт', 
+  {
+    id: 4,
+    name: 'Фитосепт',
+    description: 'Антисептические препараты, пастилки и спреи Фитосепт',
     period: '01.06.2026 — 31.12.2026',
-    members: 2, 
-    tasksCount: 4, 
+    members: 2,
+    tasksCount: 4,
     progress: 65,
-    color: 'bg-amber-50 text-amber-600',
+    color: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300',
     avatarChar: 'Ф'
-  },
+  }
 ]
 
 export default function ProjectsList() {
-  const [projects, setProjects] = useState(defaultFallbackProjects)
+  const [projects, setProjects] = useState(initialProjects)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDesc, setNewProjectDesc] = useState('')
 
+  // Load projects from backend API
   useEffect(() => {
-    const fetchProjects = async () => {
+    async function fetchProjects() {
       try {
         const res = await api.get('/projects/')
-        if (Array.isArray(res.data) && res.data.length > 0) {
+        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
           const colors = [
-            'bg-indigo-50 text-[#0052cc]',
-            'bg-blue-50 text-blue-600',
-            'bg-emerald-50 text-emerald-600',
-            'bg-amber-50 text-amber-600',
-            'bg-purple-50 text-purple-600'
+            'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300',
+            'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300',
+            'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300',
+            'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300'
           ]
-          const mapped = res.data.map((p: any, idx: number) => ({
-            id: p.id,
-            name: p.name,
-            description: p.description || 'Фармацевтический и маркетинговый проект',
-            period: p.start_date && p.end_date ? `${p.start_date} — ${p.end_date}` : '01.06.2026 — 31.12.2026',
-            members: 4,
-            tasksCount: 6,
-            progress: idx === 0 ? 86 : (idx === 1 ? 75 : (idx === 2 ? 80 : 65)),
-            color: colors[idx % colors.length],
-            avatarChar: p.name.charAt(0).toUpperCase()
-          }))
+          const mapped = res.data.map((p: any, idx: number) => {
+            const fallback = initialProjects.find(ip => ip.id === p.id) || initialProjects[idx % initialProjects.length]
+            return {
+              id: p.id,
+              name: p.name || fallback.name,
+              description: p.description || fallback.description,
+              period: '01.06.2026 — 31.12.2026',
+              members: fallback ? fallback.members : 4,
+              tasksCount: fallback ? fallback.tasksCount : 5,
+              progress: fallback ? fallback.progress : 75,
+              color: colors[idx % colors.length],
+              avatarChar: (p.name || 'P').charAt(0).toUpperCase()
+            }
+          })
           setProjects(mapped)
         }
       } catch (err) {
@@ -95,7 +98,7 @@ export default function ProjectsList() {
     try {
       const res = await api.post('/projects/', {
         name: newProjectName.trim(),
-        description: newProjectDesc.trim() || 'Маркетинговый проект',
+        description: newProjectDesc.trim() || 'Комплексная маркетинговая кампания',
         start_date: '2026-06-01',
         end_date: '2026-12-31'
       })
@@ -108,7 +111,7 @@ export default function ProjectsList() {
         members: 1,
         tasksCount: 0,
         progress: 0,
-        color: 'bg-purple-50 text-purple-600',
+        color: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-300',
         avatarChar: p.name[0].toUpperCase()
       }
       setProjects(prev => [newProj, ...prev])
@@ -122,7 +125,7 @@ export default function ProjectsList() {
         members: 1,
         tasksCount: 0,
         progress: 0,
-        color: 'bg-purple-50 text-purple-600',
+        color: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-300',
         avatarChar: newProjectName.trim()[0].toUpperCase()
       }
       setProjects(prev => [newProj, ...prev])
@@ -140,27 +143,27 @@ export default function ProjectsList() {
         {/* Breadcrumb / Back */}
         <button 
           onClick={() => setIsModalOpen(false)} 
-          className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm font-semibold mb-6 transition-colors cursor-pointer group"
+          className="inline-flex items-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-sm font-semibold mb-6 transition-colors cursor-pointer group"
         >
           <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" /> Назад к проектам
         </button>
 
-        <div className="bg-white rounded-3xl p-8 lg:p-10 border border-gray-100 shadow-sm">
+        <div className="bg-white dark:bg-[#181b20] rounded-3xl p-8 lg:p-10 border border-slate-200/80 dark:border-[#262932] shadow-sm">
           {/* Header */}
-          <div className="flex items-center gap-5 mb-8 pb-6 border-b border-gray-100">
-            <div className="w-16 h-16 bg-indigo-50 text-[#4f46e5] rounded-2xl flex items-center justify-center font-bold text-2xl shrink-0">
+          <div className="flex items-center gap-5 mb-8 pb-6 border-b border-slate-100 dark:border-[#262932]">
+            <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 rounded-2xl flex items-center justify-center font-bold text-2xl shrink-0">
               <FolderKanban size={32} />
             </div>
             <div>
-              <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Создание нового проекта</h1>
-              <p className="text-sm text-gray-500 mt-1">Задайте название, фокус, цели и параметры для вашей маркетинговой или бизнес-кампании</p>
+              <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white">Создание нового проекта</h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Задайте название бренда, цели продвижения, параметры спринтов и ответственных</p>
             </div>
           </div>
 
           <form onSubmit={handleCreateProject} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-2">
                   Название проекта *
                 </label>
                 <input 
@@ -169,24 +172,24 @@ export default function ProjectsList() {
                   placeholder="Например: Фитосепт, Extragel, Нурофен" 
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] transition-all"
+                  className="w-full bg-slate-50 dark:bg-[#121418] border border-slate-200 dark:border-[#2b303c] text-slate-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-2">
                   Период кампании
                 </label>
                 <input 
                   type="text" 
                   placeholder="01.10.2026 — 31.10.2026" 
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] transition-all"
+                  className="w-full bg-slate-50 dark:bg-[#121418] border border-slate-200 dark:border-[#2b303c] text-slate-900 dark:text-white rounded-xl px-4 py-3 text-base font-medium focus:bg-white dark:focus:bg-[#181b20] focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+              <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-2">
                 Описание / Стратегическая цель проекта
               </label>
               <textarea 
@@ -194,15 +197,15 @@ export default function ProjectsList() {
                 placeholder="Подробно опишите цели проекта, целевую аудиторию, ключевые каналы продвижения, задачи для команды..." 
                 value={newProjectDesc}
                 onChange={(e) => setNewProjectDesc(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] leading-relaxed transition-all"
+                className="w-full bg-slate-50 dark:bg-[#121418] border border-slate-200 dark:border-[#2b303c] text-slate-900 dark:text-white rounded-xl p-4 text-sm font-medium focus:bg-white dark:focus:bg-[#181b20] focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/20 focus:border-[#4f46e5] leading-relaxed transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
               />
             </div>
 
-            <div className="flex justify-between items-center pt-6 border-t border-gray-100">
+            <div className="flex justify-between items-center pt-6 border-t border-slate-100 dark:border-[#262932]">
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="px-6 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+                className="px-6 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#262932] rounded-xl transition-colors cursor-pointer"
               >
                 Отмена
               </button>
@@ -224,14 +227,16 @@ export default function ProjectsList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Мои Проекты</h1>
-          <p className="text-gray-500 text-sm font-medium mt-1">
-            Выберите проект для планирования задач, спринтов и фиксации факта
+          <h1 className="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Проекты и Бренды
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 text-base font-medium mt-1.5">
+            Управление фармацевтическими кампаниями, спринтами, полевой командой и партнерскими интеграциями
           </p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-[#5b52f6] hover:bg-[#4f46e5] text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center transition-all shadow-sm cursor-pointer"
+          className="bg-[#5b52f6] hover:bg-[#4f46e5] text-white px-5 py-3 rounded-xl font-bold text-sm flex items-center transition-all shadow-md hover:shadow-lg cursor-pointer shrink-0"
         >
           <Plus size={18} className="mr-2" />
           Создать проект
@@ -244,12 +249,12 @@ export default function ProjectsList() {
           <Link 
             to={`/project/${project.id}`} 
             key={project.id}
-            className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all hover:border-indigo-100 flex flex-col justify-between group"
+            className="bg-white dark:bg-[#181b20] rounded-2xl p-6 lg:p-7 border border-slate-200/80 dark:border-[#262932] shadow-sm hover:shadow-lg dark:hover:border-indigo-500/50 transition-all hover:border-indigo-300 flex flex-col justify-between group"
           >
             <div>
               {/* Project Card Header */}
               <div className="flex items-start justify-between mb-4">
-                <div className={`w-12 h-12 rounded-xl ${project.color} flex items-center justify-center font-bold text-lg group-hover:scale-105 transition-transform`}>
+                <div className={`w-14 h-14 rounded-2xl ${project.color} flex items-center justify-center font-bold text-xl group-hover:scale-105 transition-transform shadow-xs`}>
                   {project.avatarChar}
                 </div>
                 <button 
@@ -257,53 +262,53 @@ export default function ProjectsList() {
                     e.preventDefault()
                     e.stopPropagation()
                   }}
-                  className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-[#262932] transition-colors cursor-pointer"
                 >
-                  <MoreVertical size={18} />
+                  <MoreVertical size={20} />
                 </button>
               </div>
 
               {/* Title & Desc */}
-              <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#4f46e5] transition-colors mb-1.5 flex items-center">
+              <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white group-hover:text-[#4f46e5] dark:group-hover:text-indigo-400 transition-colors mb-2 flex items-center tracking-tight">
                 {project.name}
-                <ArrowUpRight size={16} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1" />
+                <ArrowUpRight size={20} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1.5 shrink-0" />
               </h3>
-              <p className="text-gray-500 text-xs line-clamp-2 mb-4 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 text-[15px] font-medium line-clamp-2 mb-5 leading-relaxed min-h-[48px]">
                 {project.description}
               </p>
             </div>
 
             <div>
               {/* Timeline */}
-              <div className="flex items-center text-xs text-gray-400 mb-4 bg-gray-50/70 p-2 rounded-xl">
-                <Calendar size={14} className="mr-2 text-gray-400" />
+              <div className="flex items-center text-sm font-semibold text-slate-700 dark:text-slate-200 mb-5 bg-slate-100/90 dark:bg-[#20242c] px-4 py-2.5 rounded-xl border border-slate-200/60 dark:border-[#2b303c]">
+                <Calendar size={17} className="mr-2.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span>{project.period}</span>
               </div>
 
               {/* Progress & Meta */}
-              <div className="space-y-3 pt-3 border-t border-gray-50">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-gray-400 font-medium">Прогресс выполнения</span>
-                  <span className="font-bold text-gray-800">{project.progress}%</span>
+              <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-[#262932]">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-700 dark:text-slate-300 font-semibold text-sm">Прогресс выполнения</span>
+                  <span className="font-extrabold text-lg text-[#4f46e5] dark:text-indigo-400">{project.progress}%</span>
                 </div>
                 {/* Progress Bar */}
-                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-full h-2.5 bg-slate-100 dark:bg-[#262932] rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-[#4f46e5] rounded-full transition-all duration-300"
+                    className="h-full bg-gradient-to-r from-indigo-500 to-[#4f46e5] rounded-full transition-all duration-300"
                     style={{ width: `${project.progress}%` }}
                   ></div>
                 </div>
 
                 {/* Footer info: Members & Tasks */}
-                <div className="flex justify-between items-center pt-2 text-xs text-gray-500">
+                <div className="flex justify-between items-center pt-3 text-sm">
                   <div className="flex items-center">
-                    <Users size={14} className="mr-1.5 text-gray-400" />
-                    <span className="font-semibold text-gray-700">{project.members}</span>
-                    <span className="text-gray-400 ml-1">участников</span>
+                    <Users size={17} className="mr-2 text-indigo-500 dark:text-indigo-400" />
+                    <span className="font-bold text-slate-800 dark:text-slate-200">{project.members}</span>
+                    <span className="text-slate-500 dark:text-slate-400 ml-1.5 font-medium">участника</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-700">{project.tasksCount}</span>
-                    <span className="text-gray-400 ml-1">направлений</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200">{project.tasksCount}</span>
+                    <span className="text-slate-500 dark:text-slate-400 ml-1.5 font-medium">направлений</span>
                   </div>
                 </div>
               </div>

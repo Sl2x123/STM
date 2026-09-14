@@ -60,8 +60,8 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] flex items-center justify-center p-4 font-sans">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8 sm:p-10">
+    <div className="min-h-screen bg-[#F8F9FB] dark:bg-[#0f1115] flex items-center justify-center p-4 font-sans">
+      <div className="max-w-md w-full bg-white dark:bg-[#181b20] rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#262932] p-8 sm:p-10">
         {/* Logo & Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 bg-[#1a2332] rounded-2xl shadow-lg shadow-indigo-950/20 mb-4">
@@ -69,22 +69,22 @@ export default function Login() {
               <div className="w-3 h-3 bg-white rounded-sm"></div>
             </div>
           </div>
-          <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Вход в PMS Admin</h1>
-          <p className="text-gray-500 text-sm mt-1 font-medium">
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">Вход в PMS Admin</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 font-medium">
             Система планирования, спринтов и партнерских программ
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
-            <AlertCircle size={16} className="shrink-0 text-rose-600" />
+          <div className="mb-6 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2.5">
+            <AlertCircle size={16} className="shrink-0 text-rose-600 dark:text-rose-400" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
               Email / Логин
             </label>
             <div className="relative">
@@ -97,13 +97,13 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@extragel.uz"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-800 focus:bg-white focus:border-[#4f46e5] focus:ring-4 focus:ring-[#4f46e5]/10 outline-none transition-all"
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl text-sm text-gray-800 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] dark:focus:border-indigo-500 focus:ring-4 focus:ring-[#4f46e5]/10 outline-none transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
               Пароль
             </label>
             <div className="relative">
@@ -116,17 +116,17 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-800 focus:bg-white focus:border-[#4f46e5] focus:ring-4 focus:ring-[#4f46e5]/10 outline-none transition-all"
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-2xl text-sm text-gray-800 dark:text-white focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5] dark:focus:border-indigo-500 focus:ring-4 focus:ring-[#4f46e5]/10 outline-none transition-all"
               />
             </div>
           </div>
 
           <div className="flex items-center justify-between text-xs pt-1">
-            <label className="flex items-center gap-2 cursor-pointer text-gray-600">
-              <input type="checkbox" defaultChecked className="rounded border-gray-300 text-[#4f46e5] focus:ring-[#4f46e5]" />
+            <label className="flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-300">
+              <input type="checkbox" defaultChecked className="rounded border-gray-300 dark:border-gray-600 text-[#4f46e5] focus:ring-[#4f46e5]" />
               <span>Запомнить сессию</span>
             </label>
-            <span className="text-[#4f46e5] font-semibold hover:underline cursor-pointer">
+            <span className="text-[#4f46e5] dark:text-indigo-400 font-semibold hover:underline cursor-pointer">
               Забыли пароль?
             </span>
           </div>
@@ -148,33 +148,33 @@ export default function Login() {
         </form>
 
         {/* Quick Demo Login Preset Buttons */}
-        <div className="mt-8 pt-6 border-t border-gray-100">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center mb-3">
+        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-[#262932]">
+          <p className="text-xs font-bold text-gray-400 dark:text-gray-400 uppercase tracking-wider text-center mb-3">
             Быстрый вход для тестирования:
           </p>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => fillDemoAccount('admin@extragel.uz', 'password')}
-              className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 text-left border border-gray-200/80 transition-colors cursor-pointer text-xs"
+              className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#121418] hover:bg-gray-100 dark:hover:bg-[#1e222b] text-left border border-gray-200/80 dark:border-[#2b303c] transition-colors cursor-pointer text-xs"
             >
-              <div className="font-bold text-gray-800 flex items-center gap-1">
-                <ShieldCheck size={13} className="text-[#4f46e5]" />
+              <div className="font-bold text-gray-800 dark:text-white flex items-center gap-1">
+                <ShieldCheck size={14} className="text-[#4f46e5] dark:text-indigo-400" />
                 Азамат (Admin)
               </div>
-              <div className="text-[10px] text-gray-400 font-mono mt-0.5">admin@extragel.uz</div>
+              <div className="text-xs text-gray-400 dark:text-gray-400 font-mono mt-0.5">admin@extragel.uz</div>
             </button>
 
             <button
               type="button"
               onClick={() => fillDemoAccount('manager@extragel.uz', 'password')}
-              className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 text-left border border-gray-200/80 transition-colors cursor-pointer text-xs"
+              className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#121418] hover:bg-gray-100 dark:hover:bg-[#1e222b] text-left border border-gray-200/80 dark:border-[#2b303c] transition-colors cursor-pointer text-xs"
             >
-              <div className="font-bold text-gray-800 flex items-center gap-1">
-                <CheckCircle2 size={13} className="text-emerald-600" />
+              <div className="font-bold text-gray-800 dark:text-white flex items-center gap-1">
+                <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400" />
                 Менеджер
               </div>
-              <div className="text-[10px] text-gray-400 font-mono mt-0.5">manager@extragel.uz</div>
+              <div className="text-xs text-gray-400 dark:text-gray-400 font-mono mt-0.5">manager@extragel.uz</div>
             </button>
           </div>
         </div>
