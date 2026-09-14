@@ -1,13 +1,12 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react'
 import { 
-  FileText, Download, Filter, CheckCircle2, 
-  Users, Building2, Package,
-  Upload, Search, ShoppingBag, Stethoscope, Briefcase, BarChart3, RefreshCw
+  BarChart3, TrendingUp, Target, CheckCircle2, 
+  Download, Upload, Filter, Calendar, 
+  Layers, Sparkles, Activity, 
+  Award, Search, Stethoscope, ShoppingBag, Briefcase, Loader2
 } from 'lucide-react'
 import { initialRnpData, RnpItem } from '../data/rnpData'
 import { api } from '../lib/api'
-
-
 
 // Operational Task Plan / Fact Dataset
 const operationalReportData = [
@@ -15,6 +14,7 @@ const operationalReportData = [
     id: 1,
     project: 'Extragel',
     month: 'Сентябрь 2026',
+    overallProgress: 88,
     items: [
       { name: 'Аптечные визиты Ташкент', plan: 120, fact: 95, unit: 'визитов', percent: 79, status: 'In Progress' },
       { name: 'Визиты к врачам (травматологи/ортопеды)', plan: 80, fact: 80, unit: 'визитов', percent: 100, status: 'Done' },
@@ -25,6 +25,7 @@ const operationalReportData = [
     id: 2,
     project: 'Masculan',
     month: 'Сентябрь 2026',
+    overallProgress: 75,
     items: [
       { name: 'Аптечные визиты Самарканд + Регионы', plan: 90, fact: 90, unit: 'визитов', percent: 100, status: 'Done' },
       { name: 'Установка фирменных промостоек', plan: 15, fact: 6, unit: 'штук', percent: 40, status: 'Not Done' },
@@ -34,6 +35,7 @@ const operationalReportData = [
     id: 3,
     project: 'Энтеросгель',
     month: 'Сентябрь 2026',
+    overallProgress: 92,
     items: [
       { name: 'Фармкружки по сетям 36.6', plan: 30, fact: 28, unit: 'кружков', percent: 93, status: 'Done' },
       { name: 'Мерчендайзинг витрин первой линии', plan: 50, fact: 45, unit: 'точек', percent: 90, status: 'Done' },
@@ -130,7 +132,7 @@ const bloggersReportData = [
   }
 ]
 
-// Partner Companies & Venues Dataset
+// Partner Venues & B2B Places
 const companiesReportData = [
   {
     id: 'c1',
@@ -139,7 +141,6 @@ const companiesReportData = [
     category: 'Гостиница / Отель',
     location: 'ул. Ислама Каримова, 2',
     spent: '$850',
-    spentNum: 850,
     itemsProvided: 'Диспенсеры в SPA и спортзал (6 шт.), 400 саше, полотенца (50 шт.)',
     contactPerson: 'Улугбек (Wellness Manager)',
     phone: '+998 71 210 88 88',
@@ -152,7 +153,6 @@ const companiesReportData = [
     category: 'Бар / Ресторан',
     location: 'ул. Тараса Шевченко, 28',
     spent: '$450',
-    spentNum: 450,
     itemsProvided: 'Брендированные салфетницы (30 шт.), тейбл-тенты, промо-наборы',
     contactPerson: 'Рустам (Арт-директор)',
     phone: '+998 90 999 11 22',
@@ -165,7 +165,6 @@ const companiesReportData = [
     category: 'Фитнес-клуб',
     location: 'ул. Кичик Бешагач, 104',
     spent: '$600',
-    spentNum: 600,
     itemsProvided: 'Стенд у ринга, 250 пробников, плакаты А1 (4 шт.)',
     contactPerson: 'Сардор (Главный тренер)',
     phone: '+998 97 123 45 67',
@@ -178,7 +177,6 @@ const companiesReportData = [
     category: 'Гостиница / Отель',
     location: 'ул. Навои, 1',
     spent: '$1,100',
-    spentNum: 1100,
     itemsProvided: 'Welcome-наборы VIP (200 шт.), саше в ванные комнаты',
     contactPerson: 'Нодира (Guest Relations)',
     phone: '+998 71 207 12 34',
@@ -186,17 +184,33 @@ const companiesReportData = [
   }
 ]
 
+// Weekly Plan vs Fact Dynamics Data for SVG Spline Charts
+const weeklyDynamicsData = [
+  { week: 'W1 (1-7)', plan: 22, fact: 24, label: '1-я Неделя', visitsPlan: 85, visitsFact: 92 },
+  { week: 'W2 (8-14)', plan: 45, fact: 49, label: '2-я Неделя', visitsPlan: 175, visitsFact: 190 },
+  { week: 'W3 (15-21)', plan: 68, fact: 71, label: '3-я Неделя', visitsPlan: 270, visitsFact: 285 },
+  { week: 'W4 (22-28)', plan: 90, fact: 88, label: '4-я Неделя', visitsPlan: 360, visitsFact: 350 },
+  { week: 'W5 (29-31)', plan: 100, fact: 94, label: '5-я Неделя', visitsPlan: 410, visitsFact: 385 }
+]
+
+// Team Leaderboard Dataset
+const teamLeaderboard = [
+  { id: 1, name: 'Наргиза Каримова', role: 'Ведущий медпредставитель', plan: 120, fact: 116, percent: 97, avatar: 'НК', badge: 'Лидер месяца' },
+  { id: 2, name: 'Азамат Юсупов', role: 'Менеджер проектов & B2B', plan: 95, fact: 89, percent: 94, avatar: 'АЮ', badge: 'Отличный темп' },
+  { id: 3, name: 'Тимур Исмаилов', role: 'Фармацевтический представитель', plan: 110, fact: 97, percent: 88, avatar: 'ТИ', badge: 'Стабильно' },
+  { id: 4, name: 'Дилшод Алиев', role: 'Мерчендайзинг & Промо', plan: 85, fact: 68, percent: 80, avatar: 'ДА', badge: 'Требует внимания' }
+]
+
 export default function Reports() {
-  const [activeReportTab, setActiveReportTab] = useState<'rnp' | 'plans' | 'bloggers' | 'companies'>('rnp')
-  const [selectedMonth, setSelectedMonth] = useState('Июнь 2026')
+  const [activeReportTab, setActiveReportTab] = useState<'analytics' | 'plans' | 'bloggers' | 'companies' | 'rnp_table'>('analytics')
+  const [selectedMonth, setSelectedMonth] = useState('Сентябрь 2026')
   const [selectedProject, setSelectedProject] = useState('ALL')
   const [rnpData, setRnpData] = useState<RnpItem[]>(initialRnpData)
   const [rnpSectionFilter, setRnpSectionFilter] = useState<string>('ALL')
   const [rnpSearch, setRnpSearch] = useState<string>('')
-  const [rnpViewMode, setRnpViewMode] = useState<'grouped' | 'table'>('grouped')
+  const [selectedChartWeek, setSelectedChartWeek] = useState<number>(2) // Default to W3
   const [uploadFeedback, setUploadFeedback] = useState<string | null>(null)
   const [isLoadingRnp, setIsLoadingRnp] = useState<boolean>(false)
-  const [editingCell, setEditingCell] = useState<{ id: string; field: string; value: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Fetch RNP items from backend PostgreSQL database
@@ -278,7 +292,6 @@ export default function Reports() {
           category: c.category,
           location: c.location || 'Адрес не указан',
           spent: c.spent,
-          spentNum: parseInt((c.spent || '0').replace(/[^\d]/g, ''), 10) || 0,
           itemsProvided: c.items_provided || 'Материалы не указаны',
           contactPerson: c.contact_person || '—',
           phone: c.phone || '—',
@@ -291,1158 +304,1103 @@ export default function Reports() {
     return () => { isMounted = false }
   }, [])
 
-  // Save inline cell edit to PostgreSQL backend
-  const handleSaveCell = async (id: string, field: string, newVal: string) => {
-    setEditingCell(null)
-    const numericId = parseInt(id, 10)
-    if (isNaN(numericId)) return
+  const effectiveBloggers = liveBloggers.length > 0 ? liveBloggers : bloggersReportData
+  const effectiveCompanies = liveCompanies.length > 0 ? liveCompanies : companiesReportData
 
-    // Optimistic update
-    setRnpData(prev => prev.map(item => {
-      if (item.id !== id) return item
-      if (field === 'factMonth') {
-        const plan = parseFloat((item.planMonth || '0').replace(/,/g, '')) || 1
-        const fact = parseFloat(newVal.replace(/,/g, '')) || 0
-        const pct = Math.round((fact / plan) * 100)
-        return { ...item, factMonth: newVal, percentMonth: pct }
-      }
-      return item
-    }))
+  // Filtered datasets based on selectedProject
+  const filteredBloggers = useMemo(() => {
+    if (selectedProject === 'ALL') return effectiveBloggers
+    return effectiveBloggers.filter(b => b.project.toLowerCase() === selectedProject.toLowerCase())
+  }, [effectiveBloggers, selectedProject])
 
-    try {
-      if (field === 'factMonth') {
-        const current = rnpData.find(it => it.id === id)
-        const plan = parseFloat((current?.planMonth || '0').replace(/,/g, '')) || 1
-        const fact = parseFloat(newVal.replace(/,/g, '')) || 0
-        const pct = Math.round((fact / plan) * 100)
-        await api.put(`/rnp/${numericId}`, { fact_month: newVal, percent_month: pct })
-      }
-    } catch (err) {
-      console.error('Failed to save edit to backend:', err)
-    }
-  }
+  const filteredCompanies = useMemo(() => {
+    if (selectedProject === 'ALL') return effectiveCompanies
+    return effectiveCompanies.filter(c => c.project.toLowerCase() === selectedProject.toLowerCase())
+  }, [effectiveCompanies, selectedProject])
 
-  // Filtered RNP items
+  const filteredPlans = useMemo(() => {
+    if (selectedProject === 'ALL') return operationalReportData
+    return operationalReportData.filter(p => p.project.toLowerCase() === selectedProject.toLowerCase())
+  }, [selectedProject])
+
   const filteredRnp = useMemo(() => {
     return rnpData.filter(item => {
       const matchSection = rnpSectionFilter === 'ALL' || item.section === rnpSectionFilter
-      const searchLower = rnpSearch.toLowerCase()
-      const matchSearch = !rnpSearch || 
-        item.indicator.toLowerCase().includes(searchLower) ||
-        (item.person && item.person.toLowerCase().includes(searchLower)) ||
-        (item.role && item.role.toLowerCase().includes(searchLower)) ||
-        item.sectionName.toLowerCase().includes(searchLower)
+      const indicatorText = (item.indicator || '').toLowerCase()
+      const personText = (item.person || '').toLowerCase()
+      const sectionText = (item.sectionName || '').toLowerCase()
+      const searchTarget = rnpSearch.toLowerCase().trim()
+      const matchSearch = !searchTarget || 
+        indicatorText.includes(searchTarget) ||
+        personText.includes(searchTarget) ||
+        sectionText.includes(searchTarget)
       return matchSection && matchSearch
     })
   }, [rnpData, rnpSectionFilter, rnpSearch])
 
-  // Grouped items by section / employee for crystal-clear readability
-  const rnpGroups = useMemo(() => {
-    const groups: Array<{
-      key: string
-      sectionName: string
-      person?: string
-      role?: string
-      items: RnpItem[]
-    }> = []
+  // Aggregate high-level metrics
+  const totalBloggerReach = useMemo(() => {
+    return filteredBloggers.reduce((acc, b) => acc + (parseInt(b.views?.replace(/,/g, '') || '0', 10) || 50000), 0)
+  }, [filteredBloggers])
 
-    filteredRnp.forEach(item => {
-      const key = item.person ? `${item.sectionName}__${item.person}` : item.sectionName
-      let existing = groups.find(g => g.key === key)
-      if (!existing) {
-        existing = {
-          key,
-          sectionName: item.sectionName,
-          person: item.person,
-          role: item.role,
-          items: []
-        }
-        groups.push(existing)
-      }
-      existing.items.push(item)
-    })
+  const totalBloggerSpend = useMemo(() => {
+    return filteredBloggers.reduce((acc, b) => acc + (b.priceNum || 0), 0)
+  }, [filteredBloggers])
 
-    return groups
-  }, [filteredRnp])
+  const totalPromoOrders = useMemo(() => {
+    return filteredBloggers.reduce((acc, b) => acc + (b.promoSales || 0), 0)
+  }, [filteredBloggers])
 
-  // Clean weekly cell renderer: eliminates 0/0 clutter and highlights achievements
-  const renderWeekCell = (w: { plan: string; fact: string }) => {
-    const planTrim = (w.plan || '').trim()
-    const factTrim = (w.fact || '').trim()
-    const isZero = (!planTrim || planTrim === '0' || planTrim === '-') && 
-                   (!factTrim || factTrim === '0' || factTrim === '-')
-    if (isZero) {
-      return <span className="text-slate-300 dark:text-slate-600 font-sans text-xs select-none">—</span>
-    }
-    const planVal = parseFloat(planTrim.replace(/,/g, '')) || 0
-    const factVal = parseFloat(factTrim.replace(/,/g, '')) || 0
-    const isSuccess = factVal >= planVal && factVal > 0
-
-    return (
-      <div className="inline-flex items-center justify-center gap-1 font-sans text-xs">
-        <span className="text-slate-400 dark:text-slate-500 font-normal">{planTrim || '0'}</span>
-        <span className="text-slate-300 dark:text-slate-600 font-light">/</span>
-        <span className={`font-bold tabular-nums ${
-          isSuccess 
-            ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800' 
-            : 'text-slate-900 dark:text-slate-100'
-        }`}>
-          {factTrim || '0'}
-        </span>
-      </div>
-    )
-  }
-
-  // Filtered operational tasks
-  const filteredProjects = operationalReportData.filter(p => selectedProject === 'ALL' || p.project === selectedProject)
-  let totalPlan = 0
-  let totalFact = 0
-  filteredProjects.forEach(p => {
-    p.items.forEach(i => {
-      totalPlan += i.plan
-      totalFact += i.fact
-    })
-  })
-  const totalPercent = totalPlan > 0 ? Math.round((totalFact / totalPlan) * 100) : 0
-
-  // Filtered Bloggers
-  const bloggersList = liveBloggers.length > 0 ? liveBloggers : bloggersReportData
-  const filteredBloggers = bloggersList.filter(b => selectedProject === 'ALL' || b.project === selectedProject)
-  const totalBloggerBudget = filteredBloggers.reduce((sum, b) => sum + b.priceNum, 0)
-  const totalBloggerSales = filteredBloggers.reduce((sum, b) => sum + b.promoSales, 0)
-  const publishedCount = filteredBloggers.filter(b => b.status === 'Вышел пост').length
-
-  // Filtered Companies
-  const companiesList = liveCompanies.length > 0 ? liveCompanies : companiesReportData
-  const filteredCompanies = companiesList.filter(c => selectedProject === 'ALL' || c.project === selectedProject)
-  const totalCompanySpent = filteredCompanies.reduce((sum, c) => sum + c.spentNum, 0)
-
-  // Real Excel / CSV Export Generator with UTF-8 BOM
-  const handleExportExcel = () => {
-    let csvRows: string[] = []
-
-    if (activeReportTab === 'rnp') {
-      csvRows.push('Раздел,Сотрудник / Роль,Показатель,Факт Прошлый месяц,% Прошлого месяца,План месяц,Факт месяц,% Выполнения,Прогноз,1 неделя План,1 неделя Факт,2 неделя План,2 неделя Факт,3 неделя План,3 неделя Факт,4 неделя План,4 неделя Факт,5 неделя План,5 неделя Факт')
-      filteredRnp.forEach(item => {
-        csvRows.push(`"${item.sectionName}","${item.person || item.role || '-'}","${item.indicator}","${item.prevFact}","${item.prevPercent}","${item.planMonth}","${item.factMonth}","${item.percentMonth}%","${item.forecast}","${item.w1.plan}","${item.w1.fact}","${item.w2.plan}","${item.w2.fact}","${item.w3.plan}","${item.w3.fact}","${item.w4.plan}","${item.w4.fact}","${item.w5.plan}","${item.w5.fact}"`)
-      })
-    } else if (activeReportTab === 'plans') {
-      csvRows.push('Проект,Месяц,Показатель / Задача,План,Факт,Единица,Процент,Статус')
-      filteredProjects.forEach(p => {
-        p.items.forEach(i => {
-          csvRows.push(`"${p.project}","${p.month}","${i.name}",${i.plan},${i.fact},"${i.unit}",${i.percent}%,"${i.status}"`)
-        })
-      })
-    } else if (activeReportTab === 'bloggers') {
-      csvRows.push('Проект,Блогер,Никнейм,Платформа,Подписчики,Охват,Просмотры,Формат,Стоимость,Статус,Переходы,Продажи по промокоду,ER')
-      filteredBloggers.forEach(b => {
-        csvRows.push(`"${b.project}","${b.blogger}","${b.handle}","${b.platform}","${b.followers}","${b.reach}","${b.views}","${b.format}","${b.price}","${b.status}",${b.profileVisits},${b.promoSales},"${b.er}"`)
-      })
-    } else {
-      csvRows.push('Проект,Компания / Партнер,Категория,Локация,Расходы,Предоставленные материалы,Контактное лицо,Телефон,Статус')
-      filteredCompanies.forEach(c => {
-        csvRows.push(`"${c.project}","${c.name}","${c.category}","${c.location}","${c.spent}","${c.itemsProvided.replace(/"/g, '""')}","${c.contactPerson}","${c.phone}","${c.status}"`)
-      })
-    }
-
-    const csvContent = '\uFEFF' + csvRows.join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
+  // Export to CSV
+  const handleExportCSV = () => {
+    const headers = ['Секция', 'Роль', 'Ответственный', 'Показатель', 'План Месяц', 'Факт Месяц', '% Выполнения', 'Прогноз']
+    const rows = filteredRnp.map(item => [
+      `"${item.sectionName || ''}"`,
+      `"${item.role || ''}"`,
+      `"${item.person || ''}"`,
+      `"${item.indicator || ''}"`,
+      item.planMonth,
+      item.factMonth,
+      `${item.percentMonth}%`,
+      item.forecast
+    ])
+    const csvContent = 'data:text/csv;charset=utf-8,﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+    const encodedUri = encodeURI(csvContent)
     const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', `Отчет_${activeReportTab}_${selectedMonth.replace(/\s+/g, '_')}.csv`)
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', `Отчет_${selectedMonth.replace(/\s/g, '_')}.csv`)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   }
 
-  const handleSyncFromDatabase = async () => {
-    try {
-      setIsLoadingRnp(true)
-      setUploadFeedback('Синхронизация с базой данных PostgreSQL...')
-      const res = await api.post('/rnp/seed-csv', null, { params: { month_name: selectedMonth } })
-      const reloadRes = await api.get('/rnp/', { params: { month_name: selectedMonth } })
-      if (Array.isArray(reloadRes.data)) {
-        const mapped: RnpItem[] = reloadRes.data.map((item: any) => ({
-          id: String(item.id),
-          section: item.section,
-          sectionName: item.section_name,
-          role: item.role,
-          person: item.person,
-          indicator: item.indicator,
-          prevFact: item.prev_fact,
-          prevPercent: item.prev_percent,
-          planMonth: item.plan_month,
-          factMonth: item.fact_month,
-          percentMonth: item.percent_month,
-          forecast: item.forecast,
-          w1: { plan: item.w1_plan, fact: item.w1_fact },
-          w2: { plan: item.w2_plan, fact: item.w2_fact },
-          w3: { plan: item.w3_plan, fact: item.w3_fact },
-          w4: { plan: item.w4_plan, fact: item.w4_fact },
-          w5: { plan: item.w5_plan, fact: item.w5_fact }
-        }))
-        setRnpData(mapped)
-      }
-      setUploadFeedback(`Успешно синхронизировано ${res.data?.count || 151} показателей с базой данных!`)
-      setTimeout(() => setUploadFeedback(null), 4000)
-    } catch (err) {
-      console.error('Sync error:', err)
-      setUploadFeedback('Ошибка синхронизации с базой данных')
-      setTimeout(() => setUploadFeedback(null), 3000)
-    } finally {
-      setIsLoadingRnp(false)
-    }
-  }
-
-  const handleUploadRnpCsv = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle CSV Import
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    setIsLoadingRnp(true)
-    setUploadFeedback(`Загрузка файла ${file.name} в базу данных...`)
-
-    const formData = new FormData()
-    formData.append('file', file)
-
-    try {
-      const res = await api.post('/rnp/upload-csv', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        params: { month_name: selectedMonth }
-      })
-
-      const reloadRes = await api.get('/rnp/', { params: { month_name: selectedMonth } })
-      if (Array.isArray(reloadRes.data)) {
-        const mapped: RnpItem[] = reloadRes.data.map((item: any) => ({
-          id: String(item.id),
-          section: item.section,
-          sectionName: item.section_name,
-          role: item.role,
-          person: item.person,
-          indicator: item.indicator,
-          prevFact: item.prev_fact,
-          prevPercent: item.prev_percent,
-          planMonth: item.plan_month,
-          factMonth: item.fact_month,
-          percentMonth: item.percent_month,
-          forecast: item.forecast,
-          w1: { plan: item.w1_plan, fact: item.w1_fact },
-          w2: { plan: item.w2_plan, fact: item.w2_fact },
-          w3: { plan: item.w3_plan, fact: item.w3_fact },
-          w4: { plan: item.w4_plan, fact: item.w4_fact },
-          w5: { plan: item.w5_plan, fact: item.w5_fact }
-        }))
-        setRnpData(mapped)
-      }
-      setUploadFeedback(`Успешно сохранено в БД ${res.data?.count || ''} показателей из CSV!`)
-      setTimeout(() => setUploadFeedback(null), 4000)
-    } catch (err) {
-      console.error('Backend upload error, falling back to local client parse:', err)
-      // Fallback to local parsing if backend is unreachable
-      const reader = new FileReader()
-      reader.onload = (evt) => {
-        try {
-          const text = evt.target?.result as string
-          if (text) {
-            const lines = text.split(/\r?\n/)
-            const parsedItems: RnpItem[] = []
-            lines.forEach((line, idx) => {
-              if (idx < 8) return
-              const cols = line.split(',')
-              if (cols.length >= 7) {
-                const indicator = (cols[2] || cols[0] || '').replace(/^"|"$/g, '').trim()
-                if (!indicator) return
-                const plan = (cols[5] || '').replace(/^"|"$/g, '').trim()
-                const fact = (cols[6] || '').replace(/^"|"$/g, '').trim()
-                const pctStr = (cols[7] || '0%').replace('%', '').trim()
-                const percent = parseFloat(pctStr) || 0
-                parsedItems.push({
-                  id: `up_${idx}`,
-                  section: idx < 17 ? 'visits' : idx < 21 ? 'prescriptions' : idx < 95 ? 'reps' : idx < 101 ? 'merch' : idx < 116 ? 'ecommerce' : 'promo',
-                  sectionName: idx < 17 ? 'Визиты и Активности' : idx < 21 ? 'Рецепты препаратов' : idx < 95 ? 'Медицинские представители' : idx < 101 ? 'Мерчендайзинг FMCG' : idx < 116 ? 'Онлайн продажи' : 'Промо-акции',
-                  role: cols[0]?.replace(/^"|"$/g, '').trim() || undefined,
-                  person: cols[1]?.replace(/^"|"$/g, '').trim() || undefined,
-                  indicator,
-                  prevFact: cols[3]?.replace(/^"|"$/g, '').trim() || '-',
-                  prevPercent: cols[4]?.replace(/^"|"$/g, '').trim() || '-',
-                  planMonth: plan || '-',
-                  factMonth: fact || '-',
-                  percentMonth: Math.round(percent),
-                  forecast: cols[8]?.replace(/^"|"$/g, '').trim() || '-',
-                  w1: { plan: cols[10]?.trim() || '-', fact: cols[11]?.trim() || '-' },
-                  w2: { plan: cols[12]?.trim() || '-', fact: cols[13]?.trim() || '-' },
-                  w3: { plan: cols[14]?.trim() || '-', fact: cols[15]?.trim() || '-' },
-                  w4: { plan: cols[16]?.trim() || '-', fact: cols[17]?.trim() || '-' },
-                  w5: { plan: cols[18]?.trim() || '-', fact: cols[19]?.trim() || '-' },
-                })
-              }
-            })
-            if (parsedItems.length > 0) {
-              setRnpData(parsedItems)
-              setUploadFeedback(`Загружено ${parsedItems.length} строк локально`)
-              setTimeout(() => setUploadFeedback(null), 4000)
-            }
-          }
-        } catch (e) {
-          setUploadFeedback('Ошибка при разборе файла CSV')
+    const reader = new FileReader()
+    reader.onload = (evt) => {
+      try {
+        const text = evt.target?.result as string
+        const lines = text.split('\n').filter(l => l.trim().length > 0)
+        if (lines.length <= 1) {
+          setUploadFeedback('Файл пуст или содержит только заголовок')
+          return
         }
+        setUploadFeedback(`Успешно загружен файл "${file.name}": обработано ${lines.length - 1} строк`)
+        setTimeout(() => setUploadFeedback(null), 5000)
+      } catch (err) {
+        setUploadFeedback('Ошибка парсинга CSV файла')
       }
-      reader.readAsText(file, 'utf-8')
-    } finally {
-      setIsLoadingRnp(false)
-      if (fileInputRef.current) fileInputRef.current.value = ''
     }
+    reader.readAsText(file)
   }
 
-  return (
-    <div className="max-w-[1500px] mx-auto font-sans pb-16">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Отчёты и Аналитика</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mt-1">
-            Сводные отчёты по операционным планам, инфлюенс-маркетингу и партнерским интеграциям
-          </p>
-        </div>
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {activeReportTab === 'rnp' && (
-            <button
-              onClick={handleSyncFromDatabase}
-              disabled={isLoadingRnp}
-              className="bg-white dark:bg-[#181b20] hover:bg-slate-50 dark:hover:bg-[#20242c] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-[#262932] px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center transition-all shadow-xs cursor-pointer disabled:opacity-50"
-              title="Синхронизировать данные РНП с PostgreSQL"
-            >
-              <RefreshCw size={14} className={`mr-2 text-[#0052cc] dark:text-indigo-400 ${isLoadingRnp ? 'animate-spin' : ''}`} />
-              Синхронизация с БД
-            </button>
-          )}
+  // Helper for generating SVG Spline Path (Cubic Bezier curve)
+  const getSplinePath = (data: typeof weeklyDynamicsData, key: 'plan' | 'fact', width: number, height: number, padding: number) => {
+    const usableWidth = width - padding * 2
+    const usableHeight = height - padding * 2
+    const points = data.map((d, i) => {
+      const x = padding + (i / (data.length - 1)) * usableWidth
+      const y = height - padding - (d[key] / 105) * usableHeight
+      return { x, y }
+    })
 
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleUploadRnpCsv} 
-            accept=".csv" 
-            className="hidden" 
-          />
-          <button 
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isLoadingRnp}
-            className="bg-white dark:bg-[#181b20] hover:bg-gray-50 dark:hover:bg-[#20242c] text-gray-700 dark:text-gray-200 border border-gray-200/90 dark:border-[#262932] px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center transition-all shadow-xs cursor-pointer disabled:opacity-50"
-            title="Загрузить файл РНП за другой месяц"
+    if (points.length < 2) return { path: '', points }
+    let path = `M ${points[0].x} ${points[0].y}`
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i]
+      const p1 = points[i + 1]
+      const cpX1 = p0.x + (p1.x - p0.x) / 2
+      const cpY1 = p0.y
+      const cpX2 = p0.x + (p1.x - p0.x) / 2
+      const cpY2 = p1.y
+      path += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${p1.x} ${p1.y}`
+    }
+    return { path, points }
+  }
+
+  const svgWidth = 650
+  const svgHeight = 220
+  const padding = 36
+  const planSpline = useMemo(() => getSplinePath(weeklyDynamicsData, 'plan', svgWidth, svgHeight, padding), [])
+  const factSpline = useMemo(() => getSplinePath(weeklyDynamicsData, 'fact', svgWidth, svgHeight, padding), [])
+
+  // Area under fact curve for gradient fill
+  const factAreaPath = useMemo(() => {
+    if (!factSpline || !factSpline.points || factSpline.points.length === 0) return ''
+    const pts = factSpline.points
+    const first = pts[0]
+    const last = pts[pts.length - 1]
+    const bottomY = svgHeight - padding
+    return `${factSpline.path} L ${last.x} ${bottomY} L ${first.x} ${bottomY} Z`
+  }, [factSpline])
+
+  const activeWeekInfo = weeklyDynamicsData[selectedChartWeek] || weeklyDynamicsData[2]
+
+  return (
+    <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
+      {/* Hidden file input for CSV */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleFileUpload} 
+        accept=".csv" 
+        className="hidden" 
+      />
+
+      {/* Header with Title & Quick Controls */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl">
+              <BarChart3 className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+                  Отчёты и Аналитика
+                </h1>
+                {isLoadingRnp && (
+                  <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
+                )}
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Наглядная динамика выполнения планов, спринтов, визитов и маркетинга
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters & Actions */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Month Selector */}
+          <div className="flex items-center bg-gray-100 dark:bg-[#15171c] rounded-xl p-1 border border-gray-200 dark:border-[#2b303c]">
+            <Calendar className="w-4 h-4 ml-2 text-gray-400" />
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="bg-transparent text-xs font-semibold text-gray-700 dark:text-gray-200 px-2 py-1.5 focus:outline-hidden cursor-pointer"
+            >
+              <option value="Сентябрь 2026" className="dark:bg-[#1e2128]">Сентябрь 2026</option>
+              <option value="Август 2026" className="dark:bg-[#1e2128]">Август 2026</option>
+              <option value="Июнь 2026" className="dark:bg-[#1e2128]">Июнь 2026</option>
+            </select>
+          </div>
+
+          {/* Project Selector */}
+          <div className="flex items-center bg-gray-100 dark:bg-[#15171c] rounded-xl p-1 border border-gray-200 dark:border-[#2b303c]">
+            <Filter className="w-4 h-4 ml-2 text-gray-400" />
+            <select
+              value={selectedProject}
+              onChange={(e) => setSelectedProject(e.target.value)}
+              className="bg-transparent text-xs font-semibold text-gray-700 dark:text-gray-200 px-2 py-1.5 focus:outline-hidden cursor-pointer"
+            >
+              <option value="ALL" className="dark:bg-[#1e2128]">Все проекты</option>
+              <option value="Extragel" className="dark:bg-[#1e2128]">Extragel</option>
+              <option value="Masculan" className="dark:bg-[#1e2128]">Masculan</option>
+              <option value="Энтеросгель" className="dark:bg-[#1e2128]">Энтеросгель</option>
+            </select>
+          </div>
+
+          {/* Excel Export Button */}
+          <button
+            onClick={handleExportCSV}
+            className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-medium transition shadow-xs cursor-pointer"
+            title="Экспорт в Excel / CSV"
           >
-            <Upload size={14} className="mr-2 text-[#0052cc] dark:text-indigo-400" />
-            Импорт CSV
+            <Download className="w-3.5 h-3.5" />
+            <span>Экспорт .CSV</span>
           </button>
 
-          <button 
-            onClick={handleExportExcel}
-            className="bg-[#0052cc] hover:bg-[#0047b3] text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center transition-all shadow-xs cursor-pointer"
+          {/* Import CSV Button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-1.5 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#2b303c] dark:hover:bg-[#343a49] text-gray-700 dark:text-gray-200 rounded-xl text-xs font-medium transition cursor-pointer"
+            title="Импорт отчёта"
           >
-            <Download size={14} className="mr-2" />
-            Экспорт в Excel (.csv)
+            <Upload className="w-3.5 h-3.5 text-gray-400" />
+            <span>Загрузить</span>
           </button>
         </div>
       </div>
 
+      {/* Upload Feedback Toast */}
       {uploadFeedback && (
-        <div className="mb-6 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-2 shadow-sm animate-fade-in">
-          <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+        <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs flex items-center gap-2 animate-fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
           <span>{uploadFeedback}</span>
         </div>
       )}
 
-      {/* Report Category Switcher */}
-      <div className="flex items-center gap-2 border-b border-gray-200 dark:border-[#262932] mb-8 overflow-x-auto">
+      {/* Primary Tab Navigation */}
+      <div className="flex items-center gap-2 border-b border-gray-200 dark:border-[#2b303c] pb-2 overflow-x-auto">
         <button
-          type="button"
-          onClick={() => setActiveReportTab('rnp')}
-          className={`pb-3 px-4 font-bold text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-            activeReportTab === 'rnp'
-              ? 'border-[#4f46e5] text-[#4f46e5] dark:text-indigo-400'
-              : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white'
+          onClick={() => setActiveReportTab('analytics')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shrink-0 cursor-pointer ${
+            activeReportTab === 'analytics'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#252830]'
           }`}
         >
-          <BarChart3 size={18} />
-          РНП Маркетинг & Медпреды (Июнь 2026)
-          <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
-            {rnpData.length} строк
-          </span>
+          <BarChart3 className="w-4 h-4" />
+          <span>Сводная аналитика (Графики)</span>
         </button>
 
         <button
-          type="button"
           onClick={() => setActiveReportTab('plans')}
-          className={`pb-3 px-4 font-bold text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shrink-0 cursor-pointer ${
             activeReportTab === 'plans'
-              ? 'border-[#4f46e5] text-[#4f46e5] dark:text-indigo-400'
-              : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#252830]'
           }`}
         >
-          <FileText size={18} />
-          Операционные планы (Plan / Fact)
+          <Target className="w-4 h-4" />
+          <span>План / Факт спринтов</span>
         </button>
 
         <button
-          type="button"
           onClick={() => setActiveReportTab('bloggers')}
-          className={`pb-3 px-4 font-bold text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shrink-0 cursor-pointer ${
             activeReportTab === 'bloggers'
-              ? 'border-[#4f46e5] text-[#4f46e5] dark:text-indigo-400'
-              : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#252830]'
           }`}
         >
-          <Users size={18} />
-          Маркетинг & Блогеры
-          <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-pink-50 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300">
-            {filteredBloggers.length}
-          </span>
+          <Sparkles className="w-4 h-4" />
+          <span>Маркетинг & Блогеры ({filteredBloggers.length})</span>
         </button>
 
         <button
-          type="button"
           onClick={() => setActiveReportTab('companies')}
-          className={`pb-3 px-4 font-bold text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shrink-0 cursor-pointer ${
             activeReportTab === 'companies'
-              ? 'border-[#4f46e5] text-[#4f46e5] dark:text-indigo-400'
-              : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#252830]'
           }`}
         >
-          <Building2 size={18} />
-          Компании & Партнеры
-          <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
-            {filteredCompanies.length}
-          </span>
+          <Briefcase className="w-4 h-4" />
+          <span>Партнёры и B2B ({filteredCompanies.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveReportTab('rnp_table')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shrink-0 cursor-pointer ${
+            activeReportTab === 'rnp_table'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#252830]'
+          }`}
+        >
+          <Layers className="w-4 h-4" />
+          <span>Сводная таблица РНП</span>
         </button>
       </div>
 
-      {/* Filter Toolbar */}
-      <div className="bg-white dark:bg-[#181b20] rounded-2xl shadow-sm border border-gray-100 dark:border-[#262932] p-4 mb-8 flex flex-wrap gap-4 items-center justify-between">
-        <div className="flex flex-wrap gap-3 items-center flex-1">
-          <div className="flex items-center text-sm font-semibold text-gray-600 dark:text-gray-300 mr-1">
-            <Filter size={16} className="mr-2 text-gray-400" /> Фильтры:
-          </div>
-
-          {activeReportTab === 'rnp' ? (
-            <>
-              {/* RNP Section filter pills */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {[
-                  { id: 'ALL', label: 'Все разделы' },
-                  { id: 'visits', label: '🩺 Визиты' },
-                  { id: 'prescriptions', label: '💊 Рецепты' },
-                  { id: 'reps', label: '👥 Медпреды' },
-                  { id: 'merch', label: '🛒 Мерчендайзинг' },
-                  { id: 'ecommerce', label: '🌐 E-Commerce' },
-                  { id: 'promo', label: '🎯 Акции' },
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setRnpSectionFilter(tab.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      rnpSectionFilter === tab.id
-                        ? 'bg-[#1a2332] dark:bg-[#4f46e5] text-white shadow-sm'
-                        : 'bg-gray-50 dark:bg-[#121418] text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#262932]'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* RNP Search */}
-              <div className="relative ml-auto min-w-[220px]">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <Search size={14} />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Поиск (Святослав, Дурдона, Uzum...)"
-                  value={rnpSearch}
-                  onChange={(e) => setRnpSearch(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl text-xs text-gray-800 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5]"
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 font-bold uppercase">Месяц:</span>
-                <select 
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 outline-none cursor-pointer focus:bg-white dark:focus:bg-[#181b20]"
-                >
-                  <option>Сентябрь 2026</option>
-                  <option>Август 2026</option>
-                  <option>Июль 2026</option>
-                  <option>Июнь 2026</option>
-                </select>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 font-bold uppercase">Проект:</span>
-                <select 
-                  value={selectedProject}
-                  onChange={(e) => setSelectedProject(e.target.value)}
-                  className="bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 outline-none cursor-pointer focus:bg-white dark:focus:bg-[#181b20]"
-                >
-                  <option value="ALL">Все проекты</option>
-                  <option value="Extragel">Extragel</option>
-                  <option value="Masculan">Masculan</option>
-                  <option value="Энтеросгель">Энтеросгель</option>
-                </select>
-              </div>
-            </>
-          )}
-        </div>
-
-        {activeReportTab !== 'rnp' && (
-          <div className="text-xs text-gray-400 font-medium">
-            Автоматическая синхронизация со спринтами и метриками
-          </div>
-        )}
-      </div>
-
-      {/* ========================================================================= */}
-      {/* TAB 0: RNP MARKETING & FIELD REPS REPORT (FROM CSV)                      */}
-      {/* ========================================================================= */}
-      {activeReportTab === 'rnp' && (
-        <div className="space-y-8 animate-fade-in">
-          {/* Summary KPIs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Визиты к врачам & аптекам</span>
-                <span className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-                  <Stethoscope size={16} />
+      {/* TAB 1: VISUAL ANALYTICS & INTERACTIVE CHARTS */}
+      {activeReportTab === 'analytics' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Top 4 KPI Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* KPI 1: Overall Plan Completion */}
+            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400" />
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <span className="font-medium">Общий план месяца</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-semibold text-[11px] flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3" /> +12.4%
                 </span>
               </div>
-              <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">1,544 <span className="text-sm text-gray-400 font-medium">/ 1,796</span></h3>
-              <div className="w-full bg-gray-100 dark:bg-[#262932] h-1.5 rounded-full mt-3 overflow-hidden">
-                <div className="bg-emerald-500 h-full rounded-full" style={{ width: '86%' }} />
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">88.4%</span>
+                <span className="text-xs text-gray-400 font-normal">из 100% цели</span>
               </div>
-              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-2">86% от месячного плана</p>
+              {/* Progress bar */}
+              <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden mb-2">
+                <div className="bg-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: '88.4%' }} />
+              </div>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                Опережение целевого графика на 3 дня
+              </p>
             </div>
 
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Рецепты Энтеросгель</span>
-                <span className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 flex items-center justify-center font-bold">
-                  <Package size={16} />
+            {/* KPI 2: Field Visits (Doctors & Pharmacies) */}
+            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <span className="font-medium">Визиты (Врачи & Аптеки)</span>
+                <span className="p-1 rounded-md bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400">
+                  <Stethoscope className="w-3.5 h-3.5" />
                 </span>
               </div>
-              <h3 className="text-3xl font-extrabold text-[#4f46e5] dark:text-indigo-400 tracking-tight">4,627 <span className="text-sm text-gray-400 font-medium">/ 17,000</span></h3>
-              <div className="w-full bg-gray-100 dark:bg-[#262932] h-1.5 rounded-full mt-3 overflow-hidden">
-                <div className="bg-[#4f46e5] h-full rounded-full" style={{ width: '27%' }} />
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">385</span>
+                <span className="text-xs text-gray-400 font-normal">/ 410 план</span>
               </div>
-              <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-2">Прогноз закрытия: 11,568 (68%)</p>
+              <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden mb-2">
+                <div className="bg-blue-500 h-full rounded-full transition-all duration-500" style={{ width: '93.9%' }} />
+              </div>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                93.9% выполнения полевого плана визитов
+              </p>
             </div>
 
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Выручка E-Commerce (Uzum / Яндекс)</span>
-                <span className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
-                  <ShoppingBag size={16} />
+            {/* KPI 3: Marketing & Influencer Reach */}
+            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500" />
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <span className="font-medium">Охват блогосферы</span>
+                <span className="px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 font-semibold text-[11px]">
+                  {filteredBloggers.length} блогеров
                 </span>
               </div>
-              <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">286.1M <span className="text-sm text-gray-400 font-medium">сум</span></h3>
-              <div className="w-full bg-gray-100 dark:bg-[#262932] h-1.5 rounded-full mt-3 overflow-hidden">
-                <div className="bg-purple-600 h-full rounded-full" style={{ width: '71%' }} />
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                  {(totalBloggerReach / 1000).toFixed(0)}K
+                </span>
+                <span className="text-xs text-gray-400 font-normal">просмотров</span>
               </div>
-              <p className="text-xs text-purple-600 dark:text-purple-400 font-bold mt-2">71% плана (401M сум)</p>
+              <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden mb-2">
+                <div className="bg-purple-500 h-full rounded-full transition-all duration-500" style={{ width: '91%' }} />
+              </div>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                {totalPromoOrders} прямых заказов по промокодам
+              </p>
             </div>
 
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">FMCG Мерчендайзинг Ташкент</span>
-                <span className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
-                  <Briefcase size={16} />
+            {/* KPI 4: Sprints & Task Completion */}
+            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-400" />
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <span className="font-medium">Спринты и Задачи</span>
+                <span className="p-1 rounded-md bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
+                  <Activity className="w-3.5 h-3.5" />
                 </span>
               </div>
-              <h3 className="text-3xl font-extrabold text-amber-600 tracking-tight">783 <span className="text-sm text-gray-400 font-medium">/ 858</span></h3>
-              <div className="w-full bg-gray-100 h-1.5 rounded-full mt-3 overflow-hidden">
-                <div className="bg-amber-500 h-full rounded-full" style={{ width: '91%' }} />
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">42</span>
+                <span className="text-xs text-gray-400 font-normal">/ 48 задач</span>
               </div>
-              <p className="text-xs text-amber-600 font-bold mt-2">91% охвата (3 района)</p>
+              <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden mb-2">
+                <div className="bg-amber-500 h-full rounded-full transition-all duration-500" style={{ width: '87.5%' }} />
+              </div>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                87.5% задач закрыто вовремя
+              </p>
             </div>
           </div>
 
-          {/* RNP Data Table */}
-          <div className="bg-white dark:bg-[#181b20] rounded-2xl shadow-sm border border-slate-200/90 dark:border-[#262932] overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#262932] flex flex-wrap justify-between items-center bg-slate-50/70 dark:bg-[#14161c] gap-3">
+          {/* MAIN CHART: Performance Dynamics (Plan vs Fact Spline) */}
+          <div className="bg-white dark:bg-[#1e2128] p-6 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <div className="flex items-center gap-2.5">
-                  <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                    Регулярный план-факт (РНП) — Июнь 2026
-                  </h3>
-                  <span className="text-xs font-semibold px-2 py-0.5 bg-slate-200/60 dark:bg-[#262932] text-slate-700 dark:text-slate-300 rounded-md">
-                    {filteredRnp.length} показателей
+                <h2 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <span>Динамика выполнения плана по неделям</span>
+                  <span className="text-xs px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-medium">
+                    Интерактивный график
                   </span>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Реальные данные команды, полевых визитов и продаж из таблицы РНП
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Сравнение запланированного темпа и фактического результата по 5 неделям месяца
                 </p>
               </div>
 
-              <div className="flex items-center gap-4 flex-wrap">
-                {/* View Mode Toggle */}
-                <div className="bg-slate-200/70 dark:bg-[#20242c] p-0.5 rounded-xl flex items-center gap-0.5 text-xs font-semibold text-slate-600 dark:text-slate-400">
-                  <button
-                    type="button"
-                    onClick={() => setRnpViewMode('grouped')}
-                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      rnpViewMode === 'grouped' ? 'bg-white dark:bg-[#181b20] text-slate-900 dark:text-white font-bold shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    По разделам ({rnpGroups.length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRnpViewMode('table')}
-                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      rnpViewMode === 'table' ? 'bg-white dark:bg-[#181b20] text-slate-900 dark:text-white font-bold shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    Сплошная таблица
-                  </button>
+              {/* Chart Legend */}
+              <div className="flex items-center gap-4 text-xs">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Факт (Выполнено)</span>
                 </div>
-
-                {/* Legend */}
-                <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-3 bg-white dark:bg-[#14161c] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-[#262932]">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> 100%+ факт
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> 70-99%
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> &lt;70%
-                  </span>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-4 h-0.5 border-t-2 border-dashed border-indigo-400" />
+                  <span className="text-gray-500 dark:text-gray-400">План (Цель)</span>
                 </div>
               </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left border-collapse font-sans">
-                <thead className="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400 bg-slate-50/95 dark:bg-[#14161c] border-b border-slate-200 dark:border-[#262932] sticky top-0 z-10 shadow-2xs">
-                  {/* Super Header Row */}
-                  <tr className="border-b border-slate-200/80 dark:border-[#262932] text-[10px] text-slate-400 dark:text-slate-500 tracking-wider">
-                    <th colSpan={rnpViewMode === 'table' ? 2 : 1} className="px-4 py-2 text-left bg-slate-50 dark:bg-[#14161c] border-r border-slate-200 dark:border-[#262932]">
-                      ПОКАЗАТЕЛЬ И ОТВЕТСТВЕННЫЙ
-                    </th>
-                    <th colSpan={5} className="px-4 py-2 text-center bg-slate-100/60 dark:bg-[#1a1d24] border-r border-slate-200 dark:border-[#262932]">
-                      ИТОГИ ЗА МЕСЯЦ (ПЛАН / ФАКТ)
-                    </th>
-                    <th colSpan={5} className="px-4 py-2 text-center bg-indigo-50/40 dark:bg-indigo-950/30">
-                      ДИНАМИКА ПО НЕДЕЛЯМ (ПЛАН / ФАКТ)
-                    </th>
-                  </tr>
-                  {/* Detailed Columns */}
-                  <tr className="divide-x divide-slate-200 dark:divide-[#262932] text-slate-600 dark:text-slate-300">
-                    {rnpViewMode === 'table' && (
-                      <th className="px-4 py-3 text-left w-48 font-bold bg-slate-50 dark:bg-[#14161c]">Раздел / Сотрудник</th>
-                    )}
-                    <th className="px-5 py-3 text-left min-w-[240px] font-bold bg-slate-50 dark:bg-[#14161c]">Показатель</th>
-                    <th className="px-3.5 py-3 text-right w-24 font-bold bg-slate-50 dark:bg-[#14161c]">Прошл. факт</th>
-                    <th className="px-3.5 py-3 text-right w-24 font-bold bg-slate-50 dark:bg-[#14161c]">План месяц</th>
-                    <th className="px-3.5 py-3 text-right w-24 font-bold bg-slate-50 dark:bg-[#14161c]">Факт месяц</th>
-                    <th className="px-4 py-3 text-center w-28 font-bold bg-slate-50 dark:bg-[#14161c]">% Выполн.</th>
-                    <th className="px-3.5 py-3 text-right w-24 font-bold bg-slate-50 dark:bg-[#14161c] border-r border-slate-200 dark:border-[#262932]">Прогноз</th>
-                    <th className="px-3 py-3 text-center w-24 font-bold bg-indigo-50/20 dark:bg-indigo-950/20">1 нед</th>
-                    <th className="px-3 py-3 text-center w-24 font-bold bg-indigo-50/20 dark:bg-indigo-950/20">2 нед</th>
-                    <th className="px-3 py-3 text-center w-24 font-bold bg-indigo-50/20 dark:bg-indigo-950/20">3 нед</th>
-                    <th className="px-3 py-3 text-center w-24 font-bold bg-indigo-50/20 dark:bg-indigo-950/20">4 нед</th>
-                    <th className="px-3 py-3 text-center w-24 font-bold bg-indigo-50/20 dark:bg-indigo-950/20">5 нед</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-[#262932] font-sans">
-                  {filteredRnp.length === 0 ? (
-                    <tr>
-                      <td colSpan={12} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500 text-xs">
-                        Показатели не найдены по текущему фильтру или поисковому запросу.
-                      </td>
-                    </tr>
-                  ) : rnpViewMode === 'grouped' ? (
-                    rnpGroups.map(group => (
-                      <React.Fragment key={`grp_${group.key}`}>
-                        {/* Section Header Row */}
-                        <tr className="bg-slate-100/95 dark:bg-[#1a1d24] border-y border-slate-200 dark:border-[#262932] sticky top-[73px] z-5">
-                          <td colSpan={11} className="px-5 py-2.5">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2.5">
-                                <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>
-                                <span className="font-extrabold text-slate-900 dark:text-white text-xs tracking-wide uppercase">
-                                  {group.sectionName}
-                                </span>
-                                {group.person && (
-                                  <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-white dark:bg-[#20242c] border border-indigo-200/80 dark:border-indigo-900/60 px-2.5 py-0.5 rounded-lg shadow-2xs">
-                                    {group.person} {group.role ? `• ${group.role}` : ''}
-                                  </span>
-                                )}
-                              </div>
-                              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold bg-white/80 dark:bg-[#20242c] px-2 py-0.5 rounded border border-slate-200/60 dark:border-[#262932]">
-                                {group.items.length} {group.items.length === 1 ? 'показатель' : 'показателей'}
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                        {/* Rows in this section */}
-                        {group.items.map((item, rowIdx) => (
-                          <tr 
-                            key={item.id} 
-                            className={`divide-x divide-slate-100 dark:divide-[#262932] transition-colors hover:bg-indigo-50/30 dark:hover:bg-indigo-950/20 ${
-                              rowIdx % 2 === 1 ? 'bg-slate-50/40 dark:bg-[#15171e]' : 'bg-white dark:bg-[#181b20]'
-                            }`}
-                          >
-                            <td className="px-5 py-2.5">
-                              <div className="font-semibold text-slate-900 dark:text-white text-xs">{item.indicator}</div>
-                              {item.person && !group.person && (
-                                <div className="text-xs text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">{item.person}</div>
-                              )}
-                            </td>
-                            <td className="px-3.5 py-2.5 text-right text-xs text-slate-500 dark:text-slate-400 tabular-nums">
-                              {item.prevFact} <span className="text-[10px] text-slate-400 dark:text-slate-500">({item.prevPercent})</span>
-                            </td>
-                            <td className="px-3.5 py-2.5 text-right text-xs font-semibold text-slate-700 dark:text-slate-300 tabular-nums">
-                              {item.planMonth}
-                            </td>
-                            <td 
-                              className="px-3.5 py-2.5 text-right text-xs font-bold text-slate-900 dark:text-white tabular-nums cursor-pointer hover:bg-amber-50/80 dark:hover:bg-amber-950/30 transition-colors group relative"
-                              title="Нажмите для редактирования факта (автоматически сохраняется в PostgreSQL)"
-                              onClick={() => setEditingCell({ id: item.id, field: 'factMonth', value: item.factMonth })}
-                            >
-                              {editingCell?.id === item.id && editingCell.field === 'factMonth' ? (
-                                <input
-                                  type="text"
-                                  autoFocus
-                                  defaultValue={editingCell.value}
-                                  onBlur={(e) => handleSaveCell(item.id, 'factMonth', e.target.value)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSaveCell(item.id, 'factMonth', (e.target as HTMLInputElement).value)
-                                    if (e.key === 'Escape') setEditingCell(null)
-                                  }}
-                                  className="w-20 px-1 py-0.5 text-right text-xs font-bold border border-[#0052cc] dark:border-indigo-500 rounded bg-white dark:bg-[#121418] text-slate-900 dark:text-white outline-none shadow-xs"
-                                  onClick={(e) => e.stopPropagation()}
-                                />
-                              ) : (
-                                <span className="inline-flex items-center justify-end gap-1">
-                                  <span>{item.factMonth}</span>
-                                  <span className="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-4 py-2.5 text-center">
-                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold tabular-nums inline-block border ${
-                                item.percentMonth >= 100
-                                  ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                                  : item.percentMonth >= 70
-                                  ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
-                                  : item.percentMonth > 0
-                                  ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                                  : 'bg-slate-100 dark:bg-[#20242c] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-[#262932]'
-                              }`}>
-                                {item.percentMonth}%
-                              </span>
-                            </td>
-                            <td className="px-3.5 py-2.5 text-right text-xs font-bold text-indigo-700 dark:text-indigo-400 tabular-nums border-r border-slate-200 dark:border-[#262932]">
-                              {item.forecast}
-                            </td>
-                            <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20 dark:bg-[#14161c]/30">
-                              {renderWeekCell(item.w1)}
-                            </td>
-                            <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20 dark:bg-[#14161c]/30">
-                              {renderWeekCell(item.w2)}
-                            </td>
-                            <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20 dark:bg-[#14161c]/30">
-                              {renderWeekCell(item.w3)}
-                            </td>
-                            <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20 dark:bg-[#14161c]/30">
-                              {renderWeekCell(item.w4)}
-                            </td>
-                            <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20 dark:bg-[#14161c]/30">
-                              {renderWeekCell(item.w5)}
-                            </td>
-                          </tr>
-                        ))}
-                      </React.Fragment>
-                    ))
-                  ) : (
-                    filteredRnp.map((item, rowIdx) => (
-                      <tr 
-                        key={item.id} 
-                        className={`divide-x divide-slate-100 dark:divide-[#262932] transition-colors hover:bg-indigo-50/30 dark:hover:bg-indigo-950/20 ${
-                          rowIdx % 2 === 1 ? 'bg-slate-50/40 dark:bg-[#15171e]' : 'bg-white dark:bg-[#181b20]'
+            {/* SVG Spline Chart */}
+            <div className="relative w-full overflow-x-auto">
+              <svg 
+                viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
+                className="w-full h-56 sm:h-64 select-none"
+              >
+                <defs>
+                  {/* Gradient for fact area */}
+                  <linearGradient id="factGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+                  </linearGradient>
+                  {/* Subtle vertical glow */}
+                  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#10b981" floodOpacity="0.3" />
+                  </filter>
+                </defs>
+
+                {/* Horizontal Grid lines */}
+                {[0, 25, 50, 75, 100].map((val) => {
+                  const y = svgHeight - padding - (val / 105) * (svgHeight - padding * 2)
+                  return (
+                    <g key={val}>
+                      <line 
+                        x1={padding} 
+                        y1={y} 
+                        x2={svgWidth - padding} 
+                        y2={y} 
+                        stroke="#e5e7eb" 
+                        className="dark:stroke-[#2b303c]" 
+                        strokeDasharray="4 4" 
+                      />
+                      <text 
+                        x={padding - 8} 
+                        y={y + 3} 
+                        textAnchor="end" 
+                        className="text-[10px] fill-gray-400 dark:fill-gray-500 font-mono"
+                      >
+                        {val}%
+                      </text>
+                    </g>
+                  )
+                })}
+
+                {/* Shaded Area under Fact */}
+                {factAreaPath && (
+                  <path d={factAreaPath} fill="url(#factGradient)" />
+                )}
+
+                {/* Plan Curve (Dashed line) */}
+                {planSpline && planSpline.path && (
+                  <path 
+                    d={planSpline.path} 
+                    fill="none" 
+                    stroke="#818cf8" 
+                    strokeWidth="2.5" 
+                    strokeDasharray="6 6" 
+                  />
+                )}
+
+                {/* Fact Curve (Solid line with glow) */}
+                {factSpline && factSpline.path && (
+                  <path 
+                    d={factSpline.path} 
+                    fill="none" 
+                    stroke="#10b981" 
+                    strokeWidth="3.5" 
+                    strokeLinecap="round"
+                    filter="url(#glow)"
+                  />
+                )}
+
+                {/* Data Points on Fact Curve */}
+                {factSpline && factSpline.points && factSpline.points.map((pt, idx) => {
+                  const isSelected = selectedChartWeek === idx
+                  const d = weeklyDynamicsData[idx]
+                  return (
+                    <g 
+                      key={idx} 
+                      className="cursor-pointer transition transform"
+                      onClick={() => setSelectedChartWeek(idx)}
+                    >
+                      {/* Active indicator circle ring */}
+                      {isSelected && (
+                        <circle 
+                          cx={pt.x} 
+                          cy={pt.y} 
+                          r="9" 
+                          fill="none" 
+                          stroke="#10b981" 
+                          strokeWidth="2" 
+                          strokeOpacity="0.4"
+                        />
+                      )}
+                      {/* Background circle */}
+                      <circle 
+                        cx={pt.x} 
+                        cy={pt.y} 
+                        r={isSelected ? 6 : 4.5} 
+                        className="fill-white dark:fill-[#1e2128]" 
+                        stroke="#10b981" 
+                        strokeWidth={isSelected ? 3 : 2} 
+                      />
+
+                      {/* X-axis labels */}
+                      <text 
+                        x={pt.x} 
+                        y={svgHeight - 10} 
+                        textAnchor="middle" 
+                        className={`text-[11px] ${
+                          isSelected 
+                            ? 'font-bold fill-indigo-600 dark:fill-indigo-400' 
+                            : 'fill-gray-500 dark:fill-gray-400'
                         }`}
                       >
-                        <td className="px-4 py-2.5">
-                          <div className="font-bold text-slate-800 dark:text-slate-200 text-xs">{item.sectionName}</div>
-                          {item.person && (
-                            <div className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-0.5">
-                              {item.person} {item.role ? `(${item.role})` : ''}
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-5 py-2.5">
-                          <div className="font-semibold text-slate-900 dark:text-white text-xs">{item.indicator}</div>
-                        </td>
-                        <td className="px-3.5 py-2.5 text-right text-xs text-slate-500 dark:text-slate-400 tabular-nums">
-                          {item.prevFact} <span className="text-[10px] text-slate-400 dark:text-slate-500">({item.prevPercent})</span>
-                        </td>
-                        <td className="px-3.5 py-2.5 text-right text-xs font-semibold text-slate-700 dark:text-slate-300 tabular-nums">
-                          {item.planMonth}
-                        </td>
-                        <td 
-                          className="px-3.5 py-2.5 text-right text-xs font-bold text-slate-900 dark:text-white tabular-nums cursor-pointer hover:bg-amber-50/80 dark:hover:bg-amber-950/30 transition-colors group relative"
-                          title="Нажмите для редактирования факта (автоматически сохраняется в PostgreSQL)"
-                          onClick={() => setEditingCell({ id: item.id, field: 'factMonth', value: item.factMonth })}
-                        >
-                          {editingCell?.id === item.id && editingCell.field === 'factMonth' ? (
-                            <input
-                              type="text"
-                              autoFocus
-                              defaultValue={editingCell.value}
-                              onBlur={(e) => handleSaveCell(item.id, 'factMonth', e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSaveCell(item.id, 'factMonth', (e.target as HTMLInputElement).value)
-                                if (e.key === 'Escape') setEditingCell(null)
-                              }}
-                              className="w-20 px-1 py-0.5 text-right text-xs font-bold border border-[#0052cc] dark:border-indigo-500 rounded bg-white dark:bg-[#121418] text-slate-900 dark:text-white outline-none shadow-xs"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          ) : (
-                            <span className="inline-flex items-center justify-end gap-1">
-                              <span>{item.factMonth}</span>
-                              <span className="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-2.5 text-center">
-                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold tabular-nums inline-block border ${
-                            item.percentMonth >= 100
-                              ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                              : item.percentMonth >= 70
-                              ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
-                              : item.percentMonth > 0
-                              ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                              : 'bg-slate-100 dark:bg-[#20242c] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-[#262932]'
-                          }`}>
-                            {item.percentMonth}%
-                          </span>
-                        </td>
-                        <td className="px-3.5 py-2.5 text-right text-xs font-bold text-indigo-700 dark:text-indigo-400 tabular-nums border-r border-slate-200 dark:border-[#262932]">
-                          {item.forecast}
-                        </td>
-                        <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20 dark:bg-[#14161c]/30">
-                          {renderWeekCell(item.w1)}
-                        </td>
-                        <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20 dark:bg-[#14161c]/30">
-                          {renderWeekCell(item.w2)}
-                        </td>
-                        <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20 dark:bg-[#14161c]/30">
-                          {renderWeekCell(item.w3)}
-                        </td>
-                        <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20 dark:bg-[#14161c]/30">
-                          {renderWeekCell(item.w4)}
-                        </td>
-                        <td className="px-3 py-2.5 text-center tabular-nums bg-slate-50/20 dark:bg-[#14161c]/30">
-                          {renderWeekCell(item.w5)}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
+                        {d.week}
+                      </text>
 
-      {/* ========================================================================= */}
-      {/* TAB 1: OPERATIONAL PLAN / FACT                                            */}
-      {/* ========================================================================= */}
-      {activeReportTab === 'plans' && (
-        <div className="space-y-8">
-          {/* Summary Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-400 mb-1">Суммарный План месяца</p>
-              <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{totalPlan}</h3>
-              <p className="text-xs text-gray-400 dark:text-gray-400 mt-2">Запланировано единиц по проектам</p>
+                      {/* Point value badge */}
+                      <text 
+                        x={pt.x} 
+                        y={pt.y - 10} 
+                        textAnchor="middle" 
+                        className={`text-[10px] font-bold ${
+                          isSelected 
+                            ? 'fill-emerald-600 dark:fill-emerald-400' 
+                            : 'fill-gray-600 dark:fill-gray-400'
+                        }`}
+                      >
+                        {d.fact}%
+                      </text>
+                    </g>
+                  )
+                })}
+              </svg>
             </div>
 
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-400 mb-1">Фактическое выполнение</p>
-              <h3 className="text-3xl font-extrabold text-[#4f46e5] dark:text-indigo-400 tracking-tight">{totalFact}</h3>
-              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-2">Выполнено по отчетам спринтов</p>
-            </div>
+            {/* Interactive Selected Week Detail Strip */}
+            <div className="mt-4 p-3.5 bg-gray-50 dark:bg-[#15171c] rounded-xl border border-gray-200 dark:border-[#2b303c] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs">
+                  W{selectedChartWeek + 1}
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-900 dark:text-white">
+                    Детализация: {activeWeekInfo.label} ({activeWeekInfo.week})
+                  </h4>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Нажмите на любую точку графика для просмотра данных недели
+                  </p>
+                </div>
+              </div>
 
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-400 mb-1">Общий % выполнения (Total)</p>
-              <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{totalPercent}%</h3>
-              <div className="w-full bg-gray-100 dark:bg-[#262932] rounded-full h-2 mt-3 overflow-hidden">
-                <div className="bg-[#4f46e5] h-2 rounded-full" style={{ width: `${totalPercent}%` }}></div>
+              <div className="flex items-center gap-4 text-xs">
+                <div className="bg-white dark:bg-[#1e2128] px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#2b303c]">
+                  <span className="text-gray-400 text-[10px] block">План недели:</span>
+                  <span className="font-bold text-indigo-600 dark:text-indigo-400">{activeWeekInfo.plan}%</span>
+                </div>
+
+                <div className="bg-white dark:bg-[#1e2128] px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#2b303c]">
+                  <span className="text-gray-400 text-[10px] block">Факт недели:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{activeWeekInfo.fact}%</span>
+                </div>
+
+                <div className="bg-white dark:bg-[#1e2128] px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#2b303c]">
+                  <span className="text-gray-400 text-[10px] block">Полевые визиты:</span>
+                  <span className="font-bold text-gray-800 dark:text-gray-200">
+                    {activeWeekInfo.visitsFact} / {activeWeekInfo.visitsPlan}
+                  </span>
+                </div>
+
+                <div className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                  activeWeekInfo.fact >= activeWeekInfo.plan
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+                    : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
+                }`}>
+                  {activeWeekInfo.fact >= activeWeekInfo.plan ? 'План перевыполнен' : 'Небольшое отставание'}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Reports Tables by Project */}
-          <div className="space-y-8">
-            {filteredProjects.map(proj => {
-              const projPlan = proj.items.reduce((acc, i) => acc + i.plan, 0)
-              const projFact = proj.items.reduce((acc, i) => acc + i.fact, 0)
-              const projPercent = projPlan > 0 ? Math.round((projFact / projPlan) * 100) : 0
+          {/* TWO COLUMN GRID: Categories Breakdown & Team Leaderboard */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left: Category Breakdown */}
+            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Target className="w-4 h-4 text-indigo-500" />
+                  <span>Выполнение по направлениям бизнеса</span>
+                </h3>
+                <span className="text-[11px] text-gray-400">Цель: 100%</span>
+              </div>
 
-              return (
-                <div key={proj.id} className="bg-white dark:bg-[#181b20] rounded-2xl shadow-sm border border-gray-100 dark:border-[#262932] overflow-hidden">
-                  <div className="bg-gray-50/70 dark:bg-[#14161c] px-6 py-4 flex flex-wrap justify-between items-center border-b border-gray-100 dark:border-[#262932] gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 rounded-xl flex items-center justify-center font-bold text-sm">
-                        {proj.project[0]}
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-gray-900 dark:text-white text-lg">{proj.project}</h3>
-                        <p className="text-xs text-gray-400 dark:text-gray-400">{proj.month}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-6 text-sm">
-                      <div>
-                        <span className="text-gray-400 dark:text-gray-400 text-xs mr-2">Итого план:</span>
-                        <span className="font-bold text-gray-800 dark:text-slate-200">{projPlan}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-400 dark:text-gray-400 text-xs mr-2">Итого факт:</span>
-                        <span className="font-bold text-[#4f46e5] dark:text-indigo-400">{projFact}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400 dark:text-gray-400 text-xs">Выполнение:</span>
-                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                          projPercent >= 90 ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' :
-                          projPercent >= 60 ? 'bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400' :
-                          'bg-orange-50 dark:bg-amber-950/60 text-orange-600 dark:text-amber-400'
-                        }`}>
-                          {projPercent}%
-                        </span>
-                      </div>
-                    </div>
+              <div className="space-y-4">
+                {/* Item 1 */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                      <Stethoscope className="w-3.5 h-3.5 text-blue-500" />
+                      Визиты к врачам и рецептурный охват
+                    </span>
+                    <span className="font-bold text-gray-900 dark:text-white">92%</span>
                   </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead className="text-[11px] uppercase font-bold text-gray-400 dark:text-gray-400 bg-white dark:bg-[#14161c] border-b border-gray-100 dark:border-[#262932]">
-                        <tr>
-                          <th className="px-6 py-4">Показатель / Задача</th>
-                          <th className="px-6 py-4 text-right">План месяца</th>
-                          <th className="px-6 py-4 text-right">Факт выполнения</th>
-                          <th className="px-6 py-4 text-right">% выполнения</th>
-                          <th className="px-6 py-4 text-center">Статус</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-50 dark:divide-[#262932]">
-                        {proj.items.map((item, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-[#1e222a] transition-colors">
-                            <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                              {item.name}
-                              <span className="ml-2 text-xs text-gray-400 dark:text-gray-400 font-normal">({item.unit})</span>
-                            </td>
-                            <td className="px-6 py-4 text-right font-bold text-gray-700 dark:text-slate-300">
-                              {item.plan}
-                            </td>
-                            <td className="px-6 py-4 text-right font-bold text-[#4f46e5] dark:text-indigo-400">
-                              {item.fact}
-                            </td>
-                            <td className="px-6 py-4 text-right font-bold">
-                              <span className={`${item.percent >= 90 ? 'text-emerald-600 dark:text-emerald-400' : item.percent >= 60 ? 'text-indigo-600 dark:text-indigo-400' : 'text-orange-500 dark:text-amber-400'}`}>
-                                {item.percent}%
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-center">
-                              <span className={`inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full ${
-                                item.status === 'Done' ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
-                              }`}>
-                                {item.status === 'Done' ? <CheckCircle2 size={13} className="mr-1" /> : null}
-                                {item.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-blue-500 h-full rounded-full" style={{ width: '92%' }} />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-gray-400">
+                    <span>План: 100 визитов</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">Факт: 92 визита</span>
                   </div>
                 </div>
-              )
-            })}
+
+                {/* Item 2 */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                      <ShoppingBag className="w-3.5 h-3.5 text-emerald-500" />
+                      Аптечные сети (Ташкент + Регионы)
+                    </span>
+                    <span className="font-bold text-gray-900 dark:text-white">88%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-emerald-500 h-full rounded-full" style={{ width: '88%' }} />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-gray-400">
+                    <span>План: 210 аптек</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">Факт: 185 аптек</span>
+                  </div>
+                </div>
+
+                {/* Item 3 */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                      Инфлюенс-маркетинг & Соцсети
+                    </span>
+                    <span className="font-bold text-gray-900 dark:text-white">95%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-purple-500 h-full rounded-full" style={{ width: '95%' }} />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-gray-400">
+                    <span>План: 400K просмотров</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">Факт: 415K просмотров</span>
+                  </div>
+                </div>
+
+                {/* Item 4 */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                      <Briefcase className="w-3.5 h-3.5 text-amber-500" />
+                      Партнерские отели, SPA и заведения (B2B)
+                    </span>
+                    <span className="font-bold text-gray-900 dark:text-white">78%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-amber-500 h-full rounded-full" style={{ width: '78%' }} />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-gray-400">
+                    <span>План: 10 локаций</span>
+                    <span className="text-amber-600 dark:text-amber-400 font-medium">Факт: 8 локаций</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Team Leaderboard */}
+            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Award className="w-4 h-4 text-amber-500" />
+                  <span>Рейтинг эффективности команды</span>
+                </h3>
+                <span className="text-[11px] text-gray-400">Показатель выполнения KPI</span>
+              </div>
+
+              <div className="space-y-3">
+                {teamLeaderboard.map((member, index) => (
+                  <div 
+                    key={member.id}
+                    className="p-3 bg-gray-50 dark:bg-[#15171c] rounded-xl border border-gray-200/70 dark:border-[#2b303c] flex items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Rank badge */}
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                        index === 0 
+                          ? 'bg-amber-400 text-black' 
+                          : index === 1 
+                          ? 'bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white' 
+                          : 'bg-gray-200 dark:bg-[#252830] text-gray-600 dark:text-gray-400'
+                      }`}>
+                        {index + 1}
+                      </span>
+
+                      {/* Avatar initials */}
+                      <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs flex items-center justify-center">
+                        {member.avatar}
+                      </div>
+
+                      <div>
+                        <div className="text-xs font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                          <span>{member.name}</span>
+                          <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
+                            member.percent >= 95 
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
+                              : member.percent >= 85
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300'
+                              : 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
+                          }`}>
+                            {member.badge}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400">{member.role}</p>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <div className="text-xs font-bold text-gray-900 dark:text-white">
+                        {member.percent}%
+                      </div>
+                      <p className="text-[10px] text-gray-400">
+                        {member.fact}/{member.plan} план
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Executive Insights / Quick Takeaways */}
+          <div className="p-4 bg-gradient-to-r from-indigo-50/80 to-blue-50/80 dark:from-[#1b202c] dark:to-[#171c26] rounded-2xl border border-indigo-100 dark:border-[#2b354a]">
+            <h4 className="text-xs font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              Ключевые выводы аналитики за {selectedMonth}
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-gray-700 dark:text-gray-300">
+              <div className="flex items-start gap-2 bg-white/70 dark:bg-[#1e2128]/60 p-2.5 rounded-xl">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                <span>
+                  <strong>Визиты к врачам:</strong> Ташкент закрывает цель на 100%, ортопеды и травматологи обеспечили стабильный поток назначений.
+                </span>
+              </div>
+              <div className="flex items-start gap-2 bg-white/70 dark:bg-[#1e2128]/60 p-2.5 rounded-xl">
+                <span className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                <span>
+                  <strong>Инфлюенсеры:</strong> Пост Шахзоды Мухаммедовой дал максимальную отдачу: 318 прямых заказов при бюджете $650.
+                </span>
+              </div>
+              <div className="flex items-start gap-2 bg-white/70 dark:bg-[#1e2128]/60 p-2.5 rounded-xl">
+                <span className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                <span>
+                  <strong>Фокус внимания:</strong> По проекту Masculan необходимо ускорить установку промостоек в регионах (сейчас 40% плана).
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* TAB 2: INFLUENCER MARKETING & BLOGGERS REPORT                             */}
-      {/* ========================================================================= */}
+      {/* TAB 2: SPRINTS & OPERATIONAL PLANS */}
+      {activeReportTab === 'plans' && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
+            <h2 className="text-base font-bold text-gray-900 dark:text-white mb-1">
+              План / Факт спринтов по проектам
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-5">
+              Текущий статус выполнения операционных задач и спринтов команды
+            </p>
+
+            <div className="space-y-6">
+              {filteredPlans.map(proj => (
+                <div 
+                  key={proj.id} 
+                  className="p-4 bg-gray-50 dark:bg-[#15171c] rounded-2xl border border-gray-200 dark:border-[#2b303c]"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-3 h-3 rounded-full bg-indigo-600" />
+                      <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                        {proj.project}
+                      </h3>
+                      <span className="text-xs text-gray-400">({proj.month})</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                        Выполнение: {proj.overallProgress}%
+                      </span>
+                      <div className="w-24 bg-gray-200 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-indigo-600 h-full rounded-full" 
+                          style={{ width: `${proj.overallProgress}%` }} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Items list */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
+                    {proj.items.map((it, idx) => (
+                      <div 
+                        key={idx} 
+                        className="bg-white dark:bg-[#1e2128] p-3.5 rounded-xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between text-xs mb-1.5">
+                            <span className={`px-2 py-0.5 rounded-md font-semibold text-[10px] ${
+                              it.status === 'Done'
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                : it.status === 'In Progress'
+                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300'
+                                : 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
+                            }`}>
+                              {it.status === 'Done' ? 'Выполнено' : it.status === 'In Progress' ? 'В процессе' : 'Отставание'}
+                            </span>
+                            <span className="font-bold text-xs text-gray-900 dark:text-white">
+                              {it.percent}%
+                            </span>
+                          </div>
+                          <h4 className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                            {it.name}
+                          </h4>
+                        </div>
+
+                        <div className="mt-3 pt-2 border-t border-gray-100 dark:border-[#2b303c] flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                          <span>План: {it.plan} {it.unit}</span>
+                          <span className="font-semibold text-gray-700 dark:text-gray-300">
+                            Факт: {it.fact} {it.unit}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: MARKETING & BLOGGERS */}
       {activeReportTab === 'bloggers' && (
-        <div className="space-y-8">
-          {/* Summary KPIs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-400 mb-1">Общий бюджет блогеров</p>
-              <h3 className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">${totalBloggerBudget}</h3>
-              <p className="text-xs text-gray-400 dark:text-gray-400 mt-2">По {filteredBloggers.length} инфлюенсерам</p>
+        <div className="space-y-4 animate-fade-in">
+          {/* Summary KPIs for Marketing */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white dark:bg-[#1e2128] p-4 rounded-xl border border-gray-200/80 dark:border-[#2b303c]">
+              <span className="text-xs text-gray-400 block mb-1">Общий бюджет блогеров</span>
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">${totalBloggerSpend.toLocaleString()}</span>
             </div>
-
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-400 mb-1">Вышло публикаций</p>
-              <h3 className="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight">{publishedCount} / {filteredBloggers.length}</h3>
-              <p className="text-xs text-gray-400 dark:text-gray-400 mt-2">Посты & Reels в эфире</p>
+            <div className="bg-white dark:bg-[#1e2128] p-4 rounded-xl border border-gray-200/80 dark:border-[#2b303c]">
+              <span className="text-xs text-gray-400 block mb-1">Суммарный охват</span>
+              <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">455K чел</span>
             </div>
-
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-400 mb-1">Продажи по промокодам</p>
-              <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{totalBloggerSales} шт.</h3>
-              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-2">Погашено в аптеках Olam Farm</p>
+            <div className="bg-white dark:bg-[#1e2128] p-4 rounded-xl border border-gray-200/80 dark:border-[#2b303c]">
+              <span className="text-xs text-gray-400 block mb-1">Суммарные просмотры</span>
+              <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{(totalBloggerReach / 1000).toFixed(0)}K</span>
             </div>
-
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-400 mb-1">Средний CPV (просмотр)</p>
-              <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">$0.0038</h3>
-              <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-2">Охват ~415,000 просмотров</p>
+            <div className="bg-white dark:bg-[#1e2128] p-4 rounded-xl border border-gray-200/80 dark:border-[#2b303c]">
+              <span className="text-xs text-gray-400 block mb-1">Заказов по промокодам</span>
+              <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">{totalPromoOrders}</span>
             </div>
           </div>
 
-          {/* Bloggers Performance Table */}
-          <div className="bg-white dark:bg-[#181b20] rounded-2xl shadow-sm border border-gray-100 dark:border-[#262932] overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-[#262932] flex justify-between items-center bg-gray-50/50 dark:bg-[#14161c]">
-              <h3 className="font-bold text-gray-900 dark:text-white text-base">Сводная аналитика по блогерам</h3>
-              <span className="text-xs text-gray-400 dark:text-gray-400 font-mono">Синхронизировано с Meta Graph API</span>
-            </div>
+          {/* Bloggers Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredBloggers.map(b => (
+              <div 
+                key={b.id} 
+                className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div>
+                      <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                        {b.project} • {b.platform}
+                      </span>
+                      <h4 className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">
+                        {b.blogger}
+                      </h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                        {b.handle}
+                      </p>
+                    </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-[11px] uppercase font-bold text-gray-400 dark:text-gray-400 bg-white dark:bg-[#14161c] border-b border-gray-100 dark:border-[#262932]">
-                  <tr>
-                    <th className="px-6 py-4">Блогер / Профиль</th>
-                    <th className="px-6 py-4">Проект</th>
-                    <th className="px-6 py-4 text-center">Платформа</th>
-                    <th className="px-6 py-4 text-right">Подписчики</th>
-                    <th className="px-6 py-4 text-right">Просмотры</th>
-                    <th className="px-6 py-4 text-right">Гонорар</th>
-                    <th className="px-6 py-4 text-right">Клики / Переходы</th>
-                    <th className="px-6 py-4 text-right">Продажи</th>
-                    <th className="px-6 py-4 text-center">Статус</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50 dark:divide-[#262932]">
-                  {filteredBloggers.map(b => (
-                    <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-[#1e222a] transition-colors">
-                      <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                        <div>{b.blogger}</div>
-                        <div className="text-xs text-gray-400 dark:text-gray-400 font-mono font-normal">{b.handle}</div>
-                      </td>
-                      <td className="px-6 py-4 font-bold text-gray-700 dark:text-slate-200">{b.project}</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold ${
-                          b.platform === 'Instagram' ? 'bg-pink-50 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300' :
-                          b.platform === 'Telegram' ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300' :
-                          'bg-neutral-100 dark:bg-[#262932] text-neutral-800 dark:text-slate-200'
-                        }`}>
-                          {b.platform}
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+                      b.status === 'Вышел пост'
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                        : b.status === 'Оплачено'
+                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300'
+                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                    }`}>
+                      {b.status}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-[#15171c] p-2 rounded-lg mb-3">
+                    {b.format}
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-2 text-center text-xs py-2 border-y border-gray-100 dark:border-[#2b303c]">
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">Аудитория</span>
+                      <span className="font-bold text-gray-800 dark:text-gray-200">{b.followers}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">Просмотры</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">{b.views}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">Заказы</span>
+                      <span className="font-bold text-purple-600 dark:text-purple-400">{b.promoSales}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <span>Стоимость: <strong className="text-gray-900 dark:text-white font-bold">{b.price}</strong></span>
+                  <span>ER: <strong className="text-indigo-600 dark:text-indigo-400">{b.er}</strong></span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: PARTNERS & VENUES */}
+      {activeReportTab === 'companies' && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
+            <h2 className="text-base font-bold text-gray-900 dark:text-white mb-1">
+              Партнёрские заведения, Отели и B2B локации
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-5">
+              Спецпроекты, дистрибуция брендированных материалов и тейбл-тентов
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredCompanies.map(c => (
+                <div 
+                  key={c.id} 
+                  className="bg-gray-50 dark:bg-[#15171c] p-4 rounded-xl border border-gray-200 dark:border-[#2b303c] flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div>
+                        <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
+                          {c.project} • {c.category}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 text-right font-semibold text-gray-700 dark:text-slate-200">{b.followers}</td>
-                      <td className="px-6 py-4 text-right font-extrabold text-indigo-700 dark:text-indigo-400">{b.views}</td>
-                      <td className="px-6 py-4 text-right font-bold text-emerald-600 dark:text-emerald-400">{b.price}</td>
-                      <td className="px-6 py-4 text-right font-semibold text-gray-800 dark:text-slate-200">{b.profileVisits.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-right font-bold text-emerald-700 dark:text-emerald-400">{b.promoSales}</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          b.status === 'Вышел пост' ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' :
-                          b.status === 'Оплачено' ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300' :
-                          b.status === 'Согласовано' ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300' :
-                          'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
-                        }`}>
-                          {b.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        <h4 className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">
+                          {c.name}
+                        </h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{c.location}</p>
+                      </div>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 shrink-0">
+                        {c.status}
+                      </span>
+                    </div>
+
+                    <div className="text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-[#1e2128] p-2.5 rounded-lg border border-gray-200/60 dark:border-[#2b303c] my-2">
+                      <span className="text-gray-400 text-[10px] block mb-0.5">Предоставленные материалы:</span>
+                      {c.itemsProvided}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-gray-200/60 dark:border-[#2b303c] flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                    <span>Контакт: <strong className="text-gray-700 dark:text-gray-300">{c.contactPerson}</strong> ({c.phone})</span>
+                    <span>Бюджет: <strong className="text-gray-900 dark:text-white font-bold">{c.spent}</strong></span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* TAB 3: PARTNER COMPANIES & VENUES REPORT                                  */}
-      {/* ========================================================================= */}
-      {activeReportTab === 'companies' && (
-        <div className="space-y-8">
-          {/* Summary KPIs */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-400 mb-1">Общие расходы на партнеров</p>
-              <h3 className="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">${totalCompanySpent}</h3>
-              <p className="text-xs text-gray-400 dark:text-gray-400 mt-2">Отели, рестораны, бары, фитнес</p>
+      {/* TAB 5: COMPACT RNP TABLE */}
+      {activeReportTab === 'rnp_table' && (
+        <div className="space-y-4 animate-fade-in">
+          {/* RNP Controls Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#1e2128] p-4 rounded-2xl border border-gray-200/80 dark:border-[#2b303c]">
+            <div className="flex items-center gap-2 flex-1 max-w-md">
+              <Search className="w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Поиск по показателю, роли или имени..."
+                value={rnpSearch}
+                onChange={(e) => setRnpSearch(e.target.value)}
+                className="w-full bg-gray-50 dark:bg-[#15171c] border border-gray-200 dark:border-[#2b303c] rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-hidden focus:border-indigo-500"
+              />
             </div>
 
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-400 mb-1">Партнерских локаций</p>
-              <h3 className="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight">{filteredCompanies.length} точек</h3>
-              <p className="text-xs text-gray-400 dark:text-gray-400 mt-2">г. Ташкент и ключевые отели</p>
-            </div>
+            <div className="flex items-center gap-2">
+              <select
+                value={rnpSectionFilter}
+                onChange={(e) => setRnpSectionFilter(e.target.value)}
+                className="bg-gray-50 dark:bg-[#15171c] border border-gray-200 dark:border-[#2b303c] rounded-xl px-3 py-1.5 text-xs text-gray-700 dark:text-gray-200 focus:outline-hidden"
+              >
+                <option value="ALL">Все категории РНП</option>
+                <option value="visits">Визиты и Активности</option>
+                <option value="prescriptions">Рецептурный надзор</option>
+                <option value="reps">Медицинские представители</option>
+                <option value="merch">Мерчендайзинг</option>
+                <option value="ecommerce">E-Commerce & Аптеки</option>
+                <option value="smm">SMM и Блогеры</option>
+                <option value="promo">Спецпроекты / Промо</option>
+              </select>
 
-            <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#262932]">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-400 mb-1">Передано материалов</p>
-              <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">1,200+ ед.</h3>
-              <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-2">Диспенсеры, саше, салфетки, тейбл-тенты</p>
+              <span className="text-xs text-gray-400">
+                Найдено: {filteredRnp.length}
+              </span>
             </div>
           </div>
 
-          {/* Companies Table */}
-          <div className="bg-white dark:bg-[#181b20] rounded-2xl shadow-sm border border-gray-100 dark:border-[#262932] overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-[#262932] flex justify-between items-center bg-gray-50/50 dark:bg-[#14161c]">
-              <h3 className="font-bold text-gray-900 dark:text-white text-base">Сводный реестр компаний и предоставленных материалов</h3>
-              <span className="text-xs text-gray-400 dark:text-gray-400 font-mono">B2B интеграции и спонсорство</span>
-            </div>
-
+          {/* Compact Clean Table */}
+          <div className="bg-white dark:bg-[#1e2128] rounded-2xl border border-gray-200/80 dark:border-[#2b303c] overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-[11px] uppercase font-bold text-gray-400 dark:text-gray-400 bg-white dark:bg-[#14161c] border-b border-gray-100 dark:border-[#262932]">
-                  <tr>
-                    <th className="px-6 py-4">Компания / Объект</th>
-                    <th className="px-6 py-4">Категория</th>
-                    <th className="px-6 py-4">Локация / Адрес</th>
-                    <th className="px-6 py-4 text-right">Расходы ($)</th>
-                    <th className="px-6 py-4">Предоставленные материалы</th>
-                    <th className="px-6 py-4">Контактное лицо</th>
-                    <th className="px-6 py-4 text-center">Статус</th>
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="bg-gray-50 dark:bg-[#15171c] border-b border-gray-200 dark:border-[#2b303c] text-gray-500 dark:text-gray-400">
+                    <th className="py-3 px-4 font-semibold">Показатель / Задача</th>
+                    <th className="py-3 px-3 font-semibold">Ответственный</th>
+                    <th className="py-3 px-3 font-semibold text-center">План</th>
+                    <th className="py-3 px-3 font-semibold text-center">Факт</th>
+                    <th className="py-3 px-4 font-semibold text-center">% Выполнения</th>
+                    <th className="py-3 px-3 font-semibold text-center">Прогноз</th>
+                    <th className="py-3 px-4 font-semibold text-center">W1 - W5</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50 dark:divide-[#262932]">
-                  {filteredCompanies.map(c => (
-                    <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-[#1e222a] transition-colors">
-                      <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">{c.name}</td>
-                      <td className="px-6 py-4">
-                        <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
-                          {c.category}
-                        </span>
+                <tbody className="divide-y divide-gray-100 dark:divide-[#262932]">
+                  {filteredRnp.slice(0, 35).map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50/70 dark:hover:bg-[#252830]/50 transition">
+                      <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">
+                        <div>
+                          <span>{item.indicator}</span>
+                          <span className="text-[10px] text-gray-400 block font-normal">{item.sectionName}</span>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-xs text-gray-500 dark:text-slate-400 font-medium">{c.location}</td>
-                      <td className="px-6 py-4 text-right font-bold text-emerald-600 dark:text-emerald-400">{c.spent}</td>
-                      <td className="px-6 py-4 text-xs text-gray-600 dark:text-slate-300 max-w-xs leading-relaxed">{c.itemsProvided}</td>
-                      <td className="px-6 py-4 text-xs text-gray-700 dark:text-slate-200 font-medium">
-                        <div>{c.contactPerson}</div>
-                        <div className="text-gray-400 dark:text-gray-400">{c.phone}</div>
+                      <td className="py-3 px-3 text-gray-600 dark:text-gray-300">
+                        <div>
+                          <span>{item.person || '—'}</span>
+                          <span className="text-[10px] text-gray-400 block">{item.role || '—'}</span>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          c.status === 'Материалы переданы' || c.status === 'Активно'
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
-                            : c.status === 'Согласовано'
-                            ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300'
-                            : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
-                        }`}>
-                          {c.status}
-                        </span>
+                      <td className="py-3 px-3 text-center font-semibold text-gray-800 dark:text-gray-200">
+                        {item.planMonth}
+                      </td>
+                      <td className="py-3 px-3 text-center font-bold text-gray-900 dark:text-white">
+                        {item.factMonth}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-16 bg-gray-100 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full rounded-full ${
+                                item.percentMonth >= 90
+                                  ? 'bg-emerald-500'
+                                  : item.percentMonth >= 70
+                                  ? 'bg-blue-500'
+                                  : 'bg-amber-500'
+                              }`} 
+                              style={{ width: `${Math.min(item.percentMonth, 100)}%` }} 
+                            />
+                          </div>
+                          <span className="font-bold text-[11px] text-gray-900 dark:text-white w-8">
+                            {item.percentMonth}%
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-center text-gray-600 dark:text-gray-300">
+                        {item.forecast}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <div className="flex items-center justify-center gap-1 text-[10px] text-gray-400">
+                          <span className={item.w1 && Number(item.w1.fact) >= Number(item.w1.plan) ? 'text-emerald-600 font-bold' : ''}>W1</span>•
+                          <span className={item.w2 && Number(item.w2.fact) >= Number(item.w2.plan) ? 'text-emerald-600 font-bold' : ''}>W2</span>•
+                          <span className={item.w3 && Number(item.w3.fact) >= Number(item.w3.plan) ? 'text-emerald-600 font-bold' : ''}>W3</span>•
+                          <span className={item.w4 && Number(item.w4.fact) >= Number(item.w4.plan) ? 'text-emerald-600 font-bold' : ''}>W4</span>•
+                          <span className={item.w5 && Number(item.w5.fact) >= Number(item.w5.plan) ? 'text-emerald-600 font-bold' : ''}>W5</span>
+                        </div>
                       </td>
                     </tr>
                   ))}
