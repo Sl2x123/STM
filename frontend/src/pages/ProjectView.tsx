@@ -7,7 +7,7 @@ import {
   Check, Sparkles, SlidersHorizontal, CalendarDays,
   ExternalLink, Edit3, User, Users, Eye, DollarSign, Share2,
   Building2, MapPin, Package, Phone, Zap, RefreshCw, Heart, MessageCircle, Bookmark, TrendingUp,
-  Save, AlertTriangle, Mail
+  Save, AlertTriangle, Mail, Table, Layers
 } from 'lucide-react'
 
 // Hierarchical Plans Data: Month -> Plan Item -> Sprints
@@ -17,51 +17,49 @@ const initialPlansTree = [
     type: 'MONTH',
     name: 'Сентябрь 2026',
     period: '01.09.2026 — 30.09.2026',
-    totalPlan: 210,
-    allocated: 210,
+    sprintsCount: 4,
     isOpen: true,
-    items: [
+    sprints: [
       {
-        id: 'pi1',
-        type: 'PLAN_ITEM',
-        name: 'Визиты аптечные Ташкент',
-        unit: 'визитов',
-        monthPlan: 120,
-        allocated: 120,
+        id: 'sp1_1',
+        name: 'Спринт 1 (01.09 — 07.09)',
+        period: '01.09 — 07.09',
         isOpen: true,
-        sprints: [
-          { id: 'sp1_1', name: 'Спринт 1 (01.09 - 07.09)', plan: 30, fact: 30, status: 'Done' },
-          { id: 'sp1_2', name: 'Спринт 2 (08.09 - 14.09)', plan: 30, fact: 15, status: 'In Progress' },
-          { id: 'sp1_3', name: 'Спринт 3 (15.09 - 21.09)', plan: 30, fact: 0, status: 'Not Done' },
-          { id: 'sp1_4', name: 'Спринт 4 (22.09 - 30.09)', plan: 30, fact: 0, status: 'Not Done' },
+        tasks: [
+          { id: 't1_1', name: 'Визиты аптечные Ташкент', plan: 30, fact: 30, unit: 'визитов', status: 'Done', assignee: 'Азамат' },
+          { id: 't1_2', name: 'Визиты к врачам (Кардиологи, Терапевты)', plan: 20, fact: 20, unit: 'визитов', status: 'Done', assignee: 'Наргиза' },
+          { id: 't1_3', name: 'Установка промостоек в аптеках 36.6', plan: 5, fact: 5, unit: 'стоек', status: 'Done', assignee: 'Тимур' },
         ]
       },
       {
-        id: 'pi2',
-        type: 'PLAN_ITEM',
-        name: 'Визиты к врачам (Кардиологи, Терапевты)',
-        unit: 'визитов',
-        monthPlan: 80,
-        allocated: 80,
+        id: 'sp1_2',
+        name: 'Спринт 2 (08.09 — 14.09)',
+        period: '08.09 — 14.09',
         isOpen: true,
-        sprints: [
-          { id: 'sp2_1', name: 'Спринт 1 (01.09 - 07.09)', plan: 20, fact: 20, status: 'Done' },
-          { id: 'sp2_2', name: 'Спринт 2 (08.09 - 14.09)', plan: 20, fact: 18, status: 'In Progress' },
-          { id: 'sp2_3', name: 'Спринт 3 (15.09 - 21.09)', plan: 20, fact: 0, status: 'Not Done' },
-          { id: 'sp2_4', name: 'Спринт 4 (22.09 - 30.09)', plan: 20, fact: 0, status: 'Not Done' },
+        tasks: [
+          { id: 't2_1', name: 'Визиты аптечные Ташкент', plan: 30, fact: 15, unit: 'визитов', status: 'In Progress', assignee: 'Азамат' },
+          { id: 't2_2', name: 'Визиты к врачам (Педиатры)', plan: 20, fact: 18, unit: 'визитов', status: 'In Progress', assignee: 'Наргиза' },
+          { id: 't2_3', name: 'Установка промостоек Olam Farm', plan: 5, fact: 3, unit: 'стоек', status: 'In Progress', assignee: 'Тимур' },
         ]
       },
       {
-        id: 'pi3',
-        type: 'PLAN_ITEM',
-        name: 'Установка промостоек',
-        unit: 'штук',
-        monthPlan: 10,
-        allocated: 10,
-        isOpen: false,
-        sprints: [
-          { id: 'sp3_1', name: 'Спринт 1 (01.09 - 07.09)', plan: 5, fact: 5, status: 'Done' },
-          { id: 'sp3_2', name: 'Спринт 2 (08.09 - 14.09)', plan: 5, fact: 3, status: 'In Progress' },
+        id: 'sp1_3',
+        name: 'Спринт 3 (15.09 — 21.09)',
+        period: '15.09 — 21.09',
+        isOpen: true,
+        tasks: [
+          { id: 't3_1', name: 'Визиты аптечные Ташкент', plan: 30, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Азамат' },
+          { id: 't3_2', name: 'Визиты к врачам (Аллергологи)', plan: 20, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Наргиза' },
+        ]
+      },
+      {
+        id: 'sp1_4',
+        name: 'Спринт 4 (22.09 — 30.09)',
+        period: '22.09 — 30.09',
+        isOpen: true,
+        tasks: [
+          { id: 't4_1', name: 'Визиты аптечные Ташкент', plan: 30, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Азамат' },
+          { id: 't4_2', name: 'Визиты к врачам (Терапевты)', plan: 20, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Наргиза' },
         ]
       }
     ]
@@ -71,23 +69,43 @@ const initialPlansTree = [
     type: 'MONTH',
     name: 'Октябрь 2026',
     period: '01.10.2026 — 31.10.2026',
-    totalPlan: 250,
-    allocated: 200,
+    sprintsCount: 4,
     isOpen: false,
-    items: [
+    sprints: [
       {
-        id: 'pi4',
-        type: 'PLAN_ITEM',
-        name: 'Визиты аптечные Ташкент + Регионы',
-        unit: 'визитов',
-        monthPlan: 150,
-        allocated: 150,
+        id: 'sp2_1',
+        name: 'Спринт 1 (01.10 — 07.10)',
+        period: '01.10 — 07.10',
+        isOpen: true,
+        tasks: [
+          { id: 't5_1', name: 'Визиты аптечные Ташкент + Регионы', plan: 40, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Азамат' },
+        ]
+      },
+      {
+        id: 'sp2_2',
+        name: 'Спринт 2 (08.10 — 14.10)',
+        period: '08.10 — 14.10',
+        isOpen: true,
+        tasks: [
+          { id: 't5_2', name: 'Визиты аптечные Ташкент + Регионы', plan: 40, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Азамат' },
+        ]
+      },
+      {
+        id: 'sp2_3',
+        name: 'Спринт 3 (15.10 — 21.10)',
+        period: '15.10 — 21.10',
         isOpen: false,
-        sprints: [
-          { id: 'sp4_1', name: 'Спринт 1 (01.10 - 07.10)', plan: 40, fact: 0, status: 'Not Done' },
-          { id: 'sp4_2', name: 'Спринт 2 (08.10 - 14.10)', plan: 40, fact: 0, status: 'Not Done' },
-          { id: 'sp4_3', name: 'Спринт 3 (15.10 - 21.10)', plan: 35, fact: 0, status: 'Not Done' },
-          { id: 'sp4_4', name: 'Спринт 4 (22.10 - 31.10)', plan: 35, fact: 0, status: 'Not Done' },
+        tasks: [
+          { id: 't5_3', name: 'Визиты аптечные Ташкент + Регионы', plan: 35, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Азамат' },
+        ]
+      },
+      {
+        id: 'sp2_4',
+        name: 'Спринт 4 (22.10 — 31.10)',
+        period: '22.10 — 31.10',
+        isOpen: false,
+        tasks: [
+          { id: 't5_4', name: 'Визиты аптечные Ташкент + Регионы', plan: 35, fact: 0, unit: 'визитов', status: 'Not Done', assignee: 'Азамат' },
         ]
       }
     ]
@@ -1169,24 +1187,33 @@ export default function ProjectView() {
     return Array.from(new Set(companiesData.map(c => c.category).filter(Boolean)))
   }, [companiesData])
 
-  // Plans Hierarchy State
+  // Plans Hierarchy State (Month -> Sprint -> Task)
   const [plansData, setPlansData] = useState<any[]>(initialPlansTree)
+  const [plansViewMode, setPlansViewMode] = useState<'sprints' | 'matrix'>('sprints')
 
   // Modals for Plans
   const [isAddMonthOpen, setIsAddMonthOpen] = useState(false)
   const [newMonthName, setNewMonthName] = useState('')
   const [newMonthPeriod, setNewMonthPeriod] = useState('')
+  const [newMonthSprintsCount, setNewMonthSprintsCount] = useState<number>(4)
 
-  const [isAddPlanItemOpen, setIsAddPlanItemOpen] = useState(false)
-  const [targetMonthId, setTargetMonthId] = useState('')
-  const [newPlanItemName, setNewPlanItemName] = useState('')
-  const [newPlanItemUnit, setNewPlanItemUnit] = useState('визитов')
-  const [newPlanItemTarget, setNewPlanItemTarget] = useState(100)
+  // Task to Sprint Modal
+  const [isAddTaskToSprintOpen, setIsAddTaskToSprintOpen] = useState(false)
+  const [targetSprintMonthId, setTargetSprintMonthId] = useState('')
+  const [targetSprintId, setTargetSprintId] = useState('')
+  const [targetSprintName, setTargetSprintName] = useState('')
+  const [newTaskName, setNewTaskName] = useState('')
+  const [newTaskPlan, setNewTaskPlan] = useState<number>(30)
+  const [newTaskFact, setNewTaskFact] = useState<number>(0)
+  const [newTaskUnit, setNewTaskUnit] = useState('визитов')
+  const [newTaskAssignee, setNewTaskAssignee] = useState('Азамат')
+  const [newTaskStatus, setNewTaskStatus] = useState<'Not Done' | 'In Progress' | 'Done'>('Not Done')
 
+  // Add Extra Sprint Modal
   const [isAddSprintOpen, setIsAddSprintOpen] = useState(false)
-  const [targetPlanItemId, setTargetPlanItemId] = useState('')
+  const [targetMonthForSprintId, setTargetMonthForSprintId] = useState('')
   const [newSprintName, setNewSprintName] = useState('')
-  const [newSprintPlan, setNewSprintPlan] = useState(25)
+  const [newSprintPeriod, setNewSprintPeriod] = useState('')
 
   // Execution Tasks Tree State (EPIC -> SPRINT -> DAILY -> TASK)
   const [tasksData, setTasksData] = useState<any[]>(initialTreeData)
@@ -1207,120 +1234,240 @@ export default function ProjectView() {
   const [modalParentId, setModalParentId] = useState('')
 
   // ==========================================
-  // PLANS TREE LOGIC (Month -> Plan -> Sprint)
+  // PLANS TREE LOGIC (Month -> Sprint -> Task)
   // ==========================================
   const togglePlanOpen = (id: string) => {
     setPlansData(data => data.map(month => {
       if (month.id === id) return { ...month, isOpen: !month.isOpen }
       return {
         ...month,
-        items: month.items.map((item: any) => {
-          if (item.id === id) return { ...item, isOpen: !item.isOpen }
-          return item
+        sprints: (month.sprints || []).map((sprint: any) => {
+          if (sprint.id === id) return { ...sprint, isOpen: !sprint.isOpen }
+          return sprint
         })
       }
     }))
+  }
+
+  const generateSprintsList = (_monthName: string, _periodStr: string, count: number) => {
+    const sprints = []
+    for (let i = 1; i <= count; i++) {
+      let sprintPeriod = `Период спринта ${i}`
+      if (count === 4) {
+        if (i === 1) sprintPeriod = '01 — 07 число'
+        else if (i === 2) sprintPeriod = '08 — 14 число'
+        else if (i === 3) sprintPeriod = '15 — 21 число'
+        else if (i === 4) sprintPeriod = '22 — 30/31 число'
+      } else if (count === 5) {
+        if (i === 1) sprintPeriod = '01 — 07 число'
+        else if (i === 2) sprintPeriod = '08 — 14 число'
+        else if (i === 3) sprintPeriod = '15 — 21 число'
+        else if (i === 4) sprintPeriod = '22 — 28 число'
+        else if (i === 5) sprintPeriod = '29 — 30/31 число'
+      } else {
+        sprintPeriod = `Спринт ${i}`
+      }
+      sprints.push({
+        id: `sp_${Date.now()}_${i}`,
+        name: `Спринт ${i} (${sprintPeriod})`,
+        period: sprintPeriod,
+        isOpen: true,
+        tasks: []
+      })
+    }
+    return sprints
   }
 
   const handleAddMonth = (e: React.FormEvent) => {
     e.preventDefault()
     if (!newMonthName.trim()) return
 
+    const count = Number(newMonthSprintsCount) || 4
+    const generatedSprints = generateSprintsList(newMonthName.trim(), newMonthPeriod.trim(), count)
+
     const newMonth = {
       id: `m_${Date.now()}`,
       type: 'MONTH',
       name: newMonthName.trim(),
-      period: newMonthPeriod.trim() || '01.11.2026 — 30.11.2026',
-      totalPlan: 0,
-      allocated: 0,
+      period: newMonthPeriod.trim() || '01 — 30 число',
+      sprintsCount: count,
       isOpen: true,
-      items: []
+      sprints: generatedSprints
     }
 
     setPlansData([...plansData, newMonth])
     setNewMonthName('')
     setNewMonthPeriod('')
+    setNewMonthSprintsCount(4)
     setIsAddMonthOpen(false)
   }
 
-  const handleAddPlanItem = (e: React.FormEvent) => {
+  const handleAddTaskToSprint = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newPlanItemName.trim()) return
+    if (!newTaskName.trim() || !targetSprintId) return
 
-    const newItem = {
-      id: `pi_${Date.now()}`,
-      type: 'PLAN_ITEM',
-      name: newPlanItemName.trim(),
-      unit: newPlanItemUnit.trim() || 'шт',
-      monthPlan: Number(newPlanItemTarget),
-      allocated: 0,
-      isOpen: true,
-      sprints: []
+    const newTask = {
+      id: `t_${Date.now()}`,
+      name: newTaskName.trim(),
+      plan: Number(newTaskPlan) || 0,
+      fact: Number(newTaskFact) || 0,
+      unit: newTaskUnit.trim() || 'шт',
+      status: newTaskStatus,
+      assignee: newTaskAssignee.trim() || 'Не назначен'
     }
 
     setPlansData(data => data.map(m => {
-      if (m.id === targetMonthId) {
+      if (m.id === targetSprintMonthId) {
         return {
           ...m,
-          totalPlan: m.totalPlan + Number(newPlanItemTarget),
-          items: [...m.items, newItem]
-        }
-      }
-      return m
-    }))
-
-    setNewPlanItemName('')
-    setIsAddPlanItemOpen(false)
-  }
-
-  const handleAddSprint = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newSprintName.trim()) return
-
-    const newSp = {
-      id: `sp_${Date.now()}`,
-      name: newSprintName.trim(),
-      plan: Number(newSprintPlan),
-      fact: 0,
-      status: 'Not Done'
-    }
-
-    setPlansData(data => data.map(m => ({
-      ...m,
-      items: m.items.map((item: any) => {
-        if (item.id === targetPlanItemId) {
-          const newAlloc = item.allocated + Number(newSprintPlan)
-          return {
-            ...item,
-            allocated: newAlloc,
-            sprints: [...item.sprints, newSp]
-          }
-        }
-        return item
-      })
-    })))
-
-    setNewSprintName('')
-    setIsAddSprintOpen(false)
-  }
-
-  const updateSprintPlanValue = (monthId: string, itemId: string, sprintId: string, val: number) => {
-    setPlansData(data => data.map(m => {
-      if (m.id === monthId) {
-        return {
-          ...m,
-          items: m.items.map((item: any) => {
-            if (item.id === itemId) {
-              const updatedSprints = item.sprints.map((s: any) => s.id === sprintId ? { ...s, plan: val } : s)
-              const newAllocated = updatedSprints.reduce((acc: number, s: any) => acc + Number(s.plan || 0), 0)
-              return { ...item, sprints: updatedSprints, allocated: newAllocated }
+          sprints: (m.sprints || []).map((s: any) => {
+            if (s.id === targetSprintId) {
+              return {
+                ...s,
+                tasks: [...(s.tasks || []), newTask]
+              }
             }
-            return item
+            return s
           })
         }
       }
       return m
     }))
+
+    setNewTaskName('')
+    setNewTaskPlan(30)
+    setNewTaskFact(0)
+    setIsAddTaskToSprintOpen(false)
+  }
+
+  const handleAddSprintToMonth = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newSprintName.trim() || !targetMonthForSprintId) return
+
+    const newSprint = {
+      id: `sp_${Date.now()}`,
+      name: newSprintName.trim(),
+      period: newSprintPeriod.trim() || 'Период спринта',
+      isOpen: true,
+      tasks: []
+    }
+
+    setPlansData(data => data.map(m => {
+      if (m.id === targetMonthForSprintId) {
+        return {
+          ...m,
+          sprintsCount: (m.sprintsCount || m.sprints?.length || 0) + 1,
+          sprints: [...(m.sprints || []), newSprint]
+        }
+      }
+      return m
+    }))
+
+    setNewSprintName('')
+    setNewSprintPeriod('')
+    setIsAddSprintOpen(false)
+  }
+
+  const updateSprintTaskFact = (monthId: string, sprintId: string, taskId: string, factVal: number) => {
+    setPlansData(data => data.map(m => {
+      if (m.id === monthId) {
+        return {
+          ...m,
+          sprints: (m.sprints || []).map((s: any) => {
+            if (s.id === sprintId) {
+              return {
+                ...s,
+                tasks: (s.tasks || []).map((t: any) => {
+                  if (t.id === taskId) {
+                    const newFact = Math.max(0, factVal)
+                    let newStatus = t.status
+                    if (newFact >= t.plan && t.plan > 0) newStatus = 'Done'
+                    else if (newFact > 0) newStatus = 'In Progress'
+                    else newStatus = 'Not Done'
+                    return { ...t, fact: newFact, status: newStatus }
+                  }
+                  return t
+                })
+              }
+            }
+            return s
+          })
+        }
+      }
+      return m
+    }))
+  }
+
+  const cycleSprintTaskStatus = (monthId: string, sprintId: string, taskId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setPlansData(data => data.map(m => {
+      if (m.id === monthId) {
+        return {
+          ...m,
+          sprints: (m.sprints || []).map((s: any) => {
+            if (s.id === sprintId) {
+              return {
+                ...s,
+                tasks: (s.tasks || []).map((t: any) => {
+                  if (t.id === taskId) {
+                    const nextStatus = 
+                      t.status === 'Not Done' ? 'In Progress' :
+                      t.status === 'In Progress' ? 'Done' : 'Not Done'
+                    const nextFact = nextStatus === 'Done' ? (t.fact < t.plan ? t.plan : t.fact) : t.fact
+                    return { ...t, status: nextStatus, fact: nextFact }
+                  }
+                  return t
+                })
+              }
+            }
+            return s
+          })
+        }
+      }
+      return m
+    }))
+  }
+
+  const deleteSprintTask = (monthId: string, sprintId: string, taskId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!window.confirm('Удалить эту задачу из спринта?')) return
+    setPlansData(data => data.map(m => {
+      if (m.id === monthId) {
+        return {
+          ...m,
+          sprints: (m.sprints || []).map((s: any) => {
+            if (s.id === sprintId) {
+              return {
+                ...s,
+                tasks: (s.tasks || []).filter((t: any) => t.id !== taskId)
+              }
+            }
+            return s
+          })
+        }
+      }
+      return m
+    }))
+  }
+
+  const deleteSprint = (monthId: string, sprintId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!window.confirm('Удалить этот спринт?')) return
+    setPlansData(data => data.map(m => {
+      if (m.id === monthId) {
+        return {
+          ...m,
+          sprints: (m.sprints || []).filter((s: any) => s.id !== sprintId)
+        }
+      }
+      return m
+    }))
+  }
+
+  const deleteMonth = (monthId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!window.confirm('Удалить этот месяц и все его спринты?')) return
+    setPlansData(data => data.filter(m => m.id !== monthId))
   }
 
   // ==========================================
@@ -1385,13 +1532,10 @@ export default function ProjectView() {
   }
 
   // Quick inline rename helper for Plans
-  const renamePlanSprint = (monthId: string, itemId: string, sprintId: string, newName: string) => {
+  const renamePlanSprint = (monthId: string, sprintId: string, newName: string) => {
     setPlansData(data => data.map(m => m.id === monthId ? {
       ...m,
-      items: m.items.map((it: any) => it.id === itemId ? {
-        ...it,
-        sprints: it.sprints.map((sp: any) => sp.id === sprintId ? { ...sp, name: newName } : sp)
-      } : it)
+      sprints: (m.sprints || []).map((sp: any) => sp.id === sprintId ? { ...sp, name: newName } : sp)
     } : m))
   }
 
@@ -1426,7 +1570,7 @@ export default function ProjectView() {
       }
     }
 
-    // 2. Update in plansData (Month -> Plan Item -> Sprint)
+    // 2. Update in plansData (Month -> Sprint -> Task)
     setPlansData(data => data.map(m => {
       if (m.id === updatedItem.id) {
         return { 
@@ -1438,30 +1582,31 @@ export default function ProjectView() {
       }
       return {
         ...m,
-        items: m.items.map((it: any) => {
-          if (it.id === updatedItem.id) {
-            const newMonthPlan = updatedItem.monthPlan !== undefined ? Number(updatedItem.monthPlan) : it.monthPlan
-            return { 
-              ...it, 
-              name: updatedItem.name, 
-              monthPlan: newMonthPlan, 
-              description: updatedItem.description || it.description 
+        sprints: (m.sprints || []).map((sp: any) => {
+          if (sp.id === updatedItem.id) {
+            return {
+              ...sp,
+              name: updatedItem.name,
+              period: updatedItem.period || sp.period,
+              description: updatedItem.description || sp.description
             }
           }
           return {
-            ...it,
-            sprints: it.sprints.map((sp: any) => {
-              if (sp.id === updatedItem.id) {
-                const newPlan = updatedItem.plan !== undefined ? Number(updatedItem.plan) : sp.plan
-                return { 
-                  ...sp, 
-                  name: updatedItem.name, 
-                  plan: newPlan, 
-                  status: updatedItem.status || sp.status, 
-                  description: updatedItem.description || sp.description 
+            ...sp,
+            tasks: (sp.tasks || []).map((t: any) => {
+              if (t.id === updatedItem.id) {
+                return {
+                  ...t,
+                  name: updatedItem.name,
+                  plan: updatedItem.plan !== undefined ? Number(updatedItem.plan) : t.plan,
+                  fact: updatedItem.fact !== undefined ? Number(updatedItem.fact) : t.fact,
+                  unit: updatedItem.unit || t.unit,
+                  status: updatedItem.status || t.status,
+                  assignee: updatedItem.assignee || t.assignee,
+                  description: updatedItem.description || t.description
                 }
               }
-              return sp
+              return t
             })
           }
         })
@@ -3346,7 +3491,7 @@ export default function ProjectView() {
   }
 
   // =========================================================================
-  // FULL-PAGE VIEW 7: ADD MONTH IN PLANS
+  // FULL-PAGE VIEW 7: ADD MONTH IN PLANS (AUTO-GENERATE SPRINTS)
   // =========================================================================
   if (isAddMonthOpen) {
     return (
@@ -3360,29 +3505,119 @@ export default function ProjectView() {
         </button>
 
         <div className="bg-white dark:bg-[#181b20] rounded-3xl p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6">Добавить месяц в расписание</h1>
-          <form onSubmit={handleAddMonth} className="space-y-5">
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">Создать план на месяц</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            Задайте название, период и количество спринтов. План месяца автоматически соберет все показатели из задач спринтов.
+          </p>
+
+          <form onSubmit={handleAddMonth} className="space-y-6">
             <div>
               <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Название месяца</label>
               <input
                 type="text"
                 required
-                placeholder="Октябрь 2026"
+                placeholder="Например: Ноябрь 2026"
                 value={newMonthName}
                 onChange={(e) => setNewMonthName(e.target.value)}
                 className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
+
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Период дат</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Период дат месяца</label>
               <input
                 type="text"
-                placeholder="01.10.2026 — 31.10.2026"
+                placeholder="01.11.2026 — 30.11.2026"
                 value={newMonthPeriod}
                 onChange={(e) => setNewMonthPeriod(e.target.value)}
                 className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-medium focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400">
+                  Количество спринтов в месяце
+                </label>
+                <span className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
+                  Обычно 4 или 5 спринтов
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setNewMonthSprintsCount(4)}
+                  className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all cursor-pointer ${
+                    newMonthSprintsCount === 4
+                      ? 'bg-indigo-50 dark:bg-indigo-950/60 border-[#4f46e5] text-[#4f46e5] dark:text-indigo-300 shadow-xs'
+                      : 'border-gray-200 dark:border-[#2b303c] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1c2028]'
+                  }`}
+                >
+                  4 спринта (типовой)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewMonthSprintsCount(5)}
+                  className={`px-4 py-2.5 rounded-xl text-sm font-bold border transition-all cursor-pointer ${
+                    newMonthSprintsCount === 5
+                      ? 'bg-indigo-50 dark:bg-indigo-950/60 border-[#4f46e5] text-[#4f46e5] dark:text-indigo-300 shadow-xs'
+                      : 'border-gray-200 dark:border-[#2b303c] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1c2028]'
+                  }`}
+                >
+                  5 спринтов (удлинённый)
+                </button>
+                <div className="flex items-center gap-2 ml-auto">
+                  <span className="text-xs text-gray-400 font-medium">Своё число:</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={newMonthSprintsCount}
+                    onChange={(e) => setNewMonthSprintsCount(Math.max(1, Number(e.target.value)))}
+                    className="w-16 bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-2.5 py-2 text-center text-sm font-bold outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Preview of generated sprints */}
+              <div className="bg-slate-50 dark:bg-[#121418] rounded-2xl p-4 border border-gray-100 dark:border-[#262932]">
+                <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2.5">
+                  Будут автоматически созданы спринты ({newMonthSprintsCount}):
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {Array.from({ length: newMonthSprintsCount }).map((_, idx) => {
+                    const i = idx + 1
+                    let periodLabel = `Спринт ${i}`
+                    if (newMonthSprintsCount === 4) {
+                      if (i === 1) periodLabel = '01 — 07 число'
+                      else if (i === 2) periodLabel = '08 — 14 число'
+                      else if (i === 3) periodLabel = '15 — 21 число'
+                      else if (i === 4) periodLabel = '22 — 30/31 число'
+                    } else if (newMonthSprintsCount === 5) {
+                      if (i === 1) periodLabel = '01 — 07 число'
+                      else if (i === 2) periodLabel = '08 — 14 число'
+                      else if (i === 3) periodLabel = '15 — 21 число'
+                      else if (i === 4) periodLabel = '22 — 28 число'
+                      else if (i === 5) periodLabel = '29 — 30/31 число'
+                    }
+                    return (
+                      <div key={i} className="flex items-center text-xs font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#181b20] px-3 py-2 rounded-xl border border-gray-100 dark:border-[#2b303c]">
+                        <span className="w-5 h-5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-400 flex items-center justify-center font-bold mr-2 text-[10px]">
+                          {i}
+                        </span>
+                        Спринт {i} <span className="text-gray-400 ml-1 font-normal">({periodLabel})</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-xs text-indigo-900 dark:text-indigo-200">
+              <span className="font-bold">✨ Автоматический подсчет плана:</span> В сам месяц ничего вручную вводить не требуется. После создания вы сразу добавляете конкретные задачи в спринты — месячный план сам подтянет и отобразит суммарные показатели выполнения.
+            </div>
+
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-[#262932]">
               <button
                 type="button"
@@ -3393,9 +3628,9 @@ export default function ProjectView() {
               </button>
               <button
                 type="submit"
-                className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md cursor-pointer"
+                className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Добавить месяц
+                Создать месяц и спринты
               </button>
             </div>
           </form>
@@ -3405,13 +3640,13 @@ export default function ProjectView() {
   }
 
   // =========================================================================
-  // FULL-PAGE VIEW 8: ADD PLAN ITEM
+  // FULL-PAGE VIEW 8: ADD TASK TO SPRINT
   // =========================================================================
-  if (isAddPlanItemOpen) {
+  if (isAddTaskToSprintOpen) {
     return (
       <div className="max-w-2xl mx-auto font-sans pb-16 animate-in fade-in duration-150">
         <button
-          onClick={() => setIsAddPlanItemOpen(false)}
+          onClick={() => setIsAddTaskToSprintOpen(false)}
           className="inline-flex items-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white text-sm font-semibold mb-6 transition-colors cursor-pointer group"
         >
           <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -3419,54 +3654,136 @@ export default function ProjectView() {
         </button>
 
         <div className="bg-white dark:bg-[#181b20] rounded-3xl p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6">Добавить целевой план / показатель</h1>
-          <form onSubmit={handleAddPlanItem} className="space-y-5">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">Добавить задачу в спринт</h1>
+            <span className="bg-indigo-100 dark:bg-indigo-950/70 text-[#4f46e5] dark:text-indigo-300 text-xs font-bold px-3 py-1 rounded-full">
+              {targetSprintName}
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            Укажите целевой показатель и плановое число для этого спринта. Значение сразу отобразится в сводном плане месяца.
+          </p>
+
+          <form onSubmit={handleAddTaskToSprint} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Название показателя</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Название задачи / показателя</label>
               <input
                 type="text"
                 required
-                placeholder="Например: Визиты к врачам-урологам"
-                value={newPlanItemName}
-                onChange={(e) => setNewPlanItemName(e.target.value)}
+                placeholder="Например: Визиты к кардиологам и терапевтам"
+                value={newTaskName}
+                onChange={(e) => setNewTaskName(e.target.value)}
                 className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">План на месяц (число)</label>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">План на спринт (число)</label>
                 <input
                   type="number"
                   required
-                  value={newPlanItemTarget}
-                  onChange={(e) => setNewPlanItemTarget(Number(e.target.value))}
+                  min="1"
+                  value={newTaskPlan}
+                  onChange={(e) => setNewTaskPlan(Number(e.target.value))}
                   className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
                 />
               </div>
+
               <div>
-                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Единица измерения</label>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Факт (выполнено сейчас)</label>
                 <input
-                  type="text"
-                  placeholder="визитов, аптек, продаж, постов"
-                  value={newPlanItemUnit}
-                  onChange={(e) => setNewPlanItemUnit(e.target.value)}
+                  type="number"
+                  min="0"
+                  value={newTaskFact}
+                  onChange={(e) => setNewTaskFact(Number(e.target.value))}
                   className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
                 />
               </div>
             </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Единица измерения</label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {['визитов', 'аптек', 'звонков', 'продаж', 'договоров', 'шт'].map((u) => (
+                  <button
+                    key={u}
+                    type="button"
+                    onClick={() => setNewTaskUnit(u)}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                      newTaskUnit === u
+                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-[#4f46e5] text-[#4f46e5] dark:text-indigo-300'
+                        : 'border-gray-200 dark:border-[#2b303c] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#202530]'
+                    }`}
+                  >
+                    {u}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Или укажите свою единицу"
+                value={newTaskUnit}
+                onChange={(e) => setNewTaskUnit(e.target.value)}
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white dark:focus:bg-[#181b20] outline-none"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Ответственный</label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {['Азамат', 'Наргиза', 'Тимур', 'Дилшод'].map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => setNewTaskAssignee(name)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                        newTaskAssignee === name
+                          ? 'bg-indigo-50 dark:bg-indigo-950/60 border-[#4f46e5] text-[#4f46e5] dark:text-indigo-300'
+                          : 'border-gray-200 dark:border-[#2b303c] text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      {name}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  placeholder="Имя ответственного"
+                  value={newTaskAssignee}
+                  onChange={(e) => setNewTaskAssignee(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-2.5 text-sm font-medium focus:bg-white dark:focus:bg-[#181b20] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Начальный статус</label>
+                <select
+                  value={newTaskStatus}
+                  onChange={(e) => setNewTaskStatus(e.target.value as any)}
+                  className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none cursor-pointer"
+                >
+                  <option value="Not Done">Не начато (Not Done)</option>
+                  <option value="In Progress">В процессе (In Progress)</option>
+                  <option value="Done">Выполнено (Done)</option>
+                </select>
+              </div>
+            </div>
+
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-[#262932]">
               <button
                 type="button"
-                onClick={() => setIsAddPlanItemOpen(false)}
+                onClick={() => setIsAddTaskToSprintOpen(false)}
                 className="px-5 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#262932] rounded-xl cursor-pointer"
               >
                 Отмена
               </button>
               <button
                 type="submit"
-                className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md cursor-pointer"
+                className="px-6 py-2.5 text-sm font-bold bg-[#4f46e5] text-white hover:bg-[#4338ca] rounded-xl shadow-md transition-all cursor-pointer"
               >
-                Добавить план
+                Добавить задачу в спринт
               </button>
             </div>
           </form>
@@ -3476,7 +3793,7 @@ export default function ProjectView() {
   }
 
   // =========================================================================
-  // FULL-PAGE VIEW 9: ADD SPRINT
+  // FULL-PAGE VIEW 9: ADD EXTRA SPRINT
   // =========================================================================
   if (isAddSprintOpen) {
     return (
@@ -3490,27 +3807,31 @@ export default function ProjectView() {
         </button>
 
         <div className="bg-white dark:bg-[#181b20] rounded-3xl p-8 border border-gray-100 dark:border-[#262932] shadow-sm">
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6">Добавить спринт в план</h1>
-          <form onSubmit={handleAddSprint} className="space-y-5">
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">Добавить спринт в месяц</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            Вы можете добавить дополнительный спринт к существующему месяцу.
+          </p>
+
+          <form onSubmit={handleAddSprintToMonth} className="space-y-5">
             <div>
               <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Название спринта</label>
               <input
                 type="text"
                 required
-                placeholder="Спринт 1 (1–7 число)"
+                placeholder="Спринт 5 (29.10 — 31.10)"
                 value={newSprintName}
                 onChange={(e) => setNewSprintName(e.target.value)}
                 className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Плановое значение на спринт</label>
+              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Период спринта</label>
               <input
-                type="number"
-                required
-                value={newSprintPlan}
-                onChange={(e) => setNewSprintPlan(Number(e.target.value))}
-                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-base font-semibold focus:bg-white dark:focus:bg-[#181b20] outline-none"
+                type="text"
+                placeholder="29.10 — 31.10"
+                value={newSprintPeriod}
+                onChange={(e) => setNewSprintPeriod(e.target.value)}
+                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] text-gray-900 dark:text-white rounded-xl px-4 py-3 text-sm font-medium focus:bg-white dark:focus:bg-[#181b20] outline-none"
               />
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-[#262932]">
@@ -3651,62 +3972,104 @@ export default function ProjectView() {
       </div>
 
       {/* ========================================================================= */}
-      {/* TAB 1: PLANS & SCHEDULE (Month -> Plan -> Sprint)                         */}
+      {/* TAB 1: PLANS & SCHEDULE (Month aggregated from Sprints)                   */}
       {/* ========================================================================= */}
       {activeTab === 'plans' && (
         <div className="space-y-6">
-          <div className="flex flex-wrap justify-between items-center gap-4">
+          {/* Header Toolbar */}
+          <div className="flex flex-wrap justify-between items-center gap-4 bg-white dark:bg-[#181b20] p-6 rounded-2xl border border-gray-100 dark:border-[#262932] shadow-xs">
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Месячные планы и Спринты</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Иерархическая структура: Месяц → Показатели плана → Распределение по спринтам
+              <div className="flex items-center gap-2 mb-1">
+                <h2 className="text-xl font-extrabold text-gray-900 dark:text-white">Планы на месяц и Спринты</h2>
+                <span className="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-xs font-bold px-2.5 py-0.5 rounded-full border border-emerald-200/50 dark:border-emerald-800/40">
+                  Автоматический расчёт
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Месячный план автоматически агрегирует все показатели из задач, добавленных в спринты
               </p>
             </div>
 
-            <button 
-              onClick={() => setIsAddMonthOpen(true)}
-              className="bg-[#5b52f6] hover:bg-[#4f46e5] text-white px-5 py-2.5 text-sm font-bold flex items-center rounded-xl transition-all shadow-sm cursor-pointer"
-            >
-              <Plus size={18} className="mr-2" /> Добавить месяц
-            </button>
+            <div className="flex items-center gap-3">
+              {/* View Switcher: Sprints vs Matrix */}
+              <div className="flex bg-gray-100 dark:bg-[#121418] p-1 rounded-xl border border-gray-200/70 dark:border-[#2b303c]">
+                <button
+                  type="button"
+                  onClick={() => setPlansViewMode('sprints')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    plansViewMode === 'sprints'
+                      ? 'bg-white dark:bg-[#1f232b] text-[#4f46e5] dark:text-indigo-300 shadow-xs'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                  title="Отобразить спринты с задачами"
+                >
+                  <Layers size={14} />
+                  По спринтам
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPlansViewMode('matrix')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    plansViewMode === 'matrix'
+                      ? 'bg-white dark:bg-[#1f232b] text-[#4f46e5] dark:text-indigo-300 shadow-xs'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                  title="Отобразить полный сводный план всех спринтов"
+                >
+                  <Table size={14} />
+                  Полный сводный план
+                </button>
+              </div>
+
+              <button 
+                onClick={() => setIsAddMonthOpen(true)}
+                className="bg-[#5b52f6] hover:bg-[#4f46e5] text-white px-5 py-2.5 text-sm font-bold flex items-center rounded-xl transition-all shadow-sm cursor-pointer"
+              >
+                <Plus size={18} className="mr-1.5" /> Создать план на месяц
+              </button>
+            </div>
           </div>
 
-          <div className="bg-white dark:bg-[#181b20] rounded-2xl shadow-sm border border-gray-100 dark:border-[#262932] overflow-x-auto">
-            <div className="flex bg-white dark:bg-[#181b20] border-b border-gray-100 dark:border-[#262932] text-[11px] uppercase font-bold text-gray-400 dark:text-gray-400 tracking-wider min-w-[1000px]">
-              <div className="flex-1 py-4 px-6 min-w-[320px]">Иерархия (Месяц / Показатель плана / Спринт)</div>
-              <div className="w-[180px] py-4 pr-6 text-right">План</div>
-              <div className="w-[160px] py-4 pr-6 text-right">Распределено / Факт</div>
-              <div className="w-[180px] py-4 pr-6 text-center">Статус распределения</div>
-              <div className="w-[120px] py-4 pr-6 text-right">Действия</div>
-            </div>
+          {/* Month Cards List */}
+          <div className="space-y-6">
+            {plansData.map(month => {
+              const monthSprints = month.sprints || []
+              const allMonthTasks = monthSprints.flatMap((sp: any) => sp.tasks || [])
+              const totalMonthPlan = allMonthTasks.reduce((s: number, t: any) => s + Number(t.plan || 0), 0)
+              const totalMonthFact = allMonthTasks.reduce((s: number, t: any) => s + Number(t.fact || 0), 0)
+              const monthProgress = totalMonthPlan > 0 ? Math.min(100, Math.round((totalMonthFact / totalMonthPlan) * 100)) : 0
+              const totalTasksCount = allMonthTasks.length
+              const doneTasksCount = allMonthTasks.filter((t: any) => t.status === 'Done').length
 
-            <div className="min-w-[1000px] divide-y divide-gray-100 dark:divide-[#262932]">
-              {plansData.map(month => {
-                const monthExact = month.allocated === month.totalPlan
-                const monthDiff = month.totalPlan - month.allocated
+              // Unique task names for consolidated matrix
+              const uniqueTaskNames: string[] = Array.from(new Set<string>(allMonthTasks.map((t: any) => String(t.name || ''))))
 
-                return (
-                  <div key={month.id} className="bg-white dark:bg-[#181b20]">
-                    {/* LEVEL 1: MONTH ROW */}
-                    <div 
-                      className="flex items-center hover:bg-slate-50 dark:hover:bg-[#202532] transition-colors py-4 px-6 cursor-pointer bg-slate-50/50 dark:bg-[#1c2028] font-sans"
-                      onClick={() => togglePlanOpen(month.id)}
-                    >
-                      <div className="flex-1 flex items-center">
-                        <button className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mr-2">
-                          {month.isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-                        </button>
-                        <span className="bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-bold px-2.5 py-0.5 rounded-md mr-3 tracking-wide">
-                          MONTH
-                        </span>
-                        <div className="flex items-center">
+              return (
+                <div 
+                  key={month.id} 
+                  className="bg-white dark:bg-[#181b20] rounded-2xl border border-gray-100 dark:border-[#262932] shadow-sm overflow-hidden"
+                >
+                  {/* MONTH HEADER BAR */}
+                  <div 
+                    className="flex flex-wrap items-center justify-between p-5 bg-slate-50/60 dark:bg-[#1b1f27] border-b border-gray-100 dark:border-[#262932] cursor-pointer hover:bg-slate-100/60 dark:hover:bg-[#202530] transition-colors"
+                    onClick={() => togglePlanOpen(month.id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <button className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                        {month.isOpen ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                      </button>
+                      <span className="bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 text-xs font-extrabold px-3 py-1 rounded-lg tracking-wide">
+                        MONTH
+                      </span>
+                      <div>
+                        <div className="flex items-center gap-2">
                           <span 
                             onClick={(e) => {
                               e.stopPropagation()
                               setSelectedDetailItem({ ...month, type: 'MONTH', description: month.description || '' })
                             }}
-                            className="font-bold text-gray-900 dark:text-white text-[15px] mr-1.5 hover:text-[#4f46e5] dark:hover:text-indigo-400 cursor-pointer transition-colors"
-                            title="Нажмите, чтобы переименовать месяц"
+                            className="font-extrabold text-gray-900 dark:text-white text-base hover:text-[#4f46e5] dark:hover:text-indigo-400 transition-colors"
+                            title="Переименовать месяц"
                           >
                             {month.name}
                           </span>
@@ -3715,235 +4078,464 @@ export default function ProjectView() {
                               e.stopPropagation()
                               setSelectedDetailItem({ ...month, type: 'MONTH', description: month.description || '' })
                             }}
-                            className="mr-2 text-gray-300 dark:text-gray-600 hover:text-[#4f46e5] dark:hover:text-indigo-400 p-0.5 rounded"
-                            title="Переименовать месяц"
+                            className="text-gray-400 hover:text-[#4f46e5] dark:hover:text-indigo-400 p-0.5 rounded"
+                            title="Редактировать месяц"
                           >
                             <Edit3 size={13} />
                           </button>
-                          <span className="text-xs text-gray-400 dark:text-gray-500 font-medium mr-2">
+                          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                             ({month.period})
                           </span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setTargetMonthId(month.id)
-                              setIsAddPlanItemOpen(true)
-                            }}
-                            className="w-5 h-5 rounded-md bg-purple-50 dark:bg-purple-950/60 hover:bg-[#4f46e5] text-purple-600 dark:text-purple-300 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
-                            title="Добавить показатель в этот месяц"
-                          >
-                            <Plus size={13} strokeWidth={2.5} />
-                          </button>
                         </div>
-                      </div>
-
-                      <div className="w-[180px] pr-6 text-right font-bold text-gray-900 dark:text-white text-sm">
-                        {month.totalPlan} единиц
-                      </div>
-
-                      <div className="w-[160px] pr-6 text-right font-bold text-[#4f46e5] dark:text-indigo-400 text-sm">
-                        {month.allocated} / {month.totalPlan}
-                      </div>
-
-                      <div className="w-[180px] pr-6 text-center">
-                        {monthExact ? (
-                          <span className="inline-flex items-center text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-full">
-                            <Check size={12} className="mr-1" /> 100% сошлось
+                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                            {monthSprints.length} спринтов
                           </span>
-                        ) : (
-                          <span className="inline-flex items-center text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/50 px-2.5 py-1 rounded-full">
-                            Осталось {monthDiff}
+                          <span>•</span>
+                          <span>
+                            {totalTasksCount} задач ({doneTasksCount} выполнено)
                           </span>
-                        )}
-                      </div>
-
-                      <div className="w-[120px] pr-6 text-right" onClick={(e) => e.stopPropagation()}>
-                        <button 
-                          onClick={() => {
-                            setTargetMonthId(month.id)
-                            setIsAddPlanItemOpen(true)
-                          }}
-                          className="w-7 h-7 ml-auto rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-[#4f46e5] text-[#4f46e5] dark:text-indigo-300 hover:text-white flex items-center justify-center transition-all"
-                          title="Добавить план"
-                        >
-                          <Plus size={16} />
-                        </button>
+                        </div>
                       </div>
                     </div>
 
-                    {/* LEVEL 2: PLAN ITEMS */}
-                    {month.isOpen && (
-                      <div className="divide-y divide-gray-50 dark:divide-[#262932]">
-                        {month.items.length === 0 ? (
-                          <div className="py-4 pl-16 text-xs text-gray-400 dark:text-gray-500 italic">
-                            В этом месяце пока нет показателей плана. Нажмите «+» чтобы добавить.
-                          </div>
-                        ) : (
-                          month.items.map((item: any) => {
-                            const itemExact = item.allocated === item.monthPlan
-                            const itemDiff = item.monthPlan - item.allocated
-
-                            return (
-                              <div key={item.id} className="bg-white dark:bg-[#181b20]">
-                                <div 
-                                  className="flex items-center hover:bg-indigo-50/10 dark:hover:bg-[#202532] transition-colors py-3.5 px-6 pl-14 cursor-pointer"
-                                  onClick={() => togglePlanOpen(item.id)}
-                                >
-                                  <div className="flex-1 flex items-center">
-                                    <button className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mr-2">
-                                      {item.isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                                    </button>
-                                    <span className="bg-indigo-100 dark:bg-indigo-950/60 text-[#4f46e5] dark:text-indigo-300 text-xs font-bold px-2.5 py-0.5 rounded-md mr-3 tracking-wide">
-                                      PLAN
-                                    </span>
-                                    <span 
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        setSelectedDetailItem({ ...item, type: 'PLAN_ITEM', description: item.description || '' })
-                                      }}
-                                      className="font-semibold text-gray-800 dark:text-gray-200 text-sm hover:text-[#4f46e5] dark:hover:text-indigo-400 cursor-pointer transition-colors"
-                                      title="Нажмите, чтобы переименовать показатель"
-                                    >
-                                      {item.name}
-                                    </span>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        setSelectedDetailItem({ ...item, type: 'PLAN_ITEM', description: item.description || '' })
-                                      }}
-                                      className="ml-1 mr-1.5 text-gray-300 dark:text-gray-600 hover:text-[#4f46e5] dark:hover:text-indigo-400 p-0.5 rounded"
-                                      title="Переименовать показатель"
-                                    >
-                                      <Edit3 size={12} />
-                                    </button>
-                                    <span className="text-xs text-gray-400 dark:text-gray-500 mr-2 font-normal">
-                                      ({item.unit})
-                                    </span>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        setTargetPlanItemId(item.id)
-                                        setIsAddSprintOpen(true)
-                                      }}
-                                      className="w-5 h-5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-600 text-emerald-600 dark:text-emerald-300 hover:text-white flex items-center justify-center transition-all shrink-0 shadow-xs"
-                                      title="Добавить спринт к этому показателю"
-                                    >
-                                      <Plus size={13} strokeWidth={2.5} />
-                                    </button>
-                                  </div>
-
-                                  <div className="w-[180px] pr-6 text-right font-bold text-gray-700 dark:text-gray-300 text-sm">
-                                    {item.monthPlan} {item.unit}
-                                  </div>
-
-                                  <div className="w-[160px] pr-6 text-right font-bold text-indigo-600 dark:text-indigo-400 text-sm">
-                                    {item.allocated} / {item.monthPlan}
-                                  </div>
-
-                                  <div className="w-[180px] pr-6 text-center">
-                                    {itemExact ? (
-                                      <span className="inline-flex items-center text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full">
-                                        <Check size={10} className="mr-1" /> Распределено
-                                      </span>
-                                    ) : (
-                                      <span className="inline-flex items-center text-[11px] font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/50 px-2 py-0.5 rounded-full">
-                                        Осталось {itemDiff}
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  <div className="w-[120px] pr-6 text-right" onClick={(e) => e.stopPropagation()}>
-                                    <button 
-                                      onClick={() => {
-                                        setTargetPlanItemId(item.id)
-                                        setIsAddSprintOpen(true)
-                                      }}
-                                      className="w-7 h-7 ml-auto rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-600 text-emerald-600 dark:text-emerald-300 hover:text-white flex items-center justify-center transition-all"
-                                      title="Добавить спринт"
-                                    >
-                                      <Plus size={16} />
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {/* LEVEL 3: SPRINTS */}
-                                {item.isOpen && (
-                                  <div className="bg-slate-50/40 dark:bg-[#13161c] divide-y divide-gray-100/60 dark:divide-[#262932] pl-24 pr-6 py-1">
-                                    {item.sprints.length === 0 ? (
-                                      <div className="py-3 text-xs text-gray-400 dark:text-gray-500 italic">
-                                        Спринты еще не созданы. Нажмите «+» чтобы добавить.
-                                      </div>
-                                    ) : (
-                                      item.sprints.map((sp: any) => (
-                                        <div key={sp.id} className="flex items-center py-2.5 hover:bg-white dark:hover:bg-[#1c2028] transition-colors rounded-lg px-3 my-0.5">
-                                          <div className="flex-1 flex items-center gap-1.5">
-                                            <span className="bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[9px] font-bold px-1.5 py-0.5 rounded mr-2 tracking-wide">
-                                              SPRINT
-                                            </span>
-                                            <input 
-                                              type="text"
-                                              value={sp.name}
-                                              onChange={(e) => renamePlanSprint(month.id, item.id, sp.id, e.target.value)}
-                                              className="text-sm font-semibold text-gray-700 dark:text-gray-200 bg-transparent hover:bg-white dark:hover:bg-[#1c2028] focus:bg-white dark:focus:bg-[#1c2028] border border-transparent hover:border-gray-200 dark:hover:border-[#2b303c] focus:border-[#4f46e5] rounded px-1.5 py-0.5 outline-none transition-colors max-w-xs"
-                                              title="Кликните, чтобы сразу переименовать спринт"
-                                            />
-                                            <button
-                                              onClick={(e) => {
-                                                e.stopPropagation()
-                                                setSelectedDetailItem({ ...sp, type: 'SPRINT', description: sp.description || '' })
-                                              }}
-                                              className="text-gray-300 dark:text-gray-600 hover:text-[#4f46e5] dark:hover:text-indigo-400 p-1 rounded"
-                                              title="Подробнее и описание"
-                                            >
-                                              <Edit3 size={12} />
-                                            </button>
-                                          </div>
-
-                                          <div className="w-[180px] pr-6 text-right">
-                                            <div className="inline-flex items-center gap-1.5">
-                                              <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">План:</span>
-                                              <input 
-                                                type="number"
-                                                value={sp.plan}
-                                                onChange={(e) => updateSprintPlanValue(month.id, item.id, sp.id, Number(e.target.value))}
-                                                className="w-16 text-right font-bold text-gray-800 dark:text-white bg-white dark:bg-[#181b20] border border-gray-200 dark:border-[#2b303c] rounded px-2 py-0.5 text-xs focus:ring-1 focus:ring-[#4f46e5] outline-none"
-                                              />
-                                              <span className="text-[11px] text-gray-400 dark:text-gray-500">{item.unit}</span>
-                                            </div>
-                                          </div>
-
-                                          <div className="w-[160px] pr-6 text-right text-xs font-semibold text-gray-600 dark:text-gray-400">
-                                            Факт: <span className="text-[#4f46e5] dark:text-indigo-400 font-bold">{sp.fact}</span>
-                                          </div>
-
-                                          <div className="w-[180px] pr-6 text-center">
-                                            <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
-                                              sp.status === 'Done' ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300' :
-                                              sp.status === 'In Progress' ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-300' :
-                                              'bg-gray-100 dark:bg-[#20242c] text-gray-500 dark:text-gray-400'
-                                            }`}>
-                                              {sp.status}
-                                            </span>
-                                          </div>
-
-                                          <div className="w-[120px] pr-6 text-right text-xs text-gray-400 dark:text-gray-500">
-                                            Синхронизировано
-                                          </div>
-                                        </div>
-                                      ))
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            )
-                          })
-                        )}
+                    {/* Month Metrics and Controls */}
+                    <div className="flex items-center gap-6" onClick={(e) => e.stopPropagation()}>
+                      <div className="text-right">
+                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">План месяца</div>
+                        <div className="text-sm font-extrabold text-gray-900 dark:text-white">
+                          {totalMonthPlan} <span className="text-xs font-medium text-gray-400">ед.</span>
+                        </div>
                       </div>
-                    )}
+
+                      <div className="text-right">
+                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Факт месяца</div>
+                        <div className="text-sm font-extrabold text-[#4f46e5] dark:text-indigo-400">
+                          {totalMonthFact} <span className="text-xs font-medium text-gray-400">ед.</span>
+                        </div>
+                      </div>
+
+                      <div className="w-36">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Выполнение</span>
+                          <span className="text-xs font-extrabold text-gray-800 dark:text-gray-200">{monthProgress}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-[#2b303c] rounded-full h-2 overflow-hidden">
+                          <div 
+                            className={`h-2 rounded-full transition-all duration-500 ${
+                              monthProgress >= 100 ? 'bg-emerald-500' : monthProgress > 0 ? 'bg-[#4f46e5]' : 'bg-gray-300 dark:bg-gray-600'
+                            }`}
+                            style={{ width: `${monthProgress}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 pl-2 border-l border-gray-200 dark:border-[#262932]">
+                        <button
+                          onClick={() => {
+                            setTargetMonthForSprintId(month.id)
+                            setIsAddSprintOpen(true)
+                          }}
+                          className="px-3 py-1.5 text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-[#4f46e5] text-[#4f46e5] dark:text-indigo-300 hover:text-white rounded-xl transition-colors cursor-pointer flex items-center gap-1"
+                          title="Добавить еще один спринт в этот месяц"
+                        >
+                          <Plus size={13} strokeWidth={2.5} /> Спринт
+                        </button>
+
+                        <button
+                          onClick={(e) => deleteMonth(month.id, e)}
+                          className="p-1.5 text-gray-400 hover:text-rose-500 rounded-lg transition-colors cursor-pointer"
+                          title="Удалить месяц"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                )
-              })}
-            </div>
+
+                  {/* EXPANDED CONTENT: VIEW 1 (SPRINTS) OR VIEW 2 (MATRIX) */}
+                  {month.isOpen && (
+                    <div className="p-6">
+                      {/* VIEW 1: SPRINTS CARDS & TASKS */}
+                      {plansViewMode === 'sprints' && (
+                        <div className="space-y-6">
+                          {monthSprints.length === 0 ? (
+                            <div className="p-8 text-center text-gray-400 dark:text-gray-500">
+                              В этом месяце еще нет спринтов.
+                              <button
+                                onClick={() => {
+                                  setTargetMonthForSprintId(month.id)
+                                  setIsAddSprintOpen(true)
+                                }}
+                                className="block mx-auto mt-3 px-4 py-2 bg-[#4f46e5] text-white text-xs font-bold rounded-xl cursor-pointer"
+                              >
+                                Добавить спринт
+                              </button>
+                            </div>
+                          ) : (
+                            monthSprints.map((sprint: any, sprintIdx: number) => {
+                              const sprintTasks = sprint.tasks || []
+                              const sprintPlan = sprintTasks.reduce((s: number, t: any) => s + Number(t.plan || 0), 0)
+                              const sprintFact = sprintTasks.reduce((s: number, t: any) => s + Number(t.fact || 0), 0)
+                              const sprintProgress = sprintPlan > 0 ? Math.min(100, Math.round((sprintFact / sprintPlan) * 100)) : 0
+
+                              return (
+                                <div 
+                                  key={sprint.id}
+                                  className="border border-gray-100 dark:border-[#262932] rounded-xl overflow-hidden bg-slate-50/30 dark:bg-[#14171d]"
+                                >
+                                  {/* SPRINT HEADER */}
+                                  <div className="flex flex-wrap items-center justify-between p-4 bg-white dark:bg-[#181b20] border-b border-gray-100 dark:border-[#262932]">
+                                    <div className="flex items-center gap-3">
+                                      <button 
+                                        onClick={() => togglePlanOpen(sprint.id)}
+                                        className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                                      >
+                                        {sprint.isOpen !== false ? <ChevronDown size={17} /> : <ChevronRight size={17} />}
+                                      </button>
+                                      <span className="bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-md tracking-wider">
+                                        СПРИНТ {sprintIdx + 1}
+                                      </span>
+                                      <input
+                                        type="text"
+                                        value={sprint.name}
+                                        onChange={(e) => renamePlanSprint(month.id, sprint.id, e.target.value)}
+                                        className="text-sm font-bold text-gray-900 dark:text-white bg-transparent hover:bg-slate-100 dark:hover:bg-[#202530] focus:bg-white dark:focus:bg-[#1f232b] px-2 py-1 rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-[#2b303c] outline-none transition-colors max-w-sm"
+                                        title="Кликните для быстрого переименования спринта"
+                                      />
+                                      <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
+                                        ({sprint.period})
+                                      </span>
+                                    </div>
+
+                                    <div className="flex items-center gap-5">
+                                      <div className="text-xs text-gray-600 dark:text-gray-300 font-medium">
+                                        Задач: <span className="font-bold text-gray-900 dark:text-white">{sprintTasks.length}</span>
+                                      </div>
+                                      <div className="text-xs text-gray-600 dark:text-gray-300 font-medium">
+                                        План: <span className="font-bold text-gray-900 dark:text-white">{sprintPlan}</span>
+                                      </div>
+                                      <div className="text-xs text-gray-600 dark:text-gray-300 font-medium">
+                                        Факт: <span className="font-bold text-[#4f46e5] dark:text-indigo-400">{sprintFact}</span>
+                                      </div>
+                                      <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                                        sprintProgress >= 100
+                                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                                          : sprintProgress > 0
+                                          ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
+                                          : 'bg-gray-100 dark:bg-[#20242c] text-gray-500'
+                                      }`}>
+                                        {sprintProgress}%
+                                      </span>
+
+                                      <button
+                                        onClick={() => {
+                                          setTargetSprintMonthId(month.id)
+                                          setTargetSprintId(sprint.id)
+                                          setTargetSprintName(sprint.name)
+                                          setIsAddTaskToSprintOpen(true)
+                                        }}
+                                        className="px-3 py-1.5 bg-[#4f46e5] hover:bg-[#4338ca] text-white text-xs font-bold rounded-xl flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
+                                      >
+                                        <Plus size={14} /> Добавить задачу
+                                      </button>
+
+                                      <button
+                                        onClick={(e) => deleteSprint(month.id, sprint.id, e)}
+                                        className="p-1 text-gray-400 hover:text-rose-500 rounded transition-colors cursor-pointer"
+                                        title="Удалить спринт"
+                                      >
+                                        <Trash2 size={15} />
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {/* SPRINT TASKS BODY */}
+                                  {sprint.isOpen !== false && (
+                                    <div>
+                                      {sprintTasks.length === 0 ? (
+                                        <div className="p-5 text-center text-xs text-gray-400 dark:text-gray-500">
+                                          В этом спринте пока нет задач. Нажмите «+ Добавить задачу», чтобы зафиксировать целевой показатель.
+                                        </div>
+                                      ) : (
+                                        <div className="divide-y divide-gray-100 dark:divide-[#262932]">
+                                          <div className="flex items-center px-5 py-2.5 text-[10px] uppercase font-bold text-gray-400 tracking-wider bg-slate-50/80 dark:bg-[#15181f]">
+                                            <div className="w-28">Статус</div>
+                                            <div className="flex-1">Задача / Показатель</div>
+                                            <div className="w-36">Ответственный</div>
+                                            <div className="w-28 text-right">План</div>
+                                            <div className="w-32 text-right">Факт</div>
+                                            <div className="w-28 text-right">Выполнение</div>
+                                            <div className="w-16 text-right">Действия</div>
+                                          </div>
+
+                                          {sprintTasks.map((task: any) => {
+                                            const taskProgress = task.plan > 0 ? Math.min(100, Math.round((task.fact / task.plan) * 100)) : 0
+                                            return (
+                                              <div 
+                                                key={task.id}
+                                                className="flex items-center px-5 py-3 hover:bg-white dark:hover:bg-[#181b20] transition-colors"
+                                              >
+                                                {/* Clickable Status Badge */}
+                                                <div className="w-28">
+                                                  <button
+                                                    onClick={(e) => cycleSprintTaskStatus(month.id, sprint.id, task.id, e)}
+                                                    className={`inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-lg cursor-pointer transition-all ${
+                                                      task.status === 'Done'
+                                                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100'
+                                                        : task.status === 'In Progress'
+                                                        ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-100'
+                                                        : 'bg-gray-100 dark:bg-[#202530] text-gray-500 hover:bg-gray-200'
+                                                    }`}
+                                                    title="Нажмите, чтобы изменить статус"
+                                                  >
+                                                    {task.status === 'Done' ? (
+                                                      <>
+                                                        <CheckCircle2 size={12} className="mr-1" /> Готово
+                                                      </>
+                                                    ) : task.status === 'In Progress' ? (
+                                                      <>
+                                                        <Circle size={10} className="mr-1 fill-blue-500" /> В работе
+                                                      </>
+                                                    ) : (
+                                                      'Не начато'
+                                                    )}
+                                                  </button>
+                                                </div>
+
+                                                {/* Task Name */}
+                                                <div className="flex-1 font-semibold text-gray-800 dark:text-gray-200 text-sm">
+                                                  {task.name}
+                                                </div>
+
+                                                {/* Assignee */}
+                                                <div className="w-36">
+                                                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-[#202530] px-2.5 py-1 rounded-lg">
+                                                    <User size={12} className="text-indigo-500" />
+                                                    {task.assignee}
+                                                  </span>
+                                                </div>
+
+                                                {/* Plan Target */}
+                                                <div className="w-28 text-right font-bold text-gray-900 dark:text-white text-sm">
+                                                  {task.plan} <span className="text-xs font-normal text-gray-400">{task.unit}</span>
+                                                </div>
+
+                                                {/* Inline Editable Fact */}
+                                                <div className="w-32 text-right">
+                                                  <div className="inline-flex items-center gap-1 justify-end">
+                                                    <input
+                                                      type="number"
+                                                      min="0"
+                                                      value={task.fact}
+                                                      onChange={(e) => updateSprintTaskFact(month.id, sprint.id, task.id, Number(e.target.value))}
+                                                      className="w-16 text-right font-bold text-[#4f46e5] dark:text-indigo-400 bg-white dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-lg px-2 py-1 text-xs focus:ring-1 focus:ring-[#4f46e5] outline-none"
+                                                      title="Кликните для изменения фактического значения"
+                                                    />
+                                                    <span className="text-xs text-gray-400">{task.unit}</span>
+                                                  </div>
+                                                </div>
+
+                                                {/* Progress Bar & % */}
+                                                <div className="w-28 text-right pr-2">
+                                                  <span className={`text-xs font-bold ${
+                                                    taskProgress >= 100 ? 'text-emerald-600' : 'text-indigo-600 dark:text-indigo-400'
+                                                  }`}>
+                                                    {taskProgress}%
+                                                  </span>
+                                                  <div className="w-full bg-gray-200 dark:bg-[#2b303c] rounded-full h-1.5 mt-1 overflow-hidden">
+                                                    <div
+                                                      className={`h-1.5 rounded-full ${
+                                                        taskProgress >= 100 ? 'bg-emerald-500' : 'bg-[#4f46e5]'
+                                                      }`}
+                                                      style={{ width: `${taskProgress}%` }}
+                                                    />
+                                                  </div>
+                                                </div>
+
+                                                {/* Delete Task */}
+                                                <div className="w-16 text-right">
+                                                  <button
+                                                    onClick={(e) => deleteSprintTask(month.id, sprint.id, task.id, e)}
+                                                    className="p-1 text-gray-400 hover:text-rose-500 rounded transition-colors cursor-pointer"
+                                                    title="Удалить задачу"
+                                                  >
+                                                    <Trash2 size={14} />
+                                                  </button>
+                                                </div>
+                                              </div>
+                                            )
+                                          })}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })
+                          )}
+                        </div>
+                      )}
+
+                      {/* VIEW 2: CONSOLIDATED MONTH MATRIX TABLE (ПОЛНЫЙ СВОДНЫЙ ПЛАН) */}
+                      {plansViewMode === 'matrix' && (
+                        <div className="overflow-x-auto">
+                          <div className="mb-3 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide flex items-center justify-between">
+                            <span>Полная сводная матрица спринтов месяца «{month.name}»</span>
+                            <span className="text-indigo-600 dark:text-indigo-400 lowercase font-normal">
+                              данные сформированы из задач {monthSprints.length} спринтов
+                            </span>
+                          </div>
+
+                          <table className="w-full text-left border-collapse min-w-[900px]">
+                            <thead>
+                              <tr className="border-b border-gray-200 dark:border-[#262932] text-[11px] uppercase font-bold text-gray-400 dark:text-gray-400 bg-slate-50 dark:bg-[#14171d]">
+                                <th className="py-3 px-4 rounded-l-xl">Задача / Показатель</th>
+                                <th className="py-3 px-4">Ответственный</th>
+                                {monthSprints.map((sp: any, i: number) => (
+                                  <th key={sp.id} className="py-3 px-3 text-center">
+                                    <div>Спринт {i + 1}</div>
+                                    <div className="text-[9px] font-normal text-gray-400 lowercase">{sp.period}</div>
+                                  </th>
+                                ))}
+                                <th className="py-3 px-4 text-right">ИТОГО за месяц</th>
+                                <th className="py-3 px-4 rounded-r-xl text-center">Выполнение</th>
+                              </tr>
+                            </thead>
+
+                            <tbody className="divide-y divide-gray-100 dark:divide-[#262932] text-sm">
+                              {uniqueTaskNames.length === 0 ? (
+                                <tr>
+                                  <td colSpan={monthSprints.length + 4} className="py-8 text-center text-gray-400 italic">
+                                    В спринтах пока нет добавленных задач. Переключитесь на вкладку «По спринтам» и добавьте показатели.
+                                  </td>
+                                </tr>
+                              ) : (
+                                uniqueTaskNames.map(taskName => {
+                                  // Gather metrics for this task across all sprints
+                                  let totalTaskPlan = 0
+                                  let totalTaskFact = 0
+                                  let sampleUnit = 'шт'
+                                  let sampleAssignee = '—'
+
+                                  const sprintBreakdowns = monthSprints.map((sp: any) => {
+                                    const match = (sp.tasks || []).find((t: any) => t.name === taskName)
+                                    if (match) {
+                                      totalTaskPlan += Number(match.plan || 0)
+                                      totalTaskFact += Number(match.fact || 0)
+                                      sampleUnit = match.unit || sampleUnit
+                                      sampleAssignee = match.assignee || sampleAssignee
+                                      return {
+                                        exists: true,
+                                        plan: match.plan,
+                                        fact: match.fact,
+                                        status: match.status
+                                      }
+                                    }
+                                    return { exists: false, plan: 0, fact: 0, status: 'Not Done' }
+                                  })
+
+                                  const taskProgress = totalTaskPlan > 0 ? Math.min(100, Math.round((totalTaskFact / totalTaskPlan) * 100)) : 0
+
+                                  return (
+                                    <tr key={taskName} className="hover:bg-slate-50/50 dark:hover:bg-[#1f232b] transition-colors">
+                                      {/* Indicator Name */}
+                                      <td className="py-3.5 px-4 font-bold text-gray-900 dark:text-white">
+                                        {taskName}
+                                        <span className="text-xs font-normal text-gray-400 ml-1.5">({sampleUnit})</span>
+                                      </td>
+
+                                      {/* Assignee */}
+                                      <td className="py-3.5 px-4">
+                                        <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-[#202530] px-2 py-0.5 rounded-md">
+                                          <User size={11} className="text-indigo-500" />
+                                          {sampleAssignee}
+                                        </span>
+                                      </td>
+
+                                      {/* Sprint Columns */}
+                                      {sprintBreakdowns.map((spData: any, idx: number) => (
+                                        <td key={idx} className="py-3.5 px-3 text-center">
+                                          {spData.exists ? (
+                                            <div className="inline-block">
+                                              <span className="font-extrabold text-gray-900 dark:text-white text-xs">
+                                                {spData.fact}
+                                              </span>
+                                              <span className="text-gray-400 text-xs mx-0.5">/</span>
+                                              <span className="text-gray-500 text-xs">
+                                                {spData.plan}
+                                              </span>
+                                            </div>
+                                          ) : (
+                                            <span className="text-gray-300 dark:text-gray-600 text-xs">—</span>
+                                          )}
+                                        </td>
+                                      ))}
+
+                                      {/* Month Total (Fact / Plan) */}
+                                      <td className="py-3.5 px-4 text-right font-extrabold text-sm">
+                                        <span className="text-[#4f46e5] dark:text-indigo-400">{totalTaskFact}</span>
+                                        <span className="text-gray-400 mx-1">/</span>
+                                        <span className="text-gray-900 dark:text-white">{totalTaskPlan}</span>
+                                        <span className="text-xs font-normal text-gray-400 ml-1">{sampleUnit}</span>
+                                      </td>
+
+                                      {/* Progress % */}
+                                      <td className="py-3.5 px-4 text-center">
+                                        <span className={`inline-block text-xs font-extrabold px-2.5 py-0.5 rounded-full ${
+                                          taskProgress >= 100
+                                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                                            : taskProgress > 0
+                                            ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
+                                            : 'bg-gray-100 dark:bg-[#202530] text-gray-500'
+                                        }`}>
+                                          {taskProgress}%
+                                        </span>
+                                      </td>
+                                    </tr>
+                                  )
+                                })
+                              )}
+                            </tbody>
+
+                            {/* TABLE FOOTER SUMMARY */}
+                            {uniqueTaskNames.length > 0 && (
+                              <tfoot>
+                                <tr className="border-t-2 border-gray-200 dark:border-[#262932] font-extrabold text-sm bg-slate-50/80 dark:bg-[#14171d]">
+                                  <td className="py-4 px-4 text-gray-900 dark:text-white uppercase text-xs tracking-wider">
+                                    СУММАРНО ЗА МЕСЯЦ
+                                  </td>
+                                  <td className="py-4 px-4 text-xs text-gray-400">—</td>
+                                  {monthSprints.map((sp: any) => {
+                                    const spPlan = (sp.tasks || []).reduce((s: number, t: any) => s + Number(t.plan || 0), 0)
+                                    const spFact = (sp.tasks || []).reduce((s: number, t: any) => s + Number(t.fact || 0), 0)
+                                    return (
+                                      <td key={sp.id} className="py-4 px-3 text-center text-xs font-extrabold">
+                                        <span className="text-[#4f46e5] dark:text-indigo-400">{spFact}</span>
+                                        <span className="text-gray-400 mx-0.5">/</span>
+                                        <span className="text-gray-900 dark:text-white">{spPlan}</span>
+                                      </td>
+                                    )
+                                  })}
+                                  <td className="py-4 px-4 text-right text-base text-[#4f46e5] dark:text-indigo-400 font-extrabold">
+                                    {totalMonthFact} <span className="text-gray-400 text-xs">/</span> {totalMonthPlan}
+                                  </td>
+                                  <td className="py-4 px-4 text-center">
+                                    <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full">
+                                      {monthProgress}% выполнено
+                                    </span>
+                                  </td>
+                                </tr>
+                              </tfoot>
+                            )}
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

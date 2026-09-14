@@ -6,8 +6,8 @@ import { api } from '../lib/api'
 const initialProjects = [
   {
     id: 1,
-    name: 'Extragel',
-    description: 'Продвижение и продажи Extragel, работа с аптеками и врачами',
+    name: 'Extragel (Охлаждающий гель)',
+    description: 'Комплексное продвижение фармацевтического бренда: полевые визиты медицинских представителей в аптечные сети и ЛПУ, работа с врачами-специалистами и инфлюенс-маркетинг.',
     period: '01.06.2026 — 31.12.2026',
     members: 4,
     tasksCount: 5,
@@ -17,8 +17,8 @@ const initialProjects = [
   },
   {
     id: 2,
-    name: 'Masculan',
-    description: 'Маркетинг Masculan, рекламные кампании и дистрибуция',
+    name: 'Masculan (Премиум-дистрибуция)',
+    description: 'Масштабная дистрибуция немецкого качества: представленность в аптечных сетях и FMCG-ритейле, промостойки, мерчендайзинг и омниканальные рекламные кампании.',
     period: '01.06.2026 — 31.12.2026',
     members: 6,
     tasksCount: 8,
@@ -28,8 +28,8 @@ const initialProjects = [
   },
   {
     id: 3,
-    name: 'Энтеросгель',
-    description: 'Работа с аптечными сетями, фармкружки и мерчендайзинг',
+    name: 'Энтеросгель (Энтеросорбент №1)',
+    description: 'Взаимодействие с ключевыми сетями аптек (36.6, Oxymed), проведение регулярных фармкружков для провизоров, выкладка первой линии и работа с педиатрами.',
     period: '01.06.2026 — 31.12.2026',
     members: 3,
     tasksCount: 6,
@@ -39,8 +39,8 @@ const initialProjects = [
   },
   {
     id: 4,
-    name: 'Фитосепт',
-    description: 'Антисептические препараты, пастилки и спреи Фитосепт',
+    name: 'Фитосепт (Антисептическая линейка)',
+    description: 'Сезонная маркетинговая кампания спреев и пастилок: стимулирование первичных продаж, оформление витрин, работа с терапевтами и проведение промо-акций.',
     period: '01.06.2026 — 31.12.2026',
     members: 2,
     tasksCount: 4,
@@ -72,14 +72,14 @@ export default function ProjectsList() {
             const fallback = initialProjects.find(ip => ip.id === p.id) || initialProjects[idx % initialProjects.length]
             return {
               id: p.id,
-              name: p.name || fallback.name,
-              description: p.description || fallback.description,
+              name: fallback ? fallback.name : p.name,
+              description: fallback ? fallback.description : p.description,
               period: '01.06.2026 — 31.12.2026',
               members: fallback ? fallback.members : 4,
               tasksCount: fallback ? fallback.tasksCount : 5,
               progress: fallback ? fallback.progress : 75,
               color: colors[idx % colors.length],
-              avatarChar: (p.name || 'P').charAt(0).toUpperCase()
+              avatarChar: p.name.charAt(0).toUpperCase()
             }
           })
           setProjects(mapped)
@@ -269,27 +269,27 @@ export default function ProjectsList() {
               </div>
 
               {/* Title & Desc */}
-              <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white group-hover:text-[#4f46e5] dark:group-hover:text-indigo-400 transition-colors mb-2 flex items-center tracking-tight">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-[#4f46e5] dark:group-hover:text-indigo-400 transition-colors mb-2.5 flex items-center tracking-tight">
                 {project.name}
-                <ArrowUpRight size={20} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1.5 shrink-0" />
+                <ArrowUpRight size={18} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1.5 shrink-0" />
               </h3>
-              <p className="text-slate-600 dark:text-slate-300 text-[15px] font-medium line-clamp-2 mb-5 leading-relaxed min-h-[48px]">
+              <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-3 mb-5 leading-relaxed min-h-[60px]">
                 {project.description}
               </p>
             </div>
 
             <div>
               {/* Timeline */}
-              <div className="flex items-center text-sm font-semibold text-slate-700 dark:text-slate-200 mb-5 bg-slate-100/90 dark:bg-[#20242c] px-4 py-2.5 rounded-xl border border-slate-200/60 dark:border-[#2b303c]">
-                <Calendar size={17} className="mr-2.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <div className="flex items-center text-sm font-semibold text-slate-700 dark:text-slate-200 mb-5 bg-slate-100/90 dark:bg-[#20242c] px-3.5 py-2.5 rounded-xl border border-slate-200/60 dark:border-[#2b303c]">
+                <Calendar size={16} className="mr-2 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span>{project.period}</span>
               </div>
 
               {/* Progress & Meta */}
               <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-[#262932]">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-700 dark:text-slate-300 font-semibold text-sm">Прогресс выполнения</span>
-                  <span className="font-extrabold text-lg text-[#4f46e5] dark:text-indigo-400">{project.progress}%</span>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-600 dark:text-slate-400 font-semibold">Прогресс выполнения</span>
+                  <span className="font-extrabold text-base text-[#4f46e5] dark:text-indigo-400">{project.progress}%</span>
                 </div>
                 {/* Progress Bar */}
                 <div className="w-full h-2.5 bg-slate-100 dark:bg-[#262932] rounded-full overflow-hidden">
@@ -302,7 +302,7 @@ export default function ProjectsList() {
                 {/* Footer info: Members & Tasks */}
                 <div className="flex justify-between items-center pt-3 text-sm">
                   <div className="flex items-center">
-                    <Users size={17} className="mr-2 text-indigo-500 dark:text-indigo-400" />
+                    <Users size={16} className="mr-2 text-indigo-500 dark:text-indigo-400" />
                     <span className="font-bold text-slate-800 dark:text-slate-200">{project.members}</span>
                     <span className="text-slate-500 dark:text-slate-400 ml-1.5 font-medium">участника</span>
                   </div>
