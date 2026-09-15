@@ -420,9 +420,9 @@ export default function Reports() {
     return { path, points }
   }
 
-  const svgWidth = 650
-  const svgHeight = 220
-  const padding = 36
+  const svgWidth = 1000
+  const svgHeight = 260
+  const padding = 40
   const planSpline = useMemo(() => getSplinePath(weeklyDynamicsData, 'plan', svgWidth, svgHeight, padding), [])
   const factSpline = useMemo(() => getSplinePath(weeklyDynamicsData, 'fact', svgWidth, svgHeight, padding), [])
 
@@ -439,7 +439,7 @@ export default function Reports() {
   const activeWeekInfo = weeklyDynamicsData[selectedChartWeek] || weeklyDynamicsData[2]
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="w-full space-y-6">
       {/* Hidden file input for CSV */}
       <input 
         type="file" 
@@ -721,7 +721,7 @@ export default function Reports() {
             <div className="relative w-full overflow-x-auto">
               <svg 
                 viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
-                className="w-full h-56 sm:h-64 select-none"
+                className="w-full h-60 sm:h-72 lg:h-80 select-none"
               >
                 <defs>
                   {/* Gradient for fact area */}
