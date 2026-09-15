@@ -3,7 +3,8 @@ import {
   BarChart3, TrendingUp, Target, CheckCircle2, 
   Download, Upload, Filter, Calendar, 
   Layers, Sparkles, Activity, 
-  Award, Search, Stethoscope, ShoppingBag, Briefcase, Loader2
+  Award, Search, Stethoscope, ShoppingBag, Briefcase, Loader2,
+  DollarSign, Users, Eye
 } from 'lucide-react'
 import { initialRnpData, RnpItem } from '../data/rnpData'
 import { api } from '../lib/api'
@@ -202,7 +203,7 @@ const teamLeaderboard = [
 ]
 
 export default function Reports() {
-  const [activeReportTab, setActiveReportTab] = useState<'analytics' | 'plans' | 'bloggers' | 'companies' | 'rnp_table'>('analytics')
+  const [activeReportTab, setActiveReportTab] = useState<'analytics' | 'plans' | 'bloggers' | 'companies' | 'rnp_table'>('bloggers')
   const [selectedMonth, setSelectedMonth] = useState('Сентябрь 2026')
   const [selectedProject, setSelectedProject] = useState('ALL')
   const [rnpData, setRnpData] = useState<RnpItem[]>(initialRnpData)
@@ -439,7 +440,7 @@ export default function Reports() {
   const activeWeekInfo = weeklyDynamicsData[selectedChartWeek] || weeklyDynamicsData[2]
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-7">
       {/* Hidden file input for CSV */}
       <input 
         type="file" 
@@ -450,76 +451,74 @@ export default function Reports() {
       />
 
       {/* Header with Title & Quick Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl">
-              <BarChart3 className="w-6 h-6" />
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 bg-white dark:bg-[#181b20] p-6 lg:p-7 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 bg-gradient-to-tr from-[#4f46e5] to-[#7c3aed] text-white rounded-2xl shadow-md flex items-center justify-center shrink-0">
+            <BarChart3 className="w-7 h-7" />
+          </div>
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                Отчёты и Аналитика
+              </h1>
+              {isLoadingRnp && (
+                <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
+              )}
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-                  Отчёты и Аналитика
-                </h1>
-                {isLoadingRnp && (
-                  <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
-                )}
-              </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Наглядная динамика выполнения планов, спринтов, визитов и маркетинга
-              </p>
-            </div>
+            <p className="text-sm sm:text-base font-semibold text-slate-500 dark:text-slate-400 mt-1">
+              Наглядная динамика выполнения планов, спринтов, визитов и блогосферы
+            </p>
           </div>
         </div>
 
         {/* Filters & Actions */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Month Selector */}
-          <div className="flex items-center bg-gray-100 dark:bg-[#15171c] rounded-xl p-1 border border-gray-200 dark:border-[#2b303c]">
-            <Calendar className="w-4 h-4 ml-2 text-gray-400" />
+          <div className="flex items-center bg-slate-100/90 dark:bg-[#121418] rounded-xl px-2 py-1 border border-slate-200 dark:border-[#2b303c]">
+            <Calendar className="w-4 h-4 ml-1.5 text-indigo-500 shrink-0" />
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent text-xs font-semibold text-gray-700 dark:text-gray-200 px-2 py-1.5 focus:outline-hidden cursor-pointer"
+              className="bg-transparent text-sm font-bold text-slate-800 dark:text-slate-100 px-2.5 py-1.5 focus:outline-hidden cursor-pointer"
             >
-              <option value="Сентябрь 2026" className="dark:bg-[#1e2128]">Сентябрь 2026</option>
-              <option value="Август 2026" className="dark:bg-[#1e2128]">Август 2026</option>
-              <option value="Июнь 2026" className="dark:bg-[#1e2128]">Июнь 2026</option>
+              <option value="Сентябрь 2026" className="dark:bg-[#181b20]">Сентябрь 2026</option>
+              <option value="Август 2026" className="dark:bg-[#181b20]">Август 2026</option>
+              <option value="Июнь 2026" className="dark:bg-[#181b20]">Июнь 2026</option>
             </select>
           </div>
 
           {/* Project Selector */}
-          <div className="flex items-center bg-gray-100 dark:bg-[#15171c] rounded-xl p-1 border border-gray-200 dark:border-[#2b303c]">
-            <Filter className="w-4 h-4 ml-2 text-gray-400" />
+          <div className="flex items-center bg-slate-100/90 dark:bg-[#121418] rounded-xl px-2 py-1 border border-slate-200 dark:border-[#2b303c]">
+            <Filter className="w-4 h-4 ml-1.5 text-indigo-500 shrink-0" />
             <select
               value={selectedProject}
               onChange={(e) => setSelectedProject(e.target.value)}
-              className="bg-transparent text-xs font-semibold text-gray-700 dark:text-gray-200 px-2 py-1.5 focus:outline-hidden cursor-pointer"
+              className="bg-transparent text-sm font-bold text-slate-800 dark:text-slate-100 px-2.5 py-1.5 focus:outline-hidden cursor-pointer"
             >
-              <option value="ALL" className="dark:bg-[#1e2128]">Все проекты</option>
-              <option value="Extragel" className="dark:bg-[#1e2128]">Extragel</option>
-              <option value="Masculan" className="dark:bg-[#1e2128]">Masculan</option>
-              <option value="Энтеросгель" className="dark:bg-[#1e2128]">Энтеросгель</option>
+              <option value="ALL" className="dark:bg-[#181b20]">Все проекты</option>
+              <option value="Extragel" className="dark:bg-[#181b20]">Extragel</option>
+              <option value="Masculan" className="dark:bg-[#181b20]">Masculan</option>
+              <option value="Энтеросгель" className="dark:bg-[#181b20]">Энтеросгель</option>
             </select>
           </div>
 
           {/* Excel Export Button */}
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-medium transition shadow-xs cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-xl text-sm font-bold transition shadow-sm hover:shadow-md cursor-pointer"
             title="Экспорт в Excel / CSV"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-4 h-4" />
             <span>Экспорт .CSV</span>
           </button>
 
           {/* Import CSV Button */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#2b303c] dark:hover:bg-[#343a49] text-gray-700 dark:text-gray-200 rounded-xl text-xs font-medium transition cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-[#252a36] dark:hover:bg-[#2e3444] text-slate-800 dark:text-slate-200 rounded-xl text-sm font-bold transition cursor-pointer"
             title="Импорт отчёта"
           >
-            <Upload className="w-3.5 h-3.5 text-gray-400" />
+            <Upload className="w-4 h-4 text-slate-400" />
             <span>Загрузить</span>
           </button>
         </div>
@@ -527,192 +526,192 @@ export default function Reports() {
 
       {/* Upload Feedback Toast */}
       {uploadFeedback && (
-        <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs flex items-center gap-2 animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 rounded-2xl text-sm font-semibold flex items-center gap-3 animate-fade-in shadow-xs">
+          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
           <span>{uploadFeedback}</span>
         </div>
       )}
 
       {/* Primary Tab Navigation */}
-      <div className="flex items-center gap-2 border-b border-gray-200 dark:border-[#2b303c] pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-[#2b303c] pb-3 overflow-x-auto">
         <button
           onClick={() => setActiveReportTab('analytics')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-sm sm:text-base font-bold transition shrink-0 cursor-pointer ${
             activeReportTab === 'analytics'
-              ? 'bg-indigo-600 text-white shadow-xs'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#252830]'
+              ? 'bg-[#4f46e5] text-white shadow-md shadow-indigo-500/20'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#222632]'
           }`}
         >
-          <BarChart3 className="w-4 h-4" />
+          <BarChart3 className="w-5 h-5" />
           <span>Сводная аналитика (Графики)</span>
         </button>
 
         <button
           onClick={() => setActiveReportTab('plans')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-sm sm:text-base font-bold transition shrink-0 cursor-pointer ${
             activeReportTab === 'plans'
-              ? 'bg-indigo-600 text-white shadow-xs'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#252830]'
+              ? 'bg-[#4f46e5] text-white shadow-md shadow-indigo-500/20'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#222632]'
           }`}
         >
-          <Target className="w-4 h-4" />
+          <Target className="w-5 h-5" />
           <span>План / Факт спринтов</span>
         </button>
 
         <button
           onClick={() => setActiveReportTab('bloggers')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-sm sm:text-base font-bold transition shrink-0 cursor-pointer ${
             activeReportTab === 'bloggers'
-              ? 'bg-indigo-600 text-white shadow-xs'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#252830]'
+              ? 'bg-[#4f46e5] text-white shadow-md shadow-indigo-500/20'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#222632]'
           }`}
         >
-          <Sparkles className="w-4 h-4" />
+          <Sparkles className="w-5 h-5" />
           <span>Маркетинг & Блогеры ({filteredBloggers.length})</span>
         </button>
 
         <button
           onClick={() => setActiveReportTab('companies')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-sm sm:text-base font-bold transition shrink-0 cursor-pointer ${
             activeReportTab === 'companies'
-              ? 'bg-indigo-600 text-white shadow-xs'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#252830]'
+              ? 'bg-[#4f46e5] text-white shadow-md shadow-indigo-500/20'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#222632]'
           }`}
         >
-          <Briefcase className="w-4 h-4" />
+          <Briefcase className="w-5 h-5" />
           <span>Партнёры и B2B ({filteredCompanies.length})</span>
         </button>
 
         <button
           onClick={() => setActiveReportTab('rnp_table')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition shrink-0 cursor-pointer ${
+          className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-sm sm:text-base font-bold transition shrink-0 cursor-pointer ${
             activeReportTab === 'rnp_table'
-              ? 'bg-indigo-600 text-white shadow-xs'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#252830]'
+              ? 'bg-[#4f46e5] text-white shadow-md shadow-indigo-500/20'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#222632]'
           }`}
         >
-          <Layers className="w-4 h-4" />
+          <Layers className="w-5 h-5" />
           <span>Сводная таблица РНП</span>
         </button>
       </div>
 
       {/* TAB 1: VISUAL ANALYTICS & INTERACTIVE CHARTS */}
       {activeReportTab === 'analytics' && (
-        <div className="space-y-6 animate-fade-in">
+        <div className="space-y-7 animate-fade-in">
           {/* Top 4 KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* KPI 1: Overall Plan Completion */}
-            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400" />
-              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
-                <span className="font-medium">Общий план месяца</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-semibold text-[11px] flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" /> +12.4%
+            <div className="bg-white dark:bg-[#181b20] p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 to-teal-400" />
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Общий план месяца</span>
+                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 font-extrabold text-xs flex items-center gap-1.5 border border-emerald-200 dark:border-emerald-800">
+                  <TrendingUp className="w-3.5 h-3.5" /> +12.4%
                 </span>
               </div>
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">88.4%</span>
-                <span className="text-xs text-gray-400 font-normal">из 100% цели</span>
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">88.4%</span>
+                <span className="text-sm text-slate-400 font-semibold">из 100% цели</span>
               </div>
               {/* Progress bar */}
-              <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden mb-2">
+              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden mb-2.5">
                 <div className="bg-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: '88.4%' }} />
               </div>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                 Опережение целевого графика на 3 дня
               </p>
             </div>
 
             {/* KPI 2: Field Visits (Doctors & Pharmacies) */}
-            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
-              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
-                <span className="font-medium">Визиты (Врачи & Аптеки)</span>
-                <span className="p-1 rounded-md bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400">
-                  <Stethoscope className="w-3.5 h-3.5" />
+            <div className="bg-white dark:bg-[#181b20] p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 to-indigo-500" />
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Визиты (Врачи & Аптеки)</span>
+                <span className="p-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50">
+                  <Stethoscope className="w-4 h-4" />
                 </span>
               </div>
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">385</span>
-                <span className="text-xs text-gray-400 font-normal">/ 410 план</span>
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">385</span>
+                <span className="text-sm text-slate-400 font-semibold">/ 410 план</span>
               </div>
-              <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden mb-2">
+              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden mb-2.5">
                 <div className="bg-blue-500 h-full rounded-full transition-all duration-500" style={{ width: '93.9%' }} />
               </div>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                 93.9% выполнения полевого плана визитов
               </p>
             </div>
 
             {/* KPI 3: Marketing & Influencer Reach */}
-            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500" />
-              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
-                <span className="font-medium">Охват блогосферы</span>
-                <span className="px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 font-semibold text-[11px]">
+            <div className="bg-white dark:bg-[#181b20] p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-purple-500 to-pink-500" />
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Охват блогосферы</span>
+                <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300 font-extrabold text-xs border border-purple-200 dark:border-purple-800">
                   {filteredBloggers.length} блогеров
                 </span>
               </div>
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                   {(totalBloggerReach / 1000).toFixed(0)}K
                 </span>
-                <span className="text-xs text-gray-400 font-normal">просмотров</span>
+                <span className="text-sm text-slate-400 font-semibold">просмотров</span>
               </div>
-              <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden mb-2">
+              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden mb-2.5">
                 <div className="bg-purple-500 h-full rounded-full transition-all duration-500" style={{ width: '91%' }} />
               </div>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                 {totalPromoOrders} прямых заказов по промокодам
               </p>
             </div>
 
             {/* KPI 4: Sprints & Task Completion */}
-            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-400" />
-              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
-                <span className="font-medium">Спринты и Задачи</span>
-                <span className="p-1 rounded-md bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
-                  <Activity className="w-3.5 h-3.5" />
+            <div className="bg-white dark:bg-[#181b20] p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-500 to-orange-400" />
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Спринты и Задачи</span>
+                <span className="p-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">
+                  <Activity className="w-4 h-4" />
                 </span>
               </div>
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">42</span>
-                <span className="text-xs text-gray-400 font-normal">/ 48 задач</span>
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">42</span>
+                <span className="text-sm text-slate-400 font-semibold">/ 48 задач</span>
               </div>
-              <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden mb-2">
+              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden mb-2.5">
                 <div className="bg-amber-500 h-full rounded-full transition-all duration-500" style={{ width: '87.5%' }} />
               </div>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                 87.5% задач закрыто вовремя
               </p>
             </div>
           </div>
 
           {/* MAIN CHART: Performance Dynamics (Plan vs Fact Spline) */}
-          <div className="bg-white dark:bg-[#1e2128] p-6 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
+          <div className="bg-white dark:bg-[#181b20] p-6 lg:p-8 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
                   <span>Динамика выполнения плана по неделям</span>
-                  <span className="text-xs px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-medium">
+                  <span className="text-xs px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-200 dark:border-indigo-800">
                     Интерактивный график
                   </span>
                 </h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mt-1">
                   Сравнение запланированного темпа и фактического результата по 5 неделям месяца
                 </p>
               </div>
 
               {/* Chart Legend */}
-              <div className="flex items-center gap-4 text-xs">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">Факт (Выполнено)</span>
+              <div className="flex items-center gap-5 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-3.5 h-3.5 rounded-full bg-emerald-500" />
+                  <span className="text-slate-800 dark:text-slate-200 font-bold">Факт (Выполнено)</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-4 h-0.5 border-t-2 border-dashed border-indigo-400" />
-                  <span className="text-gray-500 dark:text-gray-400">План (Цель)</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-0.5 border-t-2 border-dashed border-indigo-400" />
+                  <span className="text-slate-500 dark:text-slate-400 font-semibold">План (Цель)</span>
                 </div>
               </div>
             </div>
@@ -745,15 +744,15 @@ export default function Reports() {
                         y1={y} 
                         x2={svgWidth - padding} 
                         y2={y} 
-                        stroke="#e5e7eb" 
+                        stroke="#e2e8f0" 
                         className="dark:stroke-[#2b303c]" 
                         strokeDasharray="4 4" 
                       />
                       <text 
-                        x={padding - 8} 
-                        y={y + 3} 
+                        x={padding - 10} 
+                        y={y + 4} 
                         textAnchor="end" 
-                        className="text-[10px] fill-gray-400 dark:fill-gray-500 font-mono"
+                        className="text-xs fill-slate-400 dark:fill-slate-500 font-mono font-semibold"
                       >
                         {val}%
                       </text>
@@ -772,7 +771,7 @@ export default function Reports() {
                     d={planSpline.path} 
                     fill="none" 
                     stroke="#818cf8" 
-                    strokeWidth="2.5" 
+                    strokeWidth="3" 
                     strokeDasharray="6 6" 
                   />
                 )}
@@ -783,7 +782,7 @@ export default function Reports() {
                     d={factSpline.path} 
                     fill="none" 
                     stroke="#10b981" 
-                    strokeWidth="3.5" 
+                    strokeWidth="4" 
                     strokeLinecap="round"
                     filter="url(#glow)"
                   />
@@ -804,32 +803,32 @@ export default function Reports() {
                         <circle 
                           cx={pt.x} 
                           cy={pt.y} 
-                          r="9" 
+                          r="10" 
                           fill="none" 
                           stroke="#10b981" 
-                          strokeWidth="2" 
-                          strokeOpacity="0.4"
+                          strokeWidth="2.5" 
+                          strokeOpacity="0.5"
                         />
                       )}
                       {/* Background circle */}
                       <circle 
                         cx={pt.x} 
                         cy={pt.y} 
-                        r={isSelected ? 6 : 4.5} 
-                        className="fill-white dark:fill-[#1e2128]" 
+                        r={isSelected ? 7 : 5} 
+                        className="fill-white dark:fill-[#181b20]" 
                         stroke="#10b981" 
-                        strokeWidth={isSelected ? 3 : 2} 
+                        strokeWidth={isSelected ? 3.5 : 2.5} 
                       />
 
                       {/* X-axis labels */}
                       <text 
                         x={pt.x} 
-                        y={svgHeight - 10} 
+                        y={svgHeight - 12} 
                         textAnchor="middle" 
-                        className={`text-[11px] ${
+                        className={`text-xs ${
                           isSelected 
-                            ? 'font-bold fill-indigo-600 dark:fill-indigo-400' 
-                            : 'fill-gray-500 dark:fill-gray-400'
+                            ? 'font-black fill-[#4f46e5] dark:fill-indigo-400' 
+                            : 'font-semibold fill-slate-500 dark:fill-slate-400'
                         }`}
                       >
                         {d.week}
@@ -838,12 +837,12 @@ export default function Reports() {
                       {/* Point value badge */}
                       <text 
                         x={pt.x} 
-                        y={pt.y - 10} 
+                        y={pt.y - 12} 
                         textAnchor="middle" 
-                        className={`text-[10px] font-bold ${
+                        className={`text-xs font-black ${
                           isSelected 
                             ? 'fill-emerald-600 dark:fill-emerald-400' 
-                            : 'fill-gray-600 dark:fill-gray-400'
+                            : 'fill-slate-700 dark:fill-slate-300'
                         }`}
                       >
                         {d.fact}%
@@ -855,43 +854,43 @@ export default function Reports() {
             </div>
 
             {/* Interactive Selected Week Detail Strip */}
-            <div className="mt-4 p-3.5 bg-gray-50 dark:bg-[#15171c] rounded-xl border border-gray-200 dark:border-[#2b303c] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs">
+            <div className="mt-5 p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200 dark:border-[#2b303c] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-black text-sm border border-emerald-200 dark:border-emerald-800">
                   W{selectedChartWeek + 1}
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-900 dark:text-white">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">
                     Детализация: {activeWeekInfo.label} ({activeWeekInfo.week})
                   </h4>
-                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                     Нажмите на любую точку графика для просмотра данных недели
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 text-xs">
-                <div className="bg-white dark:bg-[#1e2128] px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#2b303c]">
-                  <span className="text-gray-400 text-[10px] block">План недели:</span>
-                  <span className="font-bold text-indigo-600 dark:text-indigo-400">{activeWeekInfo.plan}%</span>
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                <div className="bg-white dark:bg-[#181b20] px-3.5 py-2 rounded-xl border border-slate-200 dark:border-[#2b303c]">
+                  <span className="text-slate-400 text-xs block font-medium">План недели:</span>
+                  <span className="font-black text-indigo-600 dark:text-indigo-400">{activeWeekInfo.plan}%</span>
                 </div>
 
-                <div className="bg-white dark:bg-[#1e2128] px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#2b303c]">
-                  <span className="text-gray-400 text-[10px] block">Факт недели:</span>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{activeWeekInfo.fact}%</span>
+                <div className="bg-white dark:bg-[#181b20] px-3.5 py-2 rounded-xl border border-slate-200 dark:border-[#2b303c]">
+                  <span className="text-slate-400 text-xs block font-medium">Факт недели:</span>
+                  <span className="font-black text-emerald-600 dark:text-emerald-400">{activeWeekInfo.fact}%</span>
                 </div>
 
-                <div className="bg-white dark:bg-[#1e2128] px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#2b303c]">
-                  <span className="text-gray-400 text-[10px] block">Полевые визиты:</span>
-                  <span className="font-bold text-gray-800 dark:text-gray-200">
+                <div className="bg-white dark:bg-[#181b20] px-3.5 py-2 rounded-xl border border-slate-200 dark:border-[#2b303c]">
+                  <span className="text-slate-400 text-xs block font-medium">Полевые визиты:</span>
+                  <span className="font-black text-slate-900 dark:text-white">
                     {activeWeekInfo.visitsFact} / {activeWeekInfo.visitsPlan}
                   </span>
                 </div>
 
-                <div className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                <div className={`px-3 py-1.5 rounded-xl text-xs font-bold ${
                   activeWeekInfo.fact >= activeWeekInfo.plan
-                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                    : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300'
+                    : 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300'
                 }`}>
                   {activeWeekInfo.fact >= activeWeekInfo.plan ? 'План перевыполнен' : 'Небольшое отставание'}
                 </div>
@@ -902,145 +901,145 @@ export default function Reports() {
           {/* TWO COLUMN GRID: Categories Breakdown & Team Leaderboard */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left: Category Breakdown */}
-            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Target className="w-4 h-4 text-indigo-500" />
+            <div className="bg-white dark:bg-[#181b20] p-6 lg:p-7 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
+                  <Target className="w-5 h-5 text-indigo-500" />
                   <span>Выполнение по направлениям бизнеса</span>
                 </h3>
-                <span className="text-[11px] text-gray-400">Цель: 100%</span>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Цель: 100%</span>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {/* Item 1 */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                      <Stethoscope className="w-3.5 h-3.5 text-blue-500" />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                      <Stethoscope className="w-4 h-4 text-blue-500" />
                       Визиты к врачам и рецептурный охват
                     </span>
-                    <span className="font-bold text-gray-900 dark:text-white">92%</span>
+                    <span className="font-black text-slate-900 dark:text-white text-base">92%</span>
                   </div>
-                  <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden">
                     <div className="bg-blue-500 h-full rounded-full" style={{ width: '92%' }} />
                   </div>
-                  <div className="flex justify-between text-[11px] text-gray-400">
+                  <div className="flex justify-between text-xs font-semibold text-slate-400">
                     <span>План: 100 визитов</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">Факт: 92 визита</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Факт: 92 визита</span>
                   </div>
                 </div>
 
                 {/* Item 2 */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                      <ShoppingBag className="w-3.5 h-3.5 text-emerald-500" />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4 text-emerald-500" />
                       Аптечные сети (Ташкент + Регионы)
                     </span>
-                    <span className="font-bold text-gray-900 dark:text-white">88%</span>
+                    <span className="font-black text-slate-900 dark:text-white text-base">88%</span>
                   </div>
-                  <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden">
                     <div className="bg-emerald-500 h-full rounded-full" style={{ width: '88%' }} />
                   </div>
-                  <div className="flex justify-between text-[11px] text-gray-400">
+                  <div className="flex justify-between text-xs font-semibold text-slate-400">
                     <span>План: 210 аптек</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">Факт: 185 аптек</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Факт: 185 аптек</span>
                   </div>
                 </div>
 
                 {/* Item 3 */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-purple-500" />
                       Инфлюенс-маркетинг & Соцсети
                     </span>
-                    <span className="font-bold text-gray-900 dark:text-white">95%</span>
+                    <span className="font-black text-slate-900 dark:text-white text-base">95%</span>
                   </div>
-                  <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden">
                     <div className="bg-purple-500 h-full rounded-full" style={{ width: '95%' }} />
                   </div>
-                  <div className="flex justify-between text-[11px] text-gray-400">
+                  <div className="flex justify-between text-xs font-semibold text-slate-400">
                     <span>План: 400K просмотров</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">Факт: 415K просмотров</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Факт: 415K просмотров</span>
                   </div>
                 </div>
 
                 {/* Item 4 */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                      <Briefcase className="w-3.5 h-3.5 text-amber-500" />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                      <Briefcase className="w-4 h-4 text-amber-500" />
                       Партнерские отели, SPA и заведения (B2B)
                     </span>
-                    <span className="font-bold text-gray-900 dark:text-white">78%</span>
+                    <span className="font-black text-slate-900 dark:text-white text-base">78%</span>
                   </div>
-                  <div className="w-full bg-gray-100 dark:bg-[#2b303c] h-2.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden">
                     <div className="bg-amber-500 h-full rounded-full" style={{ width: '78%' }} />
                   </div>
-                  <div className="flex justify-between text-[11px] text-gray-400">
+                  <div className="flex justify-between text-xs font-semibold text-slate-400">
                     <span>План: 10 локаций</span>
-                    <span className="text-amber-600 dark:text-amber-400 font-medium">Факт: 8 локаций</span>
+                    <span className="text-amber-600 dark:text-amber-400 font-bold">Факт: 8 локаций</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Right: Team Leaderboard */}
-            <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Award className="w-4 h-4 text-amber-500" />
+            <div className="bg-white dark:bg-[#181b20] p-6 lg:p-7 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
+                  <Award className="w-5 h-5 text-amber-500" />
                   <span>Рейтинг эффективности команды</span>
                 </h3>
-                <span className="text-[11px] text-gray-400">Показатель выполнения KPI</span>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">KPI рейтинг</span>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 {teamLeaderboard.map((member, index) => (
                   <div 
                     key={member.id}
-                    className="p-3 bg-gray-50 dark:bg-[#15171c] rounded-xl border border-gray-200/70 dark:border-[#2b303c] flex items-center justify-between gap-3"
+                    className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#2b303c] flex items-center justify-between gap-4"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3.5">
                       {/* Rank badge */}
-                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${
                         index === 0 
-                          ? 'bg-amber-400 text-black' 
+                          ? 'bg-amber-400 text-slate-950' 
                           : index === 1 
-                          ? 'bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white' 
-                          : 'bg-gray-200 dark:bg-[#252830] text-gray-600 dark:text-gray-400'
+                          ? 'bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-white' 
+                          : 'bg-slate-200 dark:bg-[#222632] text-slate-600 dark:text-slate-400'
                       }`}>
                         {index + 1}
                       </span>
 
                       {/* Avatar initials */}
-                      <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-2xl bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-black text-sm flex items-center justify-center shrink-0 border border-indigo-200 dark:border-indigo-800">
                         {member.avatar}
                       </div>
 
                       <div>
-                        <div className="text-xs font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <div className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                           <span>{member.name}</span>
-                          <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
+                          <span className={`text-xs px-2 py-0.5 rounded-md font-bold ${
                             member.percent >= 95 
-                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300'
                               : member.percent >= 85
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300'
-                              : 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300'
+                              : 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300'
                           }`}>
                             {member.badge}
                           </span>
                         </div>
-                        <p className="text-[11px] text-gray-500 dark:text-gray-400">{member.role}</p>
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">{member.role}</p>
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <div className="text-xs font-bold text-gray-900 dark:text-white">
+                    <div className="text-right shrink-0">
+                      <div className="text-sm sm:text-base font-black text-slate-900 dark:text-white">
                         {member.percent}%
                       </div>
-                      <p className="text-[10px] text-gray-400">
+                      <p className="text-xs font-semibold text-slate-400">
                         {member.fact}/{member.plan} план
                       </p>
                     </div>
@@ -1051,28 +1050,28 @@ export default function Reports() {
           </div>
 
           {/* Executive Insights / Quick Takeaways */}
-          <div className="p-4 bg-gradient-to-r from-indigo-50/80 to-blue-50/80 dark:from-[#1b202c] dark:to-[#171c26] rounded-2xl border border-indigo-100 dark:border-[#2b354a]">
-            <h4 className="text-xs font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
+          <div className="p-6 bg-gradient-to-r from-indigo-50/90 to-blue-50/90 dark:from-[#1b202c] dark:to-[#171c26] rounded-3xl border border-indigo-100 dark:border-[#2b354a]">
+            <h4 className="text-sm font-extrabold text-indigo-900 dark:text-indigo-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-indigo-500" />
               Ключевые выводы аналитики за {selectedMonth}
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-gray-700 dark:text-gray-300">
-              <div className="flex items-start gap-2 bg-white/70 dark:bg-[#1e2128]/60 p-2.5 rounded-xl">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-slate-800 dark:text-slate-200">
+              <div className="flex items-start gap-3 bg-white/80 dark:bg-[#181b20]/80 p-4 rounded-2xl border border-indigo-100/60 dark:border-[#2b354a]">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
                 <span>
-                  <strong>Визиты к врачам:</strong> Ташкент закрывает цель на 100%, ортопеды и травматологи обеспечили стабильный поток назначений.
+                  <strong className="font-bold text-slate-900 dark:text-white">Визиты к врачам:</strong> Ташкент закрывает цель на 100%, ортопеды и травматологи обеспечили стабильный поток назначений.
                 </span>
               </div>
-              <div className="flex items-start gap-2 bg-white/70 dark:bg-[#1e2128]/60 p-2.5 rounded-xl">
-                <span className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+              <div className="flex items-start gap-3 bg-white/80 dark:bg-[#181b20]/80 p-4 rounded-2xl border border-indigo-100/60 dark:border-[#2b354a]">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                 <span>
-                  <strong>Инфлюенсеры:</strong> Пост Шахзоды Мухаммедовой дал максимальную отдачу: 318 прямых заказов при бюджете $650.
+                  <strong className="font-bold text-slate-900 dark:text-white">Инфлюенсеры:</strong> Пост Шахзоды Мухаммедовой дал максимальную отдачу: 318 прямых заказов при бюджете $650.
                 </span>
               </div>
-              <div className="flex items-start gap-2 bg-white/70 dark:bg-[#1e2128]/60 p-2.5 rounded-xl">
-                <span className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+              <div className="flex items-start gap-3 bg-white/80 dark:bg-[#181b20]/80 p-4 rounded-2xl border border-indigo-100/60 dark:border-[#2b354a]">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
                 <span>
-                  <strong>Фокус внимания:</strong> По проекту Masculan необходимо ускорить установку промостоек в регионах (сейчас 40% плана).
+                  <strong className="font-bold text-slate-900 dark:text-white">Фокус внимания:</strong> По проекту Masculan необходимо ускорить установку промостоек в регионах (сейчас 40% плана).
                 </span>
               </div>
             </div>
@@ -1082,12 +1081,12 @@ export default function Reports() {
 
       {/* TAB 2: SPRINTS & OPERATIONAL PLANS */}
       {activeReportTab === 'plans' && (
-        <div className="space-y-4 animate-fade-in">
-          <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
-            <h2 className="text-base font-bold text-gray-900 dark:text-white mb-1">
+        <div className="space-y-6 animate-fade-in">
+          <div className="bg-white dark:bg-[#181b20] p-6 lg:p-7 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mb-1">
               План / Факт спринтов по проектам
             </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-5">
+            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-6">
               Текущий статус выполнения операционных задач и спринтов команды
             </p>
 
@@ -1095,24 +1094,24 @@ export default function Reports() {
               {filteredPlans.map(proj => (
                 <div 
                   key={proj.id} 
-                  className="p-4 bg-gray-50 dark:bg-[#15171c] rounded-2xl border border-gray-200 dark:border-[#2b303c]"
+                  className="p-5 sm:p-6 bg-slate-50 dark:bg-[#121418] rounded-3xl border border-slate-200 dark:border-[#2b303c]"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-3 h-3 rounded-full bg-indigo-600" />
-                      <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3.5 h-3.5 rounded-full bg-indigo-600" />
+                      <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
                         {proj.project}
                       </h3>
-                      <span className="text-xs text-gray-400">({proj.month})</span>
+                      <span className="text-sm font-semibold text-slate-400">({proj.month})</span>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
                         Выполнение: {proj.overallProgress}%
                       </span>
-                      <div className="w-24 bg-gray-200 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden">
+                      <div className="w-32 bg-slate-200 dark:bg-[#2b303c] h-3 rounded-full overflow-hidden">
                         <div 
-                          className="bg-indigo-600 h-full rounded-full" 
+                          className="bg-indigo-600 h-full rounded-full transition-all duration-300" 
                           style={{ width: `${proj.overallProgress}%` }} 
                         />
                       </div>
@@ -1120,35 +1119,35 @@ export default function Reports() {
                   </div>
 
                   {/* Items list */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
                     {proj.items.map((it, idx) => (
                       <div 
                         key={idx} 
-                        className="bg-white dark:bg-[#1e2128] p-3.5 rounded-xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs flex flex-col justify-between"
+                        className="bg-white dark:bg-[#181b20] p-4 rounded-2xl border border-slate-200/90 dark:border-[#2b303c] shadow-xs flex flex-col justify-between"
                       >
                         <div>
-                          <div className="flex items-center justify-between text-xs mb-1.5">
-                            <span className={`px-2 py-0.5 rounded-md font-semibold text-[10px] ${
+                          <div className="flex items-center justify-between text-xs mb-2">
+                            <span className={`px-2.5 py-1 rounded-lg font-bold text-xs ${
                               it.status === 'Done'
-                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                                 : it.status === 'In Progress'
-                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300'
-                                : 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
+                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                                : 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                             }`}>
                               {it.status === 'Done' ? 'Выполнено' : it.status === 'In Progress' ? 'В процессе' : 'Отставание'}
                             </span>
-                            <span className="font-bold text-xs text-gray-900 dark:text-white">
+                            <span className="font-black text-sm text-slate-900 dark:text-white">
                               {it.percent}%
                             </span>
                           </div>
-                          <h4 className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                          <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-1">
                             {it.name}
                           </h4>
                         </div>
 
-                        <div className="mt-3 pt-2 border-t border-gray-100 dark:border-[#2b303c] flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                        <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-[#262a35] flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
                           <span>План: {it.plan} {it.unit}</span>
-                          <span className="font-semibold text-gray-700 dark:text-gray-300">
+                          <span className="font-bold text-slate-800 dark:text-slate-200">
                             Факт: {it.fact} {it.unit}
                           </span>
                         </div>
@@ -1164,82 +1163,129 @@ export default function Reports() {
 
       {/* TAB 3: MARKETING & BLOGGERS */}
       {activeReportTab === 'bloggers' && (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-6 animate-fade-in">
           {/* Summary KPIs for Marketing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-[#1e2128] p-4 rounded-xl border border-gray-200/80 dark:border-[#2b303c]">
-              <span className="text-xs text-gray-400 block mb-1">Общий бюджет блогеров</span>
-              <span className="text-2xl font-bold text-gray-900 dark:text-white">${totalBloggerSpend.toLocaleString()}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* Card 1: Budget */}
+            <div className="bg-white dark:bg-[#181b20] p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 to-teal-400" />
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Общий бюджет блогеров</span>
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                  <DollarSign className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                ${totalBloggerSpend.toLocaleString()}
+              </div>
+              <p className="text-xs font-semibold text-slate-400 mt-2">Выделенный рекламный фонд</p>
             </div>
-            <div className="bg-white dark:bg-[#1e2128] p-4 rounded-xl border border-gray-200/80 dark:border-[#2b303c]">
-              <span className="text-xs text-gray-400 block mb-1">Суммарный охват</span>
-              <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">455K чел</span>
+
+            {/* Card 2: Reach */}
+            <div className="bg-white dark:bg-[#181b20] p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 to-indigo-600" />
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Суммарный охват</span>
+                <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                  <Users className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="text-3xl lg:text-4xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">
+                455K чел
+              </div>
+              <p className="text-xs font-semibold text-slate-400 mt-2">Уникальная аудитория каналов</p>
             </div>
-            <div className="bg-white dark:bg-[#1e2128] p-4 rounded-xl border border-gray-200/80 dark:border-[#2b303c]">
-              <span className="text-xs text-gray-400 block mb-1">Суммарные просмотры</span>
-              <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{(totalBloggerReach / 1000).toFixed(0)}K</span>
+
+            {/* Card 3: Views */}
+            <div className="bg-white dark:bg-[#181b20] p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 to-cyan-500" />
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Суммарные просмотры</span>
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                  <Eye className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="text-3xl lg:text-4xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+                {(totalBloggerReach / 1000).toFixed(0)}K
+              </div>
+              <p className="text-xs font-semibold text-slate-400 mt-2">Фактический интерес к постам</p>
             </div>
-            <div className="bg-white dark:bg-[#1e2128] p-4 rounded-xl border border-gray-200/80 dark:border-[#2b303c]">
-              <span className="text-xs text-gray-400 block mb-1">Заказов по промокодам</span>
-              <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">{totalPromoOrders}</span>
+
+            {/* Card 4: Orders */}
+            <div className="bg-white dark:bg-[#181b20] p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-purple-500 to-pink-500" />
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Заказов по промокодам</span>
+                <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+                  <ShoppingBag className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="text-3xl lg:text-4xl font-black text-purple-600 dark:text-purple-400 tracking-tight">
+                {totalPromoOrders}
+              </div>
+              <p className="text-xs font-semibold text-slate-400 mt-2">Прямые продажи в аптеках</p>
             </div>
           </div>
 
           {/* Bloggers Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBloggers.map(b => (
               <div 
                 key={b.id} 
-                className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs flex flex-col justify-between"
+                className="bg-white dark:bg-[#181b20] p-6 lg:p-7 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all flex flex-col justify-between group"
               >
                 <div>
-                  <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="flex items-start justify-between gap-3 mb-4">
                     <div>
-                      <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                      <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 uppercase tracking-wider border border-indigo-200/60 dark:border-indigo-800/50">
                         {b.project} • {b.platform}
                       </span>
-                      <h4 className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">
+                      <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-2 tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {b.blogger}
                       </h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                      <p className="text-sm font-bold text-indigo-500 dark:text-indigo-400 font-mono mt-0.5">
                         {b.handle}
                       </p>
                     </div>
 
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+                    <span className={`text-xs font-extrabold px-3 py-1 rounded-full shrink-0 border ${
                       b.status === 'Вышел пост'
-                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
                         : b.status === 'Оплачено'
-                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300'
-                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border-blue-300 dark:border-blue-800'
+                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border-amber-300 dark:border-amber-800'
                     }`}>
                       {b.status}
                     </span>
                   </div>
 
-                  <p className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-[#15171c] p-2 rounded-lg mb-3">
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-[#121418] p-3.5 rounded-2xl mb-4 border border-slate-100 dark:border-[#262a35] leading-relaxed">
                     {b.format}
                   </p>
 
-                  <div className="grid grid-cols-3 gap-2 text-center text-xs py-2 border-y border-gray-100 dark:border-[#2b303c]">
+                  <div className="grid grid-cols-3 gap-3 text-center py-3 bg-slate-50/70 dark:bg-[#13151a] rounded-2xl border border-slate-100 dark:border-[#262a35] mb-4">
                     <div>
-                      <span className="text-[10px] text-gray-400 block">Аудитория</span>
-                      <span className="font-bold text-gray-800 dark:text-gray-200">{b.followers}</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-0.5">Аудитория</span>
+                      <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white">{b.followers}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-gray-400 block">Просмотры</span>
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400">{b.views}</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-0.5">Просмотры</span>
+                      <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">{b.views}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-gray-400 block">Заказы</span>
-                      <span className="font-bold text-purple-600 dark:text-purple-400">{b.promoSales}</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-0.5">Заказы</span>
+                      <span className="text-base sm:text-lg font-black text-purple-600 dark:text-purple-400">{b.promoSales}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                  <span>Стоимость: <strong className="text-gray-900 dark:text-white font-bold">{b.price}</strong></span>
-                  <span>ER: <strong className="text-indigo-600 dark:text-indigo-400">{b.er}</strong></span>
+                <div className="pt-3 border-t border-slate-100 dark:border-[#262a35] flex items-center justify-between text-sm">
+                  <span className="text-slate-500 dark:text-slate-400 font-semibold">
+                    Стоимость: <strong className="text-slate-900 dark:text-white font-black text-base ml-1">{b.price}</strong>
+                  </span>
+                  <span className="text-slate-500 dark:text-slate-400 font-semibold">
+                    ER: <strong className="text-indigo-600 dark:text-indigo-400 font-black text-base ml-1">{b.er}</strong>
+                  </span>
                 </div>
               </div>
             ))}
@@ -1249,46 +1295,46 @@ export default function Reports() {
 
       {/* TAB 4: PARTNERS & VENUES */}
       {activeReportTab === 'companies' && (
-        <div className="space-y-4 animate-fade-in">
-          <div className="bg-white dark:bg-[#1e2128] p-5 rounded-2xl border border-gray-200/80 dark:border-[#2b303c] shadow-xs">
-            <h2 className="text-base font-bold text-gray-900 dark:text-white mb-1">
+        <div className="space-y-6 animate-fade-in">
+          <div className="bg-white dark:bg-[#181b20] p-6 lg:p-7 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mb-1">
               Партнёрские заведения, Отели и B2B локации
             </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-5">
+            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-6">
               Спецпроекты, дистрибуция брендированных материалов и тейбл-тентов
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {filteredCompanies.map(c => (
                 <div 
                   key={c.id} 
-                  className="bg-gray-50 dark:bg-[#15171c] p-4 rounded-xl border border-gray-200 dark:border-[#2b303c] flex flex-col justify-between"
+                  className="bg-slate-50 dark:bg-[#121418] p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-[#2b303c] flex flex-col justify-between shadow-xs"
                 >
                   <div>
-                    <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-start justify-between gap-3 mb-3">
                       <div>
-                        <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
+                        <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 uppercase tracking-wider border border-indigo-200/60 dark:border-indigo-800/50">
                           {c.project} • {c.category}
                         </span>
-                        <h4 className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">
+                        <h4 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white mt-2">
                           {c.name}
                         </h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{c.location}</p>
+                        <p className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{c.location}</p>
                       </div>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 shrink-0">
+                      <span className="text-xs font-black px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 shrink-0 border border-indigo-200 dark:border-indigo-800">
                         {c.status}
                       </span>
                     </div>
 
-                    <div className="text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-[#1e2128] p-2.5 rounded-lg border border-gray-200/60 dark:border-[#2b303c] my-2">
-                      <span className="text-gray-400 text-[10px] block mb-0.5">Предоставленные материалы:</span>
+                    <div className="text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-[#181b20] p-4 rounded-2xl border border-slate-200/80 dark:border-[#2b303c] my-3 leading-relaxed">
+                      <span className="text-slate-400 text-xs font-bold uppercase tracking-wider block mb-1">Предоставленные материалы:</span>
                       {c.itemsProvided}
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-gray-200/60 dark:border-[#2b303c] flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                    <span>Контакт: <strong className="text-gray-700 dark:text-gray-300">{c.contactPerson}</strong> ({c.phone})</span>
-                    <span>Бюджет: <strong className="text-gray-900 dark:text-white font-bold">{c.spent}</strong></span>
+                  <div className="pt-3 border-t border-slate-200 dark:border-[#262a35] flex flex-wrap items-center justify-between text-sm font-semibold text-slate-500 dark:text-slate-400 gap-2">
+                    <span>Контакт: <strong className="text-slate-900 dark:text-white font-bold">{c.contactPerson}</strong> ({c.phone})</span>
+                    <span>Бюджет: <strong className="text-slate-900 dark:text-white font-black text-base">{c.spent}</strong></span>
                   </div>
                 </div>
               ))}
@@ -1299,25 +1345,25 @@ export default function Reports() {
 
       {/* TAB 5: COMPACT RNP TABLE */}
       {activeReportTab === 'rnp_table' && (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-6 animate-fade-in">
           {/* RNP Controls Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#1e2128] p-4 rounded-2xl border border-gray-200/80 dark:border-[#2b303c]">
-            <div className="flex items-center gap-2 flex-1 max-w-md">
-              <Search className="w-4 h-4 text-gray-400" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#181b20] p-5 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
+            <div className="flex items-center gap-2.5 flex-1 max-w-lg">
+              <Search className="w-5 h-5 text-slate-400 shrink-0 ml-1" />
               <input
                 type="text"
                 placeholder="Поиск по показателю, роли или имени..."
                 value={rnpSearch}
                 onChange={(e) => setRnpSearch(e.target.value)}
-                className="w-full bg-gray-50 dark:bg-[#15171c] border border-gray-200 dark:border-[#2b303c] rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-hidden focus:border-indigo-500"
+                className="w-full bg-slate-50 dark:bg-[#121418] border border-slate-200 dark:border-[#2b303c] rounded-xl px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white focus:outline-hidden focus:border-indigo-500 placeholder:text-slate-400"
               />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <select
                 value={rnpSectionFilter}
                 onChange={(e) => setRnpSectionFilter(e.target.value)}
-                className="bg-gray-50 dark:bg-[#15171c] border border-gray-200 dark:border-[#2b303c] rounded-xl px-3 py-1.5 text-xs text-gray-700 dark:text-gray-200 focus:outline-hidden"
+                className="bg-slate-50 dark:bg-[#121418] border border-slate-200 dark:border-[#2b303c] rounded-xl px-3.5 py-2 text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-hidden cursor-pointer"
               >
                 <option value="ALL">Все категории РНП</option>
                 <option value="visits">Визиты и Активности</option>
@@ -1329,77 +1375,77 @@ export default function Reports() {
                 <option value="promo">Спецпроекты / Промо</option>
               </select>
 
-              <span className="text-xs text-gray-400">
+              <span className="text-sm font-bold text-slate-400 shrink-0">
                 Найдено: {filteredRnp.length}
               </span>
             </div>
           </div>
 
           {/* Compact Clean Table */}
-          <div className="bg-white dark:bg-[#1e2128] rounded-2xl border border-gray-200/80 dark:border-[#2b303c] overflow-hidden shadow-xs">
+          <div className="bg-white dark:bg-[#181b20] rounded-3xl border border-slate-200/90 dark:border-[#2b303c] overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+              <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="bg-gray-50 dark:bg-[#15171c] border-b border-gray-200 dark:border-[#2b303c] text-gray-500 dark:text-gray-400">
-                    <th className="py-3 px-4 font-semibold">Показатель / Задача</th>
-                    <th className="py-3 px-3 font-semibold">Ответственный</th>
-                    <th className="py-3 px-3 font-semibold text-center">План</th>
-                    <th className="py-3 px-3 font-semibold text-center">Факт</th>
-                    <th className="py-3 px-4 font-semibold text-center">% Выполнения</th>
-                    <th className="py-3 px-3 font-semibold text-center">Прогноз</th>
-                    <th className="py-3 px-4 font-semibold text-center">W1 - W5</th>
+                  <tr className="bg-slate-50 dark:bg-[#121418] border-b border-slate-200 dark:border-[#2b303c] text-slate-500 dark:text-slate-400">
+                    <th className="py-4 px-5 font-bold">Показатель / Задача</th>
+                    <th className="py-4 px-4 font-bold">Ответственный</th>
+                    <th className="py-4 px-4 font-bold text-center">План</th>
+                    <th className="py-4 px-4 font-bold text-center">Факт</th>
+                    <th className="py-4 px-5 font-bold text-center">% Выполнения</th>
+                    <th className="py-4 px-4 font-bold text-center">Прогноз</th>
+                    <th className="py-4 px-5 font-bold text-center">W1 - W5</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-[#262932]">
+                <tbody className="divide-y divide-slate-100 dark:divide-[#262a35]">
                   {filteredRnp.slice(0, 35).map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50/70 dark:hover:bg-[#252830]/50 transition">
-                      <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">
+                    <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-[#20242e]/60 transition">
+                      <td className="py-4 px-5 font-bold text-slate-900 dark:text-white">
                         <div>
-                          <span>{item.indicator}</span>
-                          <span className="text-[10px] text-gray-400 block font-normal">{item.sectionName}</span>
+                          <span className="text-sm sm:text-base font-bold">{item.indicator}</span>
+                          <span className="text-xs text-slate-400 block font-medium mt-0.5">{item.sectionName}</span>
                         </div>
                       </td>
-                      <td className="py-3 px-3 text-gray-600 dark:text-gray-300">
+                      <td className="py-4 px-4 text-slate-700 dark:text-slate-200 font-semibold">
                         <div>
                           <span>{item.person || '—'}</span>
-                          <span className="text-[10px] text-gray-400 block">{item.role || '—'}</span>
+                          <span className="text-xs text-slate-400 block font-normal">{item.role || '—'}</span>
                         </div>
                       </td>
-                      <td className="py-3 px-3 text-center font-semibold text-gray-800 dark:text-gray-200">
+                      <td className="py-4 px-4 text-center font-bold text-slate-800 dark:text-slate-200">
                         {item.planMonth}
                       </td>
-                      <td className="py-3 px-3 text-center font-bold text-gray-900 dark:text-white">
+                      <td className="py-4 px-4 text-center font-black text-slate-900 dark:text-white">
                         {item.factMonth}
                       </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-16 bg-gray-100 dark:bg-[#2b303c] h-2 rounded-full overflow-hidden">
+                      <td className="py-4 px-5">
+                        <div className="flex items-center justify-center gap-2.5">
+                          <div className="w-20 bg-slate-100 dark:bg-[#2b303c] h-2.5 rounded-full overflow-hidden">
                             <div 
                               className={`h-full rounded-full ${
-                                item.percentMonth >= 90
+                                item.percentMonth >= 80
                                   ? 'bg-emerald-500'
-                                  : item.percentMonth >= 70
-                                  ? 'bg-blue-500'
-                                  : 'bg-amber-500'
+                                  : item.percentMonth >= 35
+                                  ? 'bg-amber-400'
+                                  : 'bg-red-500'
                               }`} 
                               style={{ width: `${Math.min(item.percentMonth, 100)}%` }} 
                             />
                           </div>
-                          <span className="font-bold text-[11px] text-gray-900 dark:text-white w-8">
+                          <span className="font-black text-xs sm:text-sm text-slate-900 dark:text-white w-9">
                             {item.percentMonth}%
                           </span>
                         </div>
                       </td>
-                      <td className="py-3 px-3 text-center text-gray-600 dark:text-gray-300">
+                      <td className="py-4 px-4 text-center font-bold text-slate-700 dark:text-slate-300">
                         {item.forecast}
                       </td>
-                      <td className="py-3 px-4 text-center">
-                        <div className="flex items-center justify-center gap-1 text-[10px] text-gray-400">
-                          <span className={item.w1 && Number(item.w1.fact) >= Number(item.w1.plan) ? 'text-emerald-600 font-bold' : ''}>W1</span>•
-                          <span className={item.w2 && Number(item.w2.fact) >= Number(item.w2.plan) ? 'text-emerald-600 font-bold' : ''}>W2</span>•
-                          <span className={item.w3 && Number(item.w3.fact) >= Number(item.w3.plan) ? 'text-emerald-600 font-bold' : ''}>W3</span>•
-                          <span className={item.w4 && Number(item.w4.fact) >= Number(item.w4.plan) ? 'text-emerald-600 font-bold' : ''}>W4</span>•
-                          <span className={item.w5 && Number(item.w5.fact) >= Number(item.w5.plan) ? 'text-emerald-600 font-bold' : ''}>W5</span>
+                      <td className="py-4 px-5 text-center">
+                        <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400">
+                          <span className={item.w1 && Number(item.w1.fact) >= Number(item.w1.plan) ? 'text-emerald-600 dark:text-emerald-400 font-black' : ''}>W1</span>•
+                          <span className={item.w2 && Number(item.w2.fact) >= Number(item.w2.plan) ? 'text-emerald-600 dark:text-emerald-400 font-black' : ''}>W2</span>•
+                          <span className={item.w3 && Number(item.w3.fact) >= Number(item.w3.plan) ? 'text-emerald-600 dark:text-emerald-400 font-black' : ''}>W3</span>•
+                          <span className={item.w4 && Number(item.w4.fact) >= Number(item.w4.plan) ? 'text-emerald-600 dark:text-emerald-400 font-black' : ''}>W4</span>•
+                          <span className={item.w5 && Number(item.w5.fact) >= Number(item.w5.plan) ? 'text-emerald-600 dark:text-emerald-400 font-black' : ''}>W5</span>
                         </div>
                       </td>
                     </tr>
