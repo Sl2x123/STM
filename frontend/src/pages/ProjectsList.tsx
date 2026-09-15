@@ -223,42 +223,50 @@ export default function ProjectsList() {
                   {project.name}
                   <ArrowUpRight size={18} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1.5 shrink-0" />
                 </h3>
-                <span className={`shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold ${
-                  project.progress >= 85 
-                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400' 
+                <span className={`shrink-0 px-3 py-1 rounded-lg text-xs sm:text-sm font-extrabold border ${
+                  project.progress >= 80 
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/50' 
                     : project.progress >= 70 
-                    ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400' 
-                    : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400'
+                    ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/50' 
+                    : 'bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-400 border-red-200/60 dark:border-red-800/50'
                 }`}>
                   {project.progress}%
                 </span>
               </div>
 
-              {/* Plan name and date range */}
-              <div className="mb-4 bg-slate-50 dark:bg-[#15171c] rounded-xl p-3 border border-slate-100 dark:border-[#262932]">
-                <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+              {/* Plan name and date range with enlarged font size */}
+              <div className="mb-4 bg-slate-50 dark:bg-[#15171c] rounded-xl p-3.5 border border-slate-200/60 dark:border-[#262932]">
+                <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">
                   {project.currentPlanName}
                 </div>
-                <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-                  <Calendar size={13} className="mr-1.5 text-indigo-500 shrink-0" />
-                  <span>Период: {project.currentPlanPeriod}</span>
+                <div className="flex items-center text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                  <Calendar size={18} className="mr-2 text-indigo-500 dark:text-indigo-400 shrink-0" />
+                  <span>{project.currentPlanPeriod}</span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex justify-between items-center text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300">
                 <span>Выполнение плана</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">{project.progress}%</span>
+                <span className={`font-extrabold text-sm sm:text-base ${
+                  project.progress >= 80 
+                    ? 'text-emerald-600 dark:text-emerald-400' 
+                    : project.progress >= 70 
+                    ? 'text-amber-600 dark:text-amber-400' 
+                    : 'text-red-600 dark:text-red-400'
+                }`}>
+                  {project.progress}%
+                </span>
               </div>
-              <div className="w-full h-2 bg-slate-100 dark:bg-[#262932] rounded-full overflow-hidden">
+              <div className="w-full h-2.5 bg-slate-100 dark:bg-[#262932] rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all duration-300 ${
-                    project.progress >= 85 
+                    project.progress >= 80 
                       ? 'bg-emerald-500' 
                       : project.progress >= 70 
-                      ? 'bg-indigo-600' 
-                      : 'bg-amber-500'
+                      ? 'bg-amber-400' 
+                      : 'bg-red-500'
                   }`}
                   style={{ width: `${project.progress}%` }}
                 />
