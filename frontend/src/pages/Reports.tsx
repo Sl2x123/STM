@@ -1299,186 +1299,252 @@ export default function Reports() {
             </div>
           </div>
 
-          {/* Bloggers Grid - Ultra-Minimalist */}
+          {/* Bloggers Grid - Professional SaaS Standard */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredBloggers.map(b => (
               <div 
                 key={b.id} 
                 onClick={() => setSelectedBloggerModal(b)}
-                className="bg-white dark:bg-[#121418] p-6 rounded-2xl border border-slate-200 dark:border-[#222630] hover:border-slate-400 dark:hover:border-zinc-500 transition-all cursor-pointer flex flex-col justify-between group"
+                className="bg-white dark:bg-[#15181e] p-5 sm:p-6 rounded-2xl border border-slate-200/90 dark:border-[#272b36] shadow-xs hover:shadow-md hover:border-indigo-400/80 dark:hover:border-indigo-500/50 transition-all cursor-pointer flex flex-col justify-between group"
               >
                 <div>
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div>
-                      <span className="text-xs text-slate-400 dark:text-zinc-500 block mb-1">
+                      <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
                         {b.project} • {b.platform}
                       </span>
-                      <h4 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors">
+                      <h4 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {b.blogger}
                       </h4>
                     </div>
-                    <span className="text-xs text-slate-500 dark:text-zinc-400">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#1e222a] px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-[#2d323f] shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       {b.status}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100 dark:border-[#1e222b]">
+                  <div className="grid grid-cols-3 gap-2.5 p-3 rounded-xl bg-slate-50/80 dark:bg-[#101216] border border-slate-100 dark:border-[#20242f]">
                     <div>
-                      <span className="text-xs text-slate-400 dark:text-zinc-500 block mb-0.5">Стоимость</span>
+                      <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 block mb-0.5">Стоимость</span>
                       <span className="text-base font-bold text-slate-900 dark:text-white">{b.price}</span>
                     </div>
-                    <div>
-                      <span className="text-xs text-slate-400 dark:text-zinc-500 block mb-0.5">Просмотры</span>
+                    <div className="border-x border-slate-200/60 dark:border-[#20242f] px-2">
+                      <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 block mb-0.5">Просмотры</span>
                       <span className="text-base font-bold text-slate-900 dark:text-white">{b.views}</span>
                     </div>
-                    <div>
-                      <span className="text-xs text-slate-400 dark:text-zinc-500 block mb-0.5">Переходы</span>
+                    <div className="pl-1">
+                      <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 block mb-0.5">Переходы</span>
                       <span className="text-base font-bold text-slate-900 dark:text-white">{(b.profileVisits || 0).toLocaleString()}</span>
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#20242f] flex items-center justify-between text-xs font-medium text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  <span>Детали интеграции</span>
+                  <span>Подробнее →</span>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* BLOGGER DETAILS MODAL (ULTRA-MINIMALIST) */}
+          {/* BLOGGER DETAILS MODAL (PROFESSIONAL SAAS STANDARD) */}
           {selectedBloggerModal && (
             <div 
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-sm animate-fade-in"
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-sm animate-fade-in"
               onClick={() => setSelectedBloggerModal(null)}
             >
               <div 
-                className="bg-white dark:bg-[#121418] w-full max-w-2xl rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-[#222630] shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6 text-slate-900 dark:text-white"
+                className="bg-white dark:bg-[#16181f] w-full max-w-2xl lg:max-w-3xl rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-[#2b303c] shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6 text-slate-900 dark:text-white"
                 onClick={e => e.stopPropagation()}
               >
                 {/* Header */}
-                <div className="flex items-start justify-between gap-4 pb-5 border-b border-slate-200 dark:border-[#222630]">
-                  <div>
-                    <div className="flex items-center gap-2.5 mb-1.5 text-xs text-slate-500 dark:text-zinc-400">
-                      <span>{selectedBloggerModal.project} • {selectedBloggerModal.platform}</span>
-                      <span>•</span>
-                      <span>{selectedBloggerModal.category}</span>
-                      <span>•</span>
-                      <span className="text-emerald-600 dark:text-emerald-400">{selectedBloggerModal.status}</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-[#242833]">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-200/60 dark:border-indigo-800/40 flex items-center justify-center text-lg shrink-0">
+                      {selectedBloggerModal.blogger?.slice(0, 2).toUpperCase() || 'BL'}
                     </div>
-                    <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                      {selectedBloggerModal.blogger}
-                    </h3>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                          {selectedBloggerModal.project} • {selectedBloggerModal.platform} • {selectedBloggerModal.category}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/40">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          {selectedBloggerModal.status}
+                        </span>
+                      </div>
+                      <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        {selectedBloggerModal.blogger}
+                      </h3>
+                      <a
+                        href={selectedBloggerModal.profileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5"
+                      >
+                        <span>{selectedBloggerModal.handle}</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 sm:self-start">
                     <a
                       href={selectedBloggerModal.profileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors mt-1"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-semibold transition-all shadow-sm cursor-pointer"
+                      title="Открыть страницу блогера в новой вкладке"
                     >
-                      <span>{selectedBloggerModal.handle}</span>
                       <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Открыть профиль</span>
                     </a>
-                  </div>
 
-                  <button 
-                    type="button"
-                    onClick={() => setSelectedBloggerModal(null)}
-                    className="p-2 text-slate-400 hover:text-slate-700 dark:text-zinc-500 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1e222b] rounded-lg transition-colors cursor-pointer"
-                    title="Закрыть"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* Key Numbers (Clean Minimalist Row - Monochrome) */}
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 py-3 border-b border-slate-200 dark:border-[#222630]">
-                  <div>
-                    <span className="text-xs text-slate-500 dark:text-zinc-400 block mb-1">Стоимость</span>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">{selectedBloggerModal.price}</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-500 dark:text-zinc-400 block mb-1">Просмотры</span>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">{selectedBloggerModal.views}</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-500 dark:text-zinc-400 block mb-1">Переходы</span>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">{(selectedBloggerModal.profileVisits || 0).toLocaleString()}</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-500 dark:text-zinc-400 block mb-1">Аудитория</span>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">{selectedBloggerModal.followers}</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-500 dark:text-zinc-400 block mb-1">Охват</span>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">{selectedBloggerModal.reach}</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-500 dark:text-zinc-400 block mb-1">ER</span>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">{selectedBloggerModal.er}</span>
+                    <button 
+                      type="button"
+                      onClick={() => setSelectedBloggerModal(null)}
+                      className="p-1.5 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#20242e] rounded-lg transition-colors cursor-pointer"
+                      title="Закрыть"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
                   </div>
                 </div>
 
-                {/* Structured Details List */}
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between items-baseline py-1.5 border-b border-slate-100 dark:border-[#1e222b]">
-                    <span className="text-slate-500 dark:text-zinc-400">Формат размещения</span>
-                    <span className="font-medium text-slate-900 dark:text-white text-right">{selectedBloggerModal.format}</span>
+                {/* Section 1: 3 Core Primary KPIs */}
+                <div className="grid grid-cols-3 gap-3.5">
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#111317] border border-slate-200/80 dark:border-[#222632]">
+                    <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
+                      Стоимость
+                    </span>
+                    <span className="text-2xl font-black text-slate-900 dark:text-white">
+                      {selectedBloggerModal.price}
+                    </span>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">
+                      Бюджет интеграции
+                    </span>
                   </div>
 
-                  <div className="flex justify-between items-baseline py-1.5 border-b border-slate-100 dark:border-[#1e222b]">
-                    <span className="text-slate-500 dark:text-zinc-400">География аудитории</span>
-                    <span className="font-medium text-slate-900 dark:text-white text-right">{selectedBloggerModal.geo}</span>
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#111317] border border-slate-200/80 dark:border-[#222632]">
+                    <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
+                      Просмотры видео
+                    </span>
+                    <span className="text-2xl font-black text-slate-900 dark:text-white">
+                      {selectedBloggerModal.views}
+                    </span>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">
+                      С наших роликов
+                    </span>
                   </div>
 
-                  <div className="flex justify-between items-baseline py-1.5 border-b border-slate-100 dark:border-[#1e222b]">
-                    <span className="text-slate-500 dark:text-zinc-400">Демография</span>
-                    <span className="font-medium text-slate-900 dark:text-white text-right">{selectedBloggerModal.demographics}</span>
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#111317] border border-slate-200/80 dark:border-[#222632]">
+                    <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
+                      Переходы
+                    </span>
+                    <span className="text-2xl font-black text-slate-900 dark:text-white">
+                      {(selectedBloggerModal.profileVisits || 0).toLocaleString()}
+                    </span>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">
+                      Трафик / клики в профиль
+                    </span>
                   </div>
-
-                  <div className="flex justify-between items-baseline py-1.5 border-b border-slate-100 dark:border-[#1e222b]">
-                    <span className="text-slate-500 dark:text-zinc-400">Дата публикации</span>
-                    <span className="font-medium text-slate-900 dark:text-white text-right">{selectedBloggerModal.publishDate}</span>
-                  </div>
-
-                  <div className="flex justify-between items-baseline py-1.5 border-b border-slate-100 dark:border-[#1e222b]">
-                    <span className="text-slate-500 dark:text-zinc-400">Ответственный менеджер</span>
-                    <span className="font-medium text-slate-900 dark:text-white text-right">{selectedBloggerModal.manager}</span>
-                  </div>
-
-                  <div className="flex justify-between items-baseline py-1.5 border-b border-slate-100 dark:border-[#1e222b]">
-                    <span className="text-slate-500 dark:text-zinc-400">Заказы / Продажи</span>
-                    <span className="font-medium text-slate-900 dark:text-white text-right">{selectedBloggerModal.promoSales} заказов ({selectedBloggerModal.revenue})</span>
-                  </div>
-
-                  <div className="flex justify-between items-baseline py-1.5 border-b border-slate-100 dark:border-[#1e222b]">
-                    <span className="text-slate-500 dark:text-zinc-400">Окупаемость (ROI)</span>
-                    <span className="font-medium text-slate-900 dark:text-white text-right">{selectedBloggerModal.roi} (CPC: ${selectedBloggerModal.profileVisits ? (selectedBloggerModal.priceNum / selectedBloggerModal.profileVisits).toFixed(2) : '0.16'})</span>
-                  </div>
-
-                  {selectedBloggerModal.notes && (
-                    <div className="pt-2">
-                      <span className="text-xs text-slate-500 dark:text-zinc-400 block mb-1">Заметки по интеграции</span>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
-                        {selectedBloggerModal.notes}
-                      </p>
-                    </div>
-                  )}
                 </div>
+
+                {/* Section 2: Secondary Performance & Audience Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-slate-50/70 dark:bg-[#111317]/70 border border-slate-200/70 dark:border-[#222632]">
+                  <div>
+                    <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500 block">Аудитория канала</span>
+                    <span className="text-base font-bold text-slate-800 dark:text-slate-200">{selectedBloggerModal.followers}</span>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500 block">Охват публикации</span>
+                    <span className="text-base font-bold text-slate-800 dark:text-slate-200">{selectedBloggerModal.reach}</span>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500 block">ER (Вовлечение)</span>
+                    <span className="text-base font-bold text-slate-800 dark:text-slate-200">{selectedBloggerModal.er}</span>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500 block">Заказы (Продажи)</span>
+                    <span className="text-base font-bold text-slate-800 dark:text-slate-200">{selectedBloggerModal.promoSales}</span>
+                  </div>
+                </div>
+
+                {/* Section 3: Financial ROI & Unit Economics */}
+                <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-[#111317] border border-slate-200/80 dark:border-[#222632]">
+                  <div>
+                    <span className="text-xs text-slate-400 dark:text-slate-500 block mb-0.5">Выручка по промокоду</span>
+                    <span className="text-lg font-bold text-slate-900 dark:text-white">{selectedBloggerModal.revenue}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-slate-400 dark:text-slate-500 block mb-0.5">Окупаемость (ROI)</span>
+                    <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{selectedBloggerModal.roi}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-slate-400 dark:text-slate-500 block mb-0.5">Цена перехода (CPC)</span>
+                    <span className="text-lg font-bold text-slate-900 dark:text-white">
+                      ${selectedBloggerModal.profileVisits ? (selectedBloggerModal.priceNum / selectedBloggerModal.profileVisits).toFixed(2) : '0.16'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-slate-400 dark:text-slate-500 block mb-0.5">Цена за просмотр (CPV)</span>
+                    <span className="text-lg font-bold text-slate-900 dark:text-white">$0.004</span>
+                  </div>
+                </div>
+
+                {/* Section 4: Campaign Details Spec Table */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between py-2 border-b border-slate-100 dark:border-[#20242e]">
+                    <span className="text-slate-500 dark:text-slate-400">Формат интеграции</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">{selectedBloggerModal.format}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-100 dark:border-[#20242e]">
+                    <span className="text-slate-500 dark:text-slate-400">География аудитории</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">{selectedBloggerModal.geo}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-100 dark:border-[#20242e]">
+                    <span className="text-slate-500 dark:text-slate-400">Демография аудитории</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">{selectedBloggerModal.demographics}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-100 dark:border-[#20242e]">
+                    <span className="text-slate-500 dark:text-slate-400">Дата публикации</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">{selectedBloggerModal.publishDate}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-slate-100 dark:border-[#20242e]">
+                    <span className="text-slate-500 dark:text-slate-400">Ответственный менеджер</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">{selectedBloggerModal.manager}</span>
+                  </div>
+                </div>
+
+                {/* Section 5: Campaign Notes */}
+                {selectedBloggerModal.notes && (
+                  <div className="p-3.5 rounded-xl bg-slate-50/60 dark:bg-[#111317]/60 border border-slate-200/70 dark:border-[#222632] text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 block mb-1">
+                      Заметка по интеграции:
+                    </span>
+                    {selectedBloggerModal.notes}
+                  </div>
+                )}
 
                 {/* Footer Actions */}
-                <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-[#222630]">
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-[#242833]">
                   <a
                     href={selectedBloggerModal.profileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-black dark:text-zinc-300 dark:hover:text-white transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                   >
-                    <span>Открыть профиль ({selectedBloggerModal.platform})</span>
-                    <ExternalLink className="w-4 h-4" />
+                    <span>Открыть аккаунт блогера</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
                   </a>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5">
                     {selectedBloggerModal.postUrl && (
                       <a
                         href={selectedBloggerModal.postUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
+                        className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-[#20242e] text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#282d3a] transition-colors"
                       >
                         Смотреть пост ↗
                       </a>
@@ -1486,7 +1552,7 @@ export default function Reports() {
                     <button
                       type="button"
                       onClick={() => setSelectedBloggerModal(null)}
-                      className="px-5 py-2 text-sm font-medium rounded-lg bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-colors cursor-pointer"
+                      className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200 transition-colors cursor-pointer"
                     >
                       Закрыть
                     </button>
