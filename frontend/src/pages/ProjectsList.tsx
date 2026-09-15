@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FolderKanban, MoreVertical, Users, Plus, Calendar, ArrowUpRight, ArrowLeft } from 'lucide-react'
+import { FolderKanban, Plus, ArrowUpRight, ArrowLeft } from 'lucide-react'
 import { api } from '../lib/api'
 
 const initialProjects = [
@@ -249,68 +249,40 @@ export default function ProjectsList() {
           <Link 
             to={`/project/${project.id}`} 
             key={project.id}
-            className="bg-white dark:bg-[#181b20] rounded-2xl p-6 lg:p-7 border border-slate-200/80 dark:border-[#262932] shadow-sm hover:shadow-lg dark:hover:border-indigo-500/50 transition-all hover:border-indigo-300 flex flex-col justify-between group"
+            className="bg-white dark:bg-[#181b20] rounded-2xl p-5 lg:p-6 border border-slate-200/80 dark:border-[#262932] shadow-xs hover:shadow-md dark:hover:border-indigo-500/50 transition-all hover:border-indigo-300 flex flex-col justify-between group"
           >
-            <div>
-              {/* Project Card Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className={`w-14 h-14 rounded-2xl ${project.color} flex items-center justify-center font-bold text-xl group-hover:scale-105 transition-transform shadow-xs`}>
-                  {project.avatarChar}
-                </div>
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-[#262932] transition-colors cursor-pointer"
-                >
-                  <MoreVertical size={20} />
-                </button>
-              </div>
-
-              {/* Title & Desc */}
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-[#4f46e5] dark:group-hover:text-indigo-400 transition-colors mb-2.5 flex items-center tracking-tight">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <h3 className="text-lg lg:text-xl font-bold text-slate-900 dark:text-white group-hover:text-[#4f46e5] dark:group-hover:text-indigo-400 transition-colors tracking-tight flex items-center">
                 {project.name}
                 <ArrowUpRight size={18} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1.5 shrink-0" />
               </h3>
-              <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-3 mb-5 leading-relaxed min-h-[60px]">
-                {project.description}
-              </p>
+              <span className={`shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold ${
+                project.progress >= 85 
+                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400' 
+                  : project.progress >= 70 
+                  ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400' 
+                  : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400'
+              }`}>
+                {project.progress}%
+              </span>
             </div>
 
-            <div>
-              {/* Timeline */}
-              <div className="flex items-center text-sm font-semibold text-slate-700 dark:text-slate-200 mb-5 bg-slate-100/90 dark:bg-[#20242c] px-3.5 py-2.5 rounded-xl border border-slate-200/60 dark:border-[#2b303c]">
-                <Calendar size={16} className="mr-2 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <span>{project.period}</span>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <span>Выполнение текущего плана</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{project.progress}%</span>
               </div>
-
-              {/* Progress & Meta */}
-              <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-[#262932]">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-600 dark:text-slate-400 font-semibold">Прогресс выполнения</span>
-                  <span className="font-extrabold text-base text-[#4f46e5] dark:text-indigo-400">{project.progress}%</span>
-                </div>
-                {/* Progress Bar */}
-                <div className="w-full h-2.5 bg-slate-100 dark:bg-[#262932] rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-indigo-500 to-[#4f46e5] rounded-full transition-all duration-300"
-                    style={{ width: `${project.progress}%` }}
-                  ></div>
-                </div>
-
-                {/* Footer info: Members & Tasks */}
-                <div className="flex justify-between items-center pt-3 text-sm">
-                  <div className="flex items-center">
-                    <Users size={16} className="mr-2 text-indigo-500 dark:text-indigo-400" />
-                    <span className="font-bold text-slate-800 dark:text-slate-200">{project.members}</span>
-                    <span className="text-slate-500 dark:text-slate-400 ml-1.5 font-medium">участника</span>
-                  </div>
-                  <div>
-                    <span className="font-bold text-slate-800 dark:text-slate-200">{project.tasksCount}</span>
-                    <span className="text-slate-500 dark:text-slate-400 ml-1.5 font-medium">направлений</span>
-                  </div>
-                </div>
+              <div className="w-full h-2.5 bg-slate-100 dark:bg-[#262932] rounded-full overflow-hidden">
+                <div 
+                  className={`h-full rounded-full transition-all duration-300 ${
+                    project.progress >= 85 
+                      ? 'bg-emerald-500' 
+                      : project.progress >= 70 
+                      ? 'bg-indigo-600' 
+                      : 'bg-amber-500'
+                  }`}
+                  style={{ width: `${project.progress}%` }}
+                />
               </div>
             </div>
           </Link>
