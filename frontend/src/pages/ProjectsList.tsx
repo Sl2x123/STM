@@ -224,9 +224,9 @@ export default function ProjectsList() {
                   <ArrowUpRight size={18} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1.5 shrink-0" />
                 </h3>
                 <span className={`shrink-0 px-3 py-1 rounded-lg text-xs sm:text-sm font-extrabold border ${
-                  project.progress >= 80 
+                  project.progress > 75 
                     ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/50' 
-                    : project.progress >= 70 
+                    : project.progress >= 35 
                     ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/50' 
                     : 'bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-400 border-red-200/60 dark:border-red-800/50'
                 }`}>
@@ -250,9 +250,9 @@ export default function ProjectsList() {
               <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300">
                 <span>Выполнение плана</span>
                 <span className={`font-extrabold text-sm sm:text-base ${
-                  project.progress >= 80 
+                  project.progress > 75 
                     ? 'text-emerald-600 dark:text-emerald-400' 
-                    : project.progress >= 70 
+                    : project.progress >= 35 
                     ? 'text-amber-600 dark:text-amber-400' 
                     : 'text-red-600 dark:text-red-400'
                 }`}>
@@ -262,9 +262,9 @@ export default function ProjectsList() {
               <div className="w-full h-2.5 bg-slate-100 dark:bg-[#262932] rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all duration-300 ${
-                    project.progress >= 80 
+                    project.progress > 75 
                       ? 'bg-emerald-500' 
-                      : project.progress >= 70 
+                      : project.progress >= 35 
                       ? 'bg-amber-400' 
                       : 'bg-red-500'
                   }`}
