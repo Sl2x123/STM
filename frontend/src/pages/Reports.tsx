@@ -4,7 +4,7 @@ import {
   Download, Upload, Filter, Calendar, 
   Layers, Sparkles, Activity, 
   Award, Search, Stethoscope, ShoppingBag, Briefcase, Loader2,
-  DollarSign, Users, Eye
+  DollarSign, Users, Eye, X, ChevronRight
 } from 'lucide-react'
 import { initialRnpData, RnpItem } from '../data/rnpData'
 import { api } from '../lib/api'
@@ -204,6 +204,7 @@ const teamLeaderboard = [
 
 export default function Reports() {
   const [activeReportTab, setActiveReportTab] = useState<'analytics' | 'plans' | 'bloggers' | 'companies' | 'rnp_table'>('bloggers')
+  const [selectedBloggerModal, setSelectedBloggerModal] = useState<any | null>(null)
   const [selectedMonth, setSelectedMonth] = useState('Сентябрь 2026')
   const [selectedProject, setSelectedProject] = useState('ALL')
   const [rnpData, setRnpData] = useState<RnpItem[]>(initialRnpData)
@@ -1227,69 +1228,219 @@ export default function Reports() {
             </div>
           </div>
 
-          {/* Bloggers Grid */}
+          {/* Bloggers Grid - Simplified per user instruction */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBloggers.map(b => (
               <div 
                 key={b.id} 
-                className="bg-white dark:bg-[#181b20] p-6 lg:p-7 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all flex flex-col justify-between group"
+                onClick={() => setSelectedBloggerModal(b)}
+                className="bg-white dark:bg-[#181b20] p-6 lg:p-7 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm hover:shadow-xl hover:border-indigo-400 dark:hover:border-indigo-500/50 transition-all cursor-pointer group flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div>
-                      <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 uppercase tracking-wider border border-indigo-200/60 dark:border-indigo-800/50">
-                        {b.project} • {b.platform}
-                      </span>
-                      <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-2 tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                        {b.blogger}
-                      </h4>
-                      <p className="text-sm font-bold text-indigo-500 dark:text-indigo-400 font-mono mt-0.5">
-                        {b.handle}
-                      </p>
-                    </div>
-
-                    <span className={`text-xs font-extrabold px-3 py-1 rounded-full shrink-0 border ${
-                      b.status === 'Вышел пост'
-                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
-                        : b.status === 'Оплачено'
-                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border-blue-300 dark:border-blue-800'
-                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border-amber-300 dark:border-amber-800'
-                    }`}>
-                      {b.status}
+                  {/* Top: Blogger Name with interactive hover pill */}
+                  <div className="flex items-center justify-between gap-3 mb-5">
+                    <h4 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      {b.blogger}
+                    </h4>
+                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 px-2.5 py-1 rounded-xl border border-indigo-100 dark:border-indigo-800/60 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                      Инфо →
                     </span>
                   </div>
 
-                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-[#121418] p-3.5 rounded-2xl mb-4 border border-slate-100 dark:border-[#262a35] leading-relaxed">
-                    {b.format}
-                  </p>
+                  {/* 3 Only requested metrics: Стоимость, Просмотры с наших видео, Переходы */}
+                  <div className="grid grid-cols-3 gap-3 py-4 px-2 bg-slate-50/80 dark:bg-[#121418] rounded-2xl border border-slate-100 dark:border-[#262a35]">
+                    {/* 1. Стоимость */}
+                    <div className="text-center px-1">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-1">
+                        Стоимость
+                      </span>
+                      <span className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
+                        {b.price}
+                      </span>
+                    </div>
 
-                  <div className="grid grid-cols-3 gap-3 text-center py-3 bg-slate-50/70 dark:bg-[#13151a] rounded-2xl border border-slate-100 dark:border-[#262a35] mb-4">
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-0.5">Аудитория</span>
-                      <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white">{b.followers}</span>
+                    {/* 2. Просмотры с наших видео */}
+                    <div className="text-center px-1 border-x border-slate-200/70 dark:border-[#262a35]">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-1">
+                        Просмотры видео
+                      </span>
+                      <span className="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400">
+                        {b.views}
+                      </span>
                     </div>
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-0.5">Просмотры</span>
-                      <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">{b.views}</span>
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-0.5">Заказы</span>
-                      <span className="text-base sm:text-lg font-black text-purple-600 dark:text-purple-400">{b.promoSales}</span>
+
+                    {/* 3. Переходы */}
+                    <div className="text-center px-1">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-1">
+                        Переходы
+                      </span>
+                      <span className="text-lg sm:text-xl font-black text-indigo-600 dark:text-indigo-400">
+                        {(b.profileVisits || 0).toLocaleString()}
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-[#262a35] flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400 font-semibold">
-                    Стоимость: <strong className="text-slate-900 dark:text-white font-black text-base ml-1">{b.price}</strong>
-                  </span>
-                  <span className="text-slate-500 dark:text-slate-400 font-semibold">
-                    ER: <strong className="text-indigo-600 dark:text-indigo-400 font-black text-base ml-1">{b.er}</strong>
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#262a35] flex items-center justify-between text-xs font-bold text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  <span>Инфо о блогере</span>
+                  <span className="flex items-center gap-1">
+                    Подробнее <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* BLOGGER DETAILS MODAL */}
+          {selectedBloggerModal && (
+            <div 
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in"
+              onClick={() => setSelectedBloggerModal(null)}
+            >
+              <div 
+                className="bg-white dark:bg-[#181b20] w-full max-w-xl rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-[#2b303c] shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6"
+                onClick={e => e.stopPropagation()}
+              >
+                {/* Modal Header */}
+                <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100 dark:border-[#262a35]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
+                      {selectedBloggerModal.blogger?.slice(0, 2).toUpperCase() || 'BL'}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 uppercase tracking-wider border border-indigo-200/60 dark:border-indigo-800/50">
+                          {selectedBloggerModal.project} • {selectedBloggerModal.platform}
+                        </span>
+                        <span className={`text-xs font-extrabold px-3 py-0.5 rounded-full border ${
+                          selectedBloggerModal.status === 'Вышел пост'
+                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                            : selectedBloggerModal.status === 'Оплачено'
+                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border-blue-300 dark:border-blue-800'
+                            : 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                        }`}>
+                          {selectedBloggerModal.status}
+                        </span>
+                      </div>
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1.5">
+                        {selectedBloggerModal.blogger}
+                      </h3>
+                      <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 font-mono">
+                        {selectedBloggerModal.handle}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button 
+                    type="button"
+                    onClick={() => setSelectedBloggerModal(null)}
+                    className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#262a35] transition-colors cursor-pointer"
+                    title="Закрыть"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Integration Format */}
+                <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35]">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                    Формат интеграции
+                  </span>
+                  <p className="text-base font-bold text-slate-800 dark:text-slate-100">
+                    {selectedBloggerModal.format}
+                  </p>
+                </div>
+
+                {/* Detailed Stats Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                      Аудитория канала
+                    </span>
+                    <span className="text-xl font-black text-slate-900 dark:text-white">
+                      {selectedBloggerModal.followers}
+                    </span>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                      Охват интеграции
+                    </span>
+                    <span className="text-xl font-black text-blue-600 dark:text-blue-400">
+                      {selectedBloggerModal.reach}
+                    </span>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                      ER (Вовлеченность)
+                    </span>
+                    <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                      {selectedBloggerModal.er}
+                    </span>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                      Просмотры видео
+                    </span>
+                    <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
+                      {selectedBloggerModal.views}
+                    </span>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                      Переходы в профиль
+                    </span>
+                    <span className="text-xl font-black text-purple-600 dark:text-purple-400">
+                      {(selectedBloggerModal.profileVisits || 0).toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                      Заказы / Продажи
+                    </span>
+                    <span className="text-xl font-black text-rose-600 dark:text-rose-400">
+                      {selectedBloggerModal.promoSales}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Cost & Efficiency */}
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-[#1c202a] dark:to-[#1a1d26] rounded-2xl border border-indigo-100 dark:border-[#2b303c]">
+                  <div>
+                    <span className="text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                      Общая стоимость
+                    </span>
+                    <span className="text-2xl font-black text-slate-900 dark:text-white">
+                      {selectedBloggerModal.price}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                      Цена за переход (CPC)
+                    </span>
+                    <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">
+                      ${selectedBloggerModal.profileVisits ? (selectedBloggerModal.priceNum / selectedBloggerModal.profileVisits).toFixed(2) : '0.16'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedBloggerModal(null)}
+                    className="px-6 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors cursor-pointer"
+                  >
+                    Закрыть
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
