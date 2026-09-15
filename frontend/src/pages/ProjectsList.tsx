@@ -1,52 +1,36 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FolderKanban, Plus, ArrowUpRight, ArrowLeft } from 'lucide-react'
+import { FolderKanban, Plus, ArrowUpRight, ArrowLeft, Calendar } from 'lucide-react'
 import { api } from '../lib/api'
 
 const initialProjects = [
   {
     id: 1,
     name: 'Extragel (Охлаждающий гель)',
-    description: 'Комплексное продвижение фармацевтического бренда: полевые визиты медицинских представителей в аптечные сети и ЛПУ, работа с врачами-специалистами и инфлюенс-маркетинг.',
-    period: '01.06.2026 — 31.12.2026',
-    members: 4,
-    tasksCount: 5,
+    currentPlanName: 'План на Сентябрь 2026',
+    currentPlanPeriod: 'с 01.09.2026 по 30.09.2026',
     progress: 86,
-    color: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300',
-    avatarChar: 'E'
   },
   {
     id: 2,
     name: 'Masculan (Премиум-дистрибуция)',
-    description: 'Масштабная дистрибуция немецкого качества: представленность в аптечных сетях и FMCG-ритейле, промостойки, мерчендайзинг и омниканальные рекламные кампании.',
-    period: '01.06.2026 — 31.12.2026',
-    members: 6,
-    tasksCount: 8,
+    currentPlanName: 'План на Сентябрь 2026',
+    currentPlanPeriod: 'с 01.09.2026 по 30.09.2026',
     progress: 75,
-    color: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300',
-    avatarChar: 'M'
   },
   {
     id: 3,
     name: 'Энтеросгель (Энтеросорбент №1)',
-    description: 'Взаимодействие с ключевыми сетями аптек (36.6, Oxymed), проведение регулярных фармкружков для провизоров, выкладка первой линии и работа с педиатрами.',
-    period: '01.06.2026 — 31.12.2026',
-    members: 3,
-    tasksCount: 6,
+    currentPlanName: 'План на Сентябрь 2026',
+    currentPlanPeriod: 'с 01.09.2026 по 30.09.2026',
     progress: 80,
-    color: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300',
-    avatarChar: 'Э'
   },
   {
     id: 4,
     name: 'Фитосепт (Антисептическая линейка)',
-    description: 'Сезонная маркетинговая кампания спреев и пастилок: стимулирование первичных продаж, оформление витрин, работа с терапевтами и проведение промо-акций.',
-    period: '01.06.2026 — 31.12.2026',
-    members: 2,
-    tasksCount: 4,
+    currentPlanName: 'План на Сентябрь 2026',
+    currentPlanPeriod: 'с 01.09.2026 по 30.09.2026',
     progress: 65,
-    color: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300',
-    avatarChar: 'Ф'
   }
 ]
 
@@ -62,24 +46,14 @@ export default function ProjectsList() {
       try {
         const res = await api.get('/projects/')
         if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-          const colors = [
-            'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300',
-            'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300',
-            'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300',
-            'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300'
-          ]
           const mapped = res.data.map((p: any, idx: number) => {
             const fallback = initialProjects.find(ip => ip.id === p.id) || initialProjects[idx % initialProjects.length]
             return {
               id: p.id,
               name: fallback ? fallback.name : p.name,
-              description: fallback ? fallback.description : p.description,
-              period: '01.06.2026 — 31.12.2026',
-              members: fallback ? fallback.members : 4,
-              tasksCount: fallback ? fallback.tasksCount : 5,
+              currentPlanName: fallback ? fallback.currentPlanName : 'План на Сентябрь 2026',
+              currentPlanPeriod: fallback ? fallback.currentPlanPeriod : 'с 01.09.2026 по 30.09.2026',
               progress: fallback ? fallback.progress : 75,
-              color: colors[idx % colors.length],
-              avatarChar: p.name.charAt(0).toUpperCase()
             }
           })
           setProjects(mapped)
@@ -106,13 +80,9 @@ export default function ProjectsList() {
       const newProj = {
         id: p.id,
         name: p.name,
-        description: p.description,
-        period: '01.06.2026 — 31.12.2026',
-        members: 1,
-        tasksCount: 0,
+        currentPlanName: 'План на Сентябрь 2026',
+        currentPlanPeriod: 'с 01.09.2026 по 30.09.2026',
         progress: 0,
-        color: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-300',
-        avatarChar: p.name[0].toUpperCase()
       }
       setProjects(prev => [newProj, ...prev])
     } catch (err) {
@@ -120,13 +90,9 @@ export default function ProjectsList() {
       const newProj = {
         id: Date.now(),
         name: newProjectName.trim(),
-        description: newProjectDesc.trim() || 'Описание проекта',
-        period: '01.06.2026 — 31.12.2026',
-        members: 1,
-        tasksCount: 0,
+        currentPlanName: 'План на Сентябрь 2026',
+        currentPlanPeriod: 'с 01.09.2026 по 30.09.2026',
         progress: 0,
-        color: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-300',
-        avatarChar: newProjectName.trim()[0].toUpperCase()
       }
       setProjects(prev => [newProj, ...prev])
     }
@@ -251,28 +217,41 @@ export default function ProjectsList() {
             key={project.id}
             className="bg-white dark:bg-[#181b20] rounded-2xl p-5 lg:p-6 border border-slate-200/80 dark:border-[#262932] shadow-xs hover:shadow-md dark:hover:border-indigo-500/50 transition-all hover:border-indigo-300 flex flex-col justify-between group"
           >
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <h3 className="text-lg lg:text-xl font-bold text-slate-900 dark:text-white group-hover:text-[#4f46e5] dark:group-hover:text-indigo-400 transition-colors tracking-tight flex items-center">
-                {project.name}
-                <ArrowUpRight size={18} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1.5 shrink-0" />
-              </h3>
-              <span className={`shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold ${
-                project.progress >= 85 
-                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400' 
-                  : project.progress >= 70 
-                  ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400' 
-                  : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400'
-              }`}>
-                {project.progress}%
-              </span>
+            <div>
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <h3 className="text-lg lg:text-xl font-bold text-slate-900 dark:text-white group-hover:text-[#4f46e5] dark:group-hover:text-indigo-400 transition-colors tracking-tight flex items-center">
+                  {project.name}
+                  <ArrowUpRight size={18} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1.5 shrink-0" />
+                </h3>
+                <span className={`shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold ${
+                  project.progress >= 85 
+                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400' 
+                    : project.progress >= 70 
+                    ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400' 
+                    : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400'
+                }`}>
+                  {project.progress}%
+                </span>
+              </div>
+
+              {/* Plan name and date range */}
+              <div className="mb-4 bg-slate-50 dark:bg-[#15171c] rounded-xl p-3 border border-slate-100 dark:border-[#262932]">
+                <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                  {project.currentPlanName}
+                </div>
+                <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                  <Calendar size={13} className="mr-1.5 text-indigo-500 shrink-0" />
+                  <span>Период: {project.currentPlanPeriod}</span>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs font-semibold text-slate-500 dark:text-slate-400">
-                <span>Выполнение текущего плана</span>
+                <span>Выполнение плана</span>
                 <span className="font-bold text-slate-800 dark:text-slate-200">{project.progress}%</span>
               </div>
-              <div className="w-full h-2.5 bg-slate-100 dark:bg-[#262932] rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-slate-100 dark:bg-[#262932] rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all duration-300 ${
                     project.progress >= 85 
