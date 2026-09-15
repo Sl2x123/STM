@@ -4,7 +4,7 @@ import {
   Download, Upload, Filter, Calendar, 
   Layers, Sparkles, Activity, 
   Award, Search, Stethoscope, ShoppingBag, Briefcase, Loader2,
-  DollarSign, Users, Eye, X, ChevronRight
+  DollarSign, Users, Eye, X, ChevronRight, ExternalLink, MapPin, CalendarDays, UserCheck
 } from 'lucide-react'
 import { initialRnpData, RnpItem } from '../data/rnpData'
 import { api } from '../lib/api'
@@ -52,6 +52,10 @@ const bloggersReportData = [
     blogger: 'Шахзода Мухаммедова',
     handle: '@shakhzoda__mukhammedova',
     platform: 'Instagram',
+    category: 'Beauty & Lifestyle',
+    profileUrl: 'https://www.instagram.com/shakhzoda__mukhammedova/',
+    postUrl: 'https://www.instagram.com/reel/C-shakhzoda-extragel/',
+    publishDate: '12 сентября 2026',
     followers: '4.2M',
     reach: '180K',
     views: '148,200',
@@ -61,7 +65,13 @@ const bloggersReportData = [
     status: 'Вышел пост',
     profileVisits: 3950,
     promoSales: 318,
-    er: '9.4%'
+    revenue: '$3,816',
+    roi: '+487%',
+    er: '9.4%',
+    geo: 'Ташкент (74%), Самарканд (14%), Регионы (12%)',
+    demographics: 'Женщины 82%, Мужчины 18% (20–35 лет)',
+    manager: 'Азиз Т. (+998 90 123-45-67)',
+    notes: 'Интеграция с фокусом на натуральность состава и быстрое снятие симптомов. Живой формат распаковки, личный опыт блогера и активный промокод на скидку 15% в аптечных сетях.'
   },
   {
     id: 'b2',
@@ -69,6 +79,10 @@ const bloggersReportData = [
     blogger: 'Доктор Алимов (Health & Life)',
     handle: '@dr_alimov_health',
     platform: 'Telegram',
+    category: 'Медицина & Здоровье',
+    profileUrl: 'https://t.me/dr_alimov_health',
+    postUrl: 'https://t.me/dr_alimov_health/1420',
+    publishDate: '08 сентября 2026',
     followers: '120K',
     reach: '45K',
     views: '42,000',
@@ -78,7 +92,13 @@ const bloggersReportData = [
     status: 'Оплачено',
     profileVisits: 1120,
     promoSales: 94,
-    er: '7.8%'
+    revenue: '$1,128',
+    roi: '+464%',
+    er: '7.8%',
+    geo: 'Ташкент (65%), Андижан (18%), Бухара (17%)',
+    demographics: 'Женщины 54%, Мужчины 46% (25–45 лет)',
+    manager: 'Азиз Т. (+998 90 123-45-67)',
+    notes: 'Экспертный разбор механизма действия препарата с клиническими акцентами и интерактивным опросом целевой аудитории.'
   },
   {
     id: 'b3',
@@ -86,6 +106,10 @@ const bloggersReportData = [
     blogger: 'Мадина Мамасидикова',
     handle: '@madina_lifestyle',
     platform: 'Instagram',
+    category: 'Lifestyle & Семья',
+    profileUrl: 'https://www.instagram.com/madina_lifestyle/',
+    postUrl: 'https://www.instagram.com/stories/highlights/madina_family/',
+    publishDate: '15 сентября 2026',
     followers: '850K',
     reach: '95K',
     views: '88,500',
@@ -95,7 +119,13 @@ const bloggersReportData = [
     status: 'Согласовано',
     profileVisits: 1840,
     promoSales: 142,
-    er: '8.2%'
+    revenue: '$1,704',
+    roi: '+468%',
+    er: '8.2%',
+    geo: 'Ташкент (80%), Фергана (12%), Наманган (8%)',
+    demographics: 'Женщины 89%, Мужчины 11% (22–40 лет)',
+    manager: 'Наргиза К. (+998 93 555-44-33)',
+    notes: 'Семейный контент: аптечка в поездку с детьми. Интеграция в формате серии Stories-распаковки с демонстрацией применения.'
   },
   {
     id: 'b4',
@@ -103,6 +133,10 @@ const bloggersReportData = [
     blogger: 'Фитнес Ташкент (Артём)',
     handle: '@tashkent_fit_artem',
     platform: 'TikTok',
+    category: 'Фитнес & ЗОЖ Ташкент',
+    profileUrl: 'https://www.tiktok.com/@tashkent_fit_artem',
+    postUrl: 'https://www.tiktok.com/@tashkent_fit_artem/video/739120',
+    publishDate: '20 сентября 2026',
     followers: '320K',
     reach: '60K',
     views: '65,000',
@@ -112,7 +146,13 @@ const bloggersReportData = [
     status: 'Переговоры',
     profileVisits: 980,
     promoSales: 65,
-    er: '11.1%'
+    revenue: '$780',
+    roi: '+333%',
+    er: '11.1%',
+    geo: 'Ташкент (85%), Чирчик (10%), Другие (5%)',
+    demographics: 'Мужчины 58%, Женщины 42% (18–30 лет)',
+    manager: 'Наргиза К. (+998 93 555-44-33)',
+    notes: 'Динамичный ролик после интенсивной силовой тренировки. Акцент на быстрое восстановление связок и суставов.'
   },
   {
     id: 'b5',
@@ -120,6 +160,10 @@ const bloggersReportData = [
     blogger: 'Улугбек Men Style',
     handle: '@ulugbek_style',
     platform: 'Instagram',
+    category: 'Мужской стиль & Тренды',
+    profileUrl: 'https://www.instagram.com/ulugbek_style/',
+    postUrl: 'https://www.instagram.com/reel/C-ulugbek_masculan/',
+    publishDate: '10 сентября 2026',
     followers: '450K',
     reach: '75K',
     views: '71,200',
@@ -129,7 +173,13 @@ const bloggersReportData = [
     status: 'Вышел пост',
     profileVisits: 2450,
     promoSales: 180,
-    er: '8.9%'
+    revenue: '$2,160',
+    roi: '+517%',
+    er: '8.9%',
+    geo: 'Ташкент (78%), Самарканд (12%), Навои (10%)',
+    demographics: 'Мужчины 76%, Женщины 24% (21–38 лет)',
+    manager: 'Азиз Т. (+998 90 123-45-67)',
+    notes: 'Стильный Reels в эстетике премиум-сегмента Masculan. Высокий интерес мужской аудитории и отличная конверсия в аптечные покупки.'
   }
 ]
 
@@ -263,23 +313,44 @@ export default function Reports() {
     api.get('/bloggers/').then(res => {
       if (isMounted && Array.isArray(res.data) && res.data.length > 0) {
         const projectNames: Record<number, string> = { 1: 'Extragel', 2: 'Masculan', 3: 'Энтеросгель', 4: 'Фитосепт' }
-        const mapped = res.data.map((b: any) => ({
-          id: b.id,
-          project: projectNames[b.project_id] || (b.project_id ? `Проект #${b.project_id}` : 'Extragel'),
-          blogger: b.name,
-          handle: b.handle,
-          platform: b.platform,
-          followers: b.followers,
-          reach: b.reach,
-          views: (b.views || 0).toLocaleString(),
-          format: b.format,
-          price: b.price,
-          priceNum: parseInt((b.price || '0').replace(/[^\d]/g, ''), 10) || 0,
-          status: b.status,
-          profileVisits: b.profile_visits || 1200,
-          promoSales: b.link_clicks || 85,
-          er: '8.4%'
-        }))
+        const mapped = res.data.map((b: any) => {
+          const cleanHandle = (b.handle || '').replace(/^@/, '')
+          const profileUrl = b.profile_url || (
+            b.platform?.toLowerCase() === 'telegram' ? `https://t.me/${cleanHandle}` :
+            b.platform?.toLowerCase() === 'tiktok' ? `https://www.tiktok.com/@${cleanHandle}` :
+            b.platform?.toLowerCase() === 'youtube' ? `https://www.youtube.com/@${cleanHandle}` :
+            `https://www.instagram.com/${cleanHandle}/`
+          )
+          const promoSales = b.link_clicks || 85
+          const priceNum = parseInt((b.price || '0').replace(/[^\d]/g, ''), 10) || 250
+          return {
+            id: b.id,
+            project: projectNames[b.project_id] || (b.project_id ? `Проект #${b.project_id}` : 'Extragel'),
+            blogger: b.name,
+            handle: b.handle,
+            platform: b.platform || 'Instagram',
+            category: b.category || 'Beauty & Lifestyle',
+            profileUrl,
+            postUrl: b.post_url || profileUrl,
+            publishDate: b.publish_date || 'Сентябрь 2026',
+            followers: b.followers || '250K',
+            reach: b.reach || '65K',
+            views: (b.views || 0).toLocaleString(),
+            format: b.format || 'Reels + Stories',
+            price: b.price || `$${priceNum}`,
+            priceNum,
+            status: b.status || 'Вышел пост',
+            profileVisits: b.profile_visits || 1200,
+            promoSales,
+            revenue: `$${(promoSales * 12).toLocaleString()}`,
+            roi: `+${Math.round(((promoSales * 12) / (priceNum || 1)) * 100)}%`,
+            er: b.er || '8.4%',
+            geo: b.geo || 'Ташкент (72%), Самарканд (16%), Регионы (12%)',
+            demographics: b.demographics || 'Женщины 75%, Мужчины 25% (20–35 лет)',
+            manager: b.manager || 'Азиз Т. (+998 90 123-45-67)',
+            notes: b.notes || 'Интеграция с акцентом на преимущества продукта, живую распаковку и промокод со скидкой 15% в аптечных сетях.'
+          }
+        })
         setLiveBloggers(mapped)
       }
     }).catch(() => {})
@@ -1291,28 +1362,31 @@ export default function Reports() {
             ))}
           </div>
 
-          {/* BLOGGER DETAILS MODAL */}
+          {/* BLOGGER DETAILS MODAL (EXPANDED & DETAILED) */}
           {selectedBloggerModal && (
             <div 
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in"
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md animate-fade-in"
               onClick={() => setSelectedBloggerModal(null)}
             >
               <div 
-                className="bg-white dark:bg-[#181b20] w-full max-w-xl rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-[#2b303c] shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6"
+                className="bg-white dark:bg-[#181b20] w-full max-w-3xl lg:max-w-4xl rounded-3xl p-6 sm:p-8 lg:p-9 border border-slate-200/90 dark:border-[#2b303c] shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6"
                 onClick={e => e.stopPropagation()}
               >
                 {/* Modal Header */}
-                <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100 dark:border-[#262a35]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pb-5 border-b border-slate-100 dark:border-[#262a35]">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center font-black text-2xl shadow-lg shrink-0">
                       {selectedBloggerModal.blogger?.slice(0, 2).toUpperCase() || 'BL'}
                     </div>
                     <div>
-                      <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
                         <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 uppercase tracking-wider border border-indigo-200/60 dark:border-indigo-800/50">
                           {selectedBloggerModal.project} • {selectedBloggerModal.platform}
                         </span>
-                        <span className={`text-xs font-extrabold px-3 py-0.5 rounded-full border ${
+                        <span className="text-xs font-black px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-[#262a35] text-slate-700 dark:text-slate-300">
+                          {selectedBloggerModal.category}
+                        </span>
+                        <span className={`text-xs font-extrabold px-3 py-1 rounded-full border ${
                           selectedBloggerModal.status === 'Вышел пост'
                             ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
                             : selectedBloggerModal.status === 'Оплачено'
@@ -1322,66 +1396,107 @@ export default function Reports() {
                           {selectedBloggerModal.status}
                         </span>
                       </div>
-                      <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1.5">
+                      <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                         {selectedBloggerModal.blogger}
                       </h3>
-                      <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 font-mono">
-                        {selectedBloggerModal.handle}
-                      </p>
+                      <a 
+                        href={selectedBloggerModal.profileUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5"
+                      >
+                        <span>{selectedBloggerModal.handle}</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
                     </div>
                   </div>
 
-                  <button 
-                    type="button"
-                    onClick={() => setSelectedBloggerModal(null)}
-                    className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#262a35] transition-colors cursor-pointer"
-                    title="Закрыть"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  {/* Actions in Header */}
+                  <div className="flex items-center gap-2.5 sm:self-start">
+                    <a
+                      href={selectedBloggerModal.profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-sm hover:shadow-md hover:brightness-110 transition-all cursor-pointer"
+                      title="Открыть профиль в отдельном окне"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      <span>Открыть профиль</span>
+                    </a>
+
+                    <button 
+                      type="button"
+                      onClick={() => setSelectedBloggerModal(null)}
+                      className="p-2.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#262a35] transition-colors cursor-pointer"
+                      title="Закрыть"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
 
-                {/* Integration Format */}
-                <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35]">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    Формат интеграции
-                  </span>
-                  <p className="text-base font-bold text-slate-800 dark:text-slate-100">
-                    {selectedBloggerModal.format}
-                  </p>
+                {/* Direct Action Links Banner */}
+                <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300">
+                    <span className="text-slate-400">Формат размещения:</span>
+                    <span className="text-slate-900 dark:text-white font-black">{selectedBloggerModal.format}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5">
+                    {selectedBloggerModal.postUrl && (
+                      <a
+                        href={selectedBloggerModal.postUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-extrabold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Смотреть видео / пост ↗</span>
+                      </a>
+                    )}
+                    <a
+                      href={selectedBloggerModal.profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-extrabold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>{selectedBloggerModal.platform} профиль ↗</span>
+                    </a>
+                  </div>
                 </div>
 
-                {/* Detailed Stats Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
-                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                      Аудитория канала
+                {/* Detailed Stats Grid (6 cards) */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                  <div className="p-3.5 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">
+                      Аудитория
                     </span>
                     <span className="text-xl font-black text-slate-900 dark:text-white">
                       {selectedBloggerModal.followers}
                     </span>
                   </div>
 
-                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                      Охват интеграции
+                  <div className="p-3.5 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">
+                      Охват поста
                     </span>
                     <span className="text-xl font-black text-blue-600 dark:text-blue-400">
                       {selectedBloggerModal.reach}
                     </span>
                   </div>
 
-                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                      ER (Вовлеченность)
+                  <div className="p-3.5 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">
+                      Вовлечение (ER)
                     </span>
                     <span className="text-xl font-black text-indigo-600 dark:text-indigo-400">
                       {selectedBloggerModal.er}
                     </span>
                   </div>
 
-                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  <div className="p-3.5 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">
                       Просмотры видео
                     </span>
                     <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
@@ -1389,18 +1504,18 @@ export default function Reports() {
                     </span>
                   </div>
 
-                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                      Переходы в профиль
+                  <div className="p-3.5 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">
+                      Переходы
                     </span>
                     <span className="text-xl font-black text-purple-600 dark:text-purple-400">
                       {(selectedBloggerModal.profileVisits || 0).toLocaleString()}
                     </span>
                   </div>
 
-                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                      Заказы / Продажи
+                  <div className="p-3.5 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] text-center">
+                    <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">
+                      Заказы (Продажи)
                     </span>
                     <span className="text-xl font-black text-rose-600 dark:text-rose-400">
                       {selectedBloggerModal.promoSales}
@@ -1408,32 +1523,124 @@ export default function Reports() {
                   </div>
                 </div>
 
-                {/* Cost & Efficiency */}
-                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-[#1c202a] dark:to-[#1a1d26] rounded-2xl border border-indigo-100 dark:border-[#2b303c]">
-                  <div>
-                    <span className="text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                      Общая стоимость
-                    </span>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white">
-                      {selectedBloggerModal.price}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                      Цена за переход (CPC)
-                    </span>
-                    <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">
-                      ${selectedBloggerModal.profileVisits ? (selectedBloggerModal.priceNum / selectedBloggerModal.profileVisits).toFixed(2) : '0.16'}
-                    </span>
+                {/* Financials & ROI Panel */}
+                <div className="p-5 bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-pink-50/40 dark:from-[#1b1f2b] dark:via-[#181b24] dark:to-[#1a1724] rounded-3xl border border-indigo-100 dark:border-[#2b303c]">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div>
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                        Стоимость размещения
+                      </span>
+                      <span className="text-2xl font-black text-slate-900 dark:text-white">
+                        {selectedBloggerModal.price}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                        Выручка по промокоду
+                      </span>
+                      <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                        {selectedBloggerModal.revenue || '$2,800'}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                        Окупаемость (ROI)
+                      </span>
+                      <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
+                        {selectedBloggerModal.roi || '+450%'}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                        Цена перехода / CPC
+                      </span>
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-2xl font-black text-slate-900 dark:text-white">
+                          ${selectedBloggerModal.profileVisits ? (selectedBloggerModal.priceNum / selectedBloggerModal.profileVisits).toFixed(2) : '0.16'}
+                        </span>
+                        <span className="text-xs font-semibold text-slate-400">CPC</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex items-center justify-end gap-3 pt-2">
+                {/* Audience Demographics & Geography */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] space-y-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      <MapPin className="w-4 h-4 text-rose-500" />
+                      <span>География аудитории</span>
+                    </div>
+                    <p className="text-sm font-extrabold text-slate-800 dark:text-slate-200">
+                      {selectedBloggerModal.geo}
+                    </p>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] space-y-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      <Users className="w-4 h-4 text-blue-500" />
+                      <span>Демография & Возраст</span>
+                    </div>
+                    <p className="text-sm font-extrabold text-slate-800 dark:text-slate-200">
+                      {selectedBloggerModal.demographics}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Campaign Context & Management */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] space-y-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      <CalendarDays className="w-4 h-4 text-indigo-500" />
+                      <span>Дата публикации & Спринт</span>
+                    </div>
+                    <p className="text-sm font-extrabold text-slate-800 dark:text-slate-200">
+                      {selectedBloggerModal.publishDate}
+                    </p>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] space-y-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      <UserCheck className="w-4 h-4 text-emerald-500" />
+                      <span>Ответственный менеджер</span>
+                    </div>
+                    <p className="text-sm font-extrabold text-slate-800 dark:text-slate-200">
+                      {selectedBloggerModal.manager}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Notes & Brief */}
+                {selectedBloggerModal.notes && (
+                  <div className="p-4 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262a35] space-y-1.5">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                      Краткое резюме интеграции
+                    </span>
+                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
+                      {selectedBloggerModal.notes}
+                    </p>
+                  </div>
+                )}
+
+                {/* Footer Buttons */}
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-[#262a35]">
+                  <a
+                    href={selectedBloggerModal.profileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Перейти на страницу {selectedBloggerModal.blogger} в новом окне</span>
+                  </a>
+
                   <button
                     type="button"
                     onClick={() => setSelectedBloggerModal(null)}
-                    className="px-6 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors cursor-pointer"
+                    className="px-6 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all cursor-pointer"
                   >
                     Закрыть
                   </button>
