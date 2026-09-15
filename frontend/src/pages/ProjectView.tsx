@@ -672,6 +672,18 @@ export default function ProjectView() {
   const projectName = currentProject?.name || fallbackNames[projectId] || `Проект #${projectId}`
   const projectInitial = projectName[0] || 'П'
 
+  const handleDeleteCurrentProject = async () => {
+    if (!window.confirm(`Вы уверены, что хотите удалить проект "${projectName}"?`)) {
+      return
+    }
+    try {
+      await api.delete(`/projects/${projectId}`)
+    } catch (err) {
+      console.warn('Backend delete project fallback:', err)
+    }
+    navigate('/projects')
+  }
+
   // Active Tab: 'tasks' | 'plans' | 'bloggers' | 'companies' | 'members' | 'settings'
   const [activeTab, setActiveTab] = useState<'tasks' | 'plans' | 'bloggers' | 'companies' | 'members' | 'settings'>('tasks')
 
@@ -3861,10 +3873,18 @@ export default function ProjectView() {
   return (
     <div className="max-w-[1400px] mx-auto font-sans pb-12">
       
-      {/* Breadcrumb / Back */}
-      <Link to="/projects" className="inline-flex items-center text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-sm font-medium mb-6 transition-colors">
-        <ArrowLeft size={16} className="mr-2" /> Назад к проектам
-      </Link>
+      {/* Breadcrumb / Back & Actions */}
+      <div className="flex items-center justify-between mb-6">
+        <Link to="/projects" className="inline-flex items-center text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-sm font-medium transition-colors">
+          <ArrowLeft size={16} className="mr-2" /> Назад к проектам
+        </Link>
+        <button 
+          onClick={handleDeleteCurrentProject}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors border border-rose-200/60 dark:border-rose-900/50 cursor-pointer"
+        >
+          <Trash2 size={14} /> Удалить проект
+        </button>
+      </div>
 
       {/* Header Area */}
       <div className="flex flex-wrap lg:flex-nowrap justify-between items-start mb-8 gap-6">

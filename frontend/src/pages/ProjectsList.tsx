@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FolderKanban, Plus, ArrowUpRight, ArrowLeft, Calendar } from 'lucide-react'
+import { FolderKanban, Plus, ArrowUpRight, ArrowLeft, Calendar, Trash2 } from 'lucide-react'
 import { api } from '../lib/api'
 
 const initialProjects = [
@@ -100,6 +100,20 @@ export default function ProjectsList() {
     setNewProjectName('')
     setNewProjectDesc('')
     setIsModalOpen(false)
+  }
+
+  const handleDeleteProject = async (e: React.MouseEvent, projectId: number, projectName: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!window.confirm(`Вы уверены, что хотите удалить проект "${projectName}"?`)) {
+      return
+    }
+    try {
+      await api.delete(`/projects/${projectId}`)
+    } catch (err) {
+      console.warn('Backend delete project fallback:', err)
+    }
+    setProjects(prev => prev.filter(p => p.id !== projectId))
   }
 
   // Full-Page View for Creating a Project
@@ -223,15 +237,24 @@ export default function ProjectsList() {
                   {project.name}
                   <ArrowUpRight size={18} className="opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all text-[#4f46e5] ml-1.5 shrink-0" />
                 </h3>
-                <span className={`shrink-0 px-3 py-1 rounded-lg text-xs sm:text-sm font-extrabold border ${
-                  project.progress > 75 
-                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/50' 
-                    : project.progress >= 35 
-                    ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/50' 
-                    : 'bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-400 border-red-200/60 dark:border-red-800/50'
-                }`}>
-                  {project.progress}%
-                </span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className={`px-3 py-1 rounded-lg text-xs sm:text-sm font-extrabold border ${
+                    project.progress > 75 
+                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/50' 
+                      : project.progress >= 35 
+                      ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/50' 
+                      : 'bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-400 border-red-200/60 dark:border-red-800/50'
+                  }`}>
+                    {project.progress}%
+                  </span>
+                  <button
+                    onClick={(e) => handleDeleteProject(e, project.id, project.name)}
+                    className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors cursor-pointer"
+                    title="Удалить проект"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
 
               {/* Plan name and date range with enlarged font size */}
