@@ -260,7 +260,6 @@ const initialBloggers = [
     reach: '180K',
     format: 'Reels + 2 Stories',
     price: '$650',
-    status: 'Вышел пост',
     publishDate: '05.09.2026',
     sprint: 'Спринт 1',
     profileUrl: 'https://instagram.com',
@@ -279,7 +278,6 @@ const initialBloggers = [
     reach: '45K',
     format: 'Экспертный пост с опросом',
     price: '$200',
-    status: 'Оплачено',
     publishDate: '12.09.2026',
     sprint: 'Спринт 2',
     profileUrl: 'https://t.me',
@@ -298,7 +296,6 @@ const initialBloggers = [
     reach: '95K',
     format: 'Stories распаковка аптечки',
     price: '$300',
-    status: 'Согласовано',
     publishDate: '18.09.2026',
     sprint: 'Спринт 3',
     profileUrl: 'https://instagram.com',
@@ -317,13 +314,12 @@ const initialBloggers = [
     reach: '60K',
     format: 'Динамичный ролик с тренировки',
     price: '$180',
-    status: 'Переговоры',
     publishDate: '24.09.2026',
     sprint: 'Спринт 4',
     profileUrl: 'https://tiktok.com',
     postUrl: '',
     managerContact: '@artem_coach',
-    notes: 'Ждем ответа по датам съемки в зале.'
+    notes: 'Съемка динамичного ролика в зале: демонстрация охлаждающего действия Extragel при интенсивных нагрузках.'
   }
 ]
 
@@ -551,7 +547,6 @@ const normalizeBlogger = (b: any) => ({
   views: b.views || 0,
   format: b.format || 'Reels + 2 Stories',
   price: b.price || '$250',
-  status: b.status || 'Переговоры',
   publishDate: b.publishDate || b.publish_date || b.date || '15.09.2026',
   publish_date: b.publish_date || b.publishDate || b.date || '15.09.2026',
   sprint: b.sprint || 'Спринт 2',
@@ -711,7 +706,6 @@ export default function ProjectView() {
   const [bloggersData, setBloggersData] = useState<any[]>([])
   const [bloggerSearch, setBloggerSearch] = useState('')
   const [bloggerPlatformFilter, setBloggerPlatformFilter] = useState('ALL')
-  const [bloggerStatusFilter, setBloggerStatusFilter] = useState('ALL')
   const [isAddBloggerOpen, setIsAddBloggerOpen] = useState(false)
   const [selectedBlogger, setSelectedBlogger] = useState<any | null>(null)
 
@@ -887,7 +881,6 @@ export default function ProjectView() {
         views: normalized.views || 0,
         format: normalized.format,
         price: normalized.price,
-        status: normalized.status,
         publish_date: normalized.publishDate,
         sprint: normalized.sprint,
         profile_url: normalized.profileUrl,
@@ -926,7 +919,6 @@ export default function ProjectView() {
         views: normalized.views || 0,
         format: normalized.format,
         price: normalized.price,
-        status: normalized.status,
         publish_date: normalized.publishDate,
         sprint: normalized.sprint,
         profile_url: normalized.profileUrl,
@@ -941,25 +933,6 @@ export default function ProjectView() {
       }
     } catch (err) {
       console.error('Failed to quick add blogger:', err)
-    }
-  }
-
-  const cycleBloggerStatus = async (id: any, e: React.MouseEvent) => {
-    e.stopPropagation()
-    const statuses = ['Переговоры', 'Согласовано', 'Оплачено', 'Вышел пост']
-    const target = bloggersData.find(b => b.id === id)
-    if (!target) return
-    const nextIdx = (statuses.indexOf(target.status) + 1) % statuses.length
-    const nextStatus = statuses[nextIdx]
-
-    setBloggersData(data => data.map(b => b.id === id ? { ...b, status: nextStatus } : b))
-
-    if (typeof id === 'number' || (typeof id === 'string' && /^\d+$/.test(id))) {
-      try {
-        await api.put(`/bloggers/${id}`, { status: nextStatus })
-      } catch (err) {
-        console.error('Failed to update blogger status in backend:', err)
-      }
     }
   }
 
@@ -993,7 +966,6 @@ export default function ProjectView() {
           views: normalized.views || 0,
           format: normalized.format,
           price: normalized.price,
-          status: normalized.status,
           publish_date: normalized.publishDate,
           sprint: normalized.sprint,
           profile_url: normalized.profileUrl,
@@ -1168,10 +1140,9 @@ export default function ProjectView() {
         b.handle.toLowerCase().includes(q) ||
         (b.notes && b.notes.toLowerCase().includes(q))
       const matchesPlatform = bloggerPlatformFilter === 'ALL' || b.platform === bloggerPlatformFilter
-      const matchesStatus = bloggerStatusFilter === 'ALL' || b.status === bloggerStatusFilter
-      return matchesSearch && matchesPlatform && matchesStatus
+      return matchesSearch && matchesPlatform
     })
-  }, [bloggersData, bloggerSearch, bloggerPlatformFilter, bloggerStatusFilter])
+  }, [bloggersData, bloggerSearch, bloggerPlatformFilter])
 
   const filteredCompanies = useMemo(() => {
     return companiesData.filter(c => {
@@ -2536,12 +2507,7 @@ export default function ProjectView() {
           <div className="flex items-center gap-6 bg-gray-50 dark:bg-[#121418] px-6 py-4 rounded-2xl border border-gray-100 dark:border-[#262932]">
             <div>
               <span className="text-xs text-gray-400 font-bold uppercase block mb-0.5">Гонорар</span>
-              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{selectedBlogger.cost}</span>
-            </div>
-            <div className="w-px h-10 bg-gray-200 dark:bg-[#262932]"></div>
-            <div>
-              <span className="text-xs text-gray-400 font-bold uppercase block mb-0.5">Статус</span>
-              <span className="text-base font-bold text-indigo-700 dark:text-indigo-400">{selectedBlogger.status}</span>
+              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{selectedBlogger.cost || selectedBlogger.price}</span>
             </div>
           </div>
         </div>
@@ -2751,19 +2717,6 @@ export default function ProjectView() {
           </div>
 
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm">
-              <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-3">Статус публикации</label>
-              <select
-                value={selectedBlogger.status}
-                onChange={(e) => setSelectedBlogger({ ...selectedBlogger, status: e.target.value })}
-                className="w-full bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-3 text-sm font-bold text-gray-800 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
-              >
-                <option value="Договорились">Договорились</option>
-                <option value="Согласовано">Согласовано</option>
-                <option value="Оплачено">Оплачено</option>
-                <option value="Вышел пост">Вышел пост</option>
-              </select>
-            </div>
 
             <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 border border-gray-100 dark:border-[#262932] shadow-sm">
               <label className="block text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">Гонорар ($)</label>
@@ -2846,7 +2799,7 @@ export default function ProjectView() {
                 </span>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Достаточно написать только <strong>Имя</strong> и <strong>Никнейм</strong> — система сама определит охваты, подписчиков, оптимальный формат, стоимость и бриф!
+                Добавляйте подтвержденных блогеров, с которыми согласованы условия сотрудничества. Достаточно указать <strong>Имя</strong> и <strong>Никнейм</strong>.
               </p>
             </div>
           </div>
@@ -4736,7 +4689,7 @@ export default function ProjectView() {
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Список блогеров ({projectName})</h2>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Нажмите на блогера в списке, чтобы открыть подробную информацию, бриф и ссылку на публикацию
+                Инфлюенсеры, с которыми согласованы условия и ведётся сотрудничество
               </p>
             </div>
             
@@ -4822,22 +4775,6 @@ export default function ProjectView() {
                 ))}
               </div>
             </div>
-
-            {/* Status Filter */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Статус:</span>
-              <select
-                value={bloggerStatusFilter}
-                onChange={(e) => setBloggerStatusFilter(e.target.value)}
-                className="bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 outline-none cursor-pointer focus:bg-white dark:focus:bg-[#181b20] focus:border-[#4f46e5]"
-              >
-                <option value="ALL">Все статусы</option>
-                <option value="Переговоры">Переговоры</option>
-                <option value="Согласовано">Согласовано</option>
-                <option value="Оплачено">Оплачено</option>
-                <option value="Вышел пост">Вышел пост</option>
-              </select>
-            </div>
           </div>
 
           {/* Clean Bloggers List */}
@@ -4846,14 +4783,10 @@ export default function ProjectView() {
               <div className="bg-white dark:bg-[#181b20] rounded-2xl border border-gray-100 dark:border-[#262932] p-12 text-center text-gray-400 dark:text-gray-500">
                 <Users size={36} className="mx-auto mb-2 text-gray-300 dark:text-gray-600 stroke-[1.5]" />
                 <p className="font-semibold text-gray-600 dark:text-gray-300">Блогеры не найдены</p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Попробуйте изменить поисковый запрос или фильтр</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Попробуйте изменить поисковый запрос или фильтр платформы</p>
               </div>
             ) : (
               filteredBloggers.map((blogger) => {
-                const isPublished = blogger.status === 'Вышел пост'
-                const isPaid = blogger.status === 'Оплачено'
-                const isApproved = blogger.status === 'Согласовано'
-
                 return (
                   <div 
                     key={blogger.id}
@@ -4898,41 +4831,22 @@ export default function ProjectView() {
                       <span className="text-gray-400 dark:text-gray-500 font-medium">{blogger.publishDate}</span>
                     </div>
 
-                    {/* Right: Price, Status & Detailed View CTA */}
+                    {/* Right: Price & Detailed View CTA */}
                     <div className="flex items-center gap-3 ml-auto">
                       <div className="text-right">
                         <span className="font-bold text-gray-900 dark:text-white font-mono text-sm">{blogger.price}</span>
                         <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">охват ~{blogger.reach}</p>
                       </div>
 
-                      {/* Status Button */}
-                      <button 
-                        type="button"
-                        onClick={(e) => cycleBloggerStatus(blogger.id, e)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all transform active:scale-95 shadow-sm border cursor-pointer ${
-                          isPublished
-                            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
-                            : isPaid
-                            ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60'
-                            : isApproved
-                            ? 'bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/60'
-                            : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60'
-                        }`}
-                        title="Нажмите для быстрой смены статуса"
-                      >
-                        {isPublished && <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />}
-                        {blogger.status}
-                      </button>
-
-                      {/* Direct Post Link Icon if published */}
+                      {/* Direct Post Link Icon if exists */}
                       {blogger.postUrl && (
                         <a
                           href={blogger.postUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 flex items-center justify-center transition-colors"
-                          title="Открыть опубликованный пост"
+                          className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 flex items-center justify-center transition-colors"
+                          title="Открыть публикацию"
                         >
                           <ExternalLink size={14} />
                         </a>
