@@ -4,42 +4,314 @@ import {
   Download, Upload, Filter, Calendar, 
   Layers, Sparkles, Activity, 
   Award, Search, Stethoscope, ShoppingBag, Briefcase, Loader2,
-  DollarSign, Users, Eye, X, ExternalLink
+  DollarSign, Users, Eye, X, ExternalLink,
+  Table, Kanban, AlertTriangle
 } from 'lucide-react'
 import { initialRnpData, RnpItem } from '../data/rnpData'
 import { api } from '../lib/api'
 
-// Operational Task Plan / Fact Dataset
-const operationalReportData = [
+// Operational Sprints & Task Plan / Fact Dataset
+export interface SprintTask {
+  id: string
+  name: string
+  plan: number
+  fact: number
+  unit: string
+  percent: number
+  assignee: string
+}
+
+export interface ProjectSprint {
+  sprintId: number
+  name: string
+  dates: string
+  isCurrent?: boolean
+  plan: number
+  fact: number
+  unit: string
+  percent: number
+  tasks: SprintTask[]
+}
+
+export interface ProjectOperationalPlan {
+  id: number
+  project: string
+  category: string
+  manager: string
+  month: string
+  overallPlan: number
+  overallFact: number
+  overallProgress: number
+  unit: string
+  sprints: ProjectSprint[]
+}
+
+const operationalReportData: ProjectOperationalPlan[] = [
   {
     id: 1,
     project: 'Extragel',
+    category: 'Фармацевтика / Мази',
+    manager: 'Азамат Ю.',
     month: 'Сентябрь 2026',
-    overallProgress: 88,
-    items: [
-      { name: 'Аптечные визиты Ташкент', plan: 120, fact: 95, unit: 'визитов', percent: 79, status: 'In Progress' },
-      { name: 'Визиты к врачам (травматологи/ортопеды)', plan: 80, fact: 80, unit: 'визитов', percent: 100, status: 'Done' },
-      { name: 'Фармаконадзор и отчеты', plan: 20, fact: 14, unit: 'отчетов', percent: 70, status: 'In Progress' },
+    overallPlan: 220,
+    overallFact: 189,
+    overallProgress: 86,
+    unit: 'визитов',
+    sprints: [
+      {
+        sprintId: 1,
+        name: 'Спринт 1',
+        dates: '01.09 — 07.09',
+        plan: 55,
+        fact: 55,
+        percent: 100,
+        unit: 'визитов',
+        tasks: [
+          { id: 't1_1', name: 'Аптечные визиты Ташкент (Центр)', plan: 30, fact: 30, unit: 'визитов', percent: 100, assignee: 'Азамат Ю.' },
+          { id: 't1_2', name: 'Визиты к травматологам и хирургам', plan: 20, fact: 20, unit: 'визитов', percent: 100, assignee: 'Наргиза К.' },
+          { id: 't1_3', name: 'Размещение POSM в сетях 36.6', plan: 5, fact: 5, unit: 'точек', percent: 100, assignee: 'Тимур М.' }
+        ]
+      },
+      {
+        sprintId: 2,
+        name: 'Спринт 2',
+        dates: '08.09 — 14.09',
+        plan: 55,
+        fact: 52,
+        percent: 95,
+        unit: 'визитов',
+        tasks: [
+          { id: 't2_1', name: 'Аптечные визиты Чиланзар & Юнусабад', plan: 30, fact: 28, unit: 'визитов', percent: 93, assignee: 'Азамат Ю.' },
+          { id: 't2_2', name: 'Визиты к спортивным врачам', plan: 20, fact: 20, unit: 'визитов', percent: 100, assignee: 'Наргиза К.' },
+          { id: 't2_3', name: 'Проверка первой линии выкладки', plan: 5, fact: 4, unit: 'точек', percent: 80, assignee: 'Тимур М.' }
+        ]
+      },
+      {
+        sprintId: 3,
+        name: 'Спринт 3',
+        dates: '15.09 — 21.09',
+        isCurrent: true,
+        plan: 55,
+        fact: 44,
+        percent: 80,
+        unit: 'визитов',
+        tasks: [
+          { id: 't3_1', name: 'Аптечные визиты Самарканд', plan: 30, fact: 24, unit: 'визитов', percent: 80, assignee: 'Азамат Ю.' },
+          { id: 't3_2', name: 'Визиты к ортопедам и реабилитологам', plan: 20, fact: 16, unit: 'визитов', percent: 80, assignee: 'Наргиза К.' },
+          { id: 't3_3', name: 'Фармаконадзор и мониторинг наличия', plan: 5, fact: 4, unit: 'отчетов', percent: 80, assignee: 'Лола Т.' }
+        ]
+      },
+      {
+        sprintId: 4,
+        name: 'Спринт 4',
+        dates: '22.09 — 30.09',
+        plan: 55,
+        fact: 38,
+        percent: 69,
+        unit: 'визитов',
+        tasks: [
+          { id: 't4_1', name: 'Повторный аудит аптек и дозаказ', plan: 35, fact: 25, unit: 'визитов', percent: 71, assignee: 'Азамат Ю.' },
+          { id: 't4_2', name: 'Клинические презентации в клиниках', plan: 20, fact: 13, unit: 'визитов', percent: 65, assignee: 'Наргиза К.' }
+        ]
+      }
     ]
   },
   {
     id: 2,
     project: 'Masculan',
+    category: 'Контрацепция & Wellness',
+    manager: 'Тимур М.',
     month: 'Сентябрь 2026',
-    overallProgress: 75,
-    items: [
-      { name: 'Аптечные визиты Самарканд + Регионы', plan: 90, fact: 90, unit: 'визитов', percent: 100, status: 'Done' },
-      { name: 'Установка фирменных промостоек', plan: 15, fact: 6, unit: 'штук', percent: 40, status: 'Not Done' },
+    overallPlan: 145,
+    overallFact: 110,
+    overallProgress: 76,
+    unit: 'задач',
+    sprints: [
+      {
+        sprintId: 1,
+        name: 'Спринт 1',
+        dates: '01.09 — 07.09',
+        plan: 35,
+        fact: 35,
+        percent: 100,
+        unit: 'визитов',
+        tasks: [
+          { id: 'm1_1', name: 'Аптечные визиты Ташкент (Сеть Olam)', plan: 25, fact: 25, unit: 'визитов', percent: 100, assignee: 'Тимур М.' },
+          { id: 'm1_2', name: 'Мерчендайзинг кассовой зоны', plan: 10, fact: 10, unit: 'точек', percent: 100, assignee: 'Сардор Р.' }
+        ]
+      },
+      {
+        sprintId: 2,
+        name: 'Спринт 2',
+        dates: '08.09 — 14.09',
+        plan: 35,
+        fact: 30,
+        percent: 86,
+        unit: 'визитов',
+        tasks: [
+          { id: 'm2_1', name: 'Визиты в ключевые аптеки Самарканда', plan: 25, fact: 22, unit: 'визитов', percent: 88, assignee: 'Тимур М.' },
+          { id: 'm2_2', name: 'Установка брендированных диспенсеров', plan: 10, fact: 8, unit: 'штук', percent: 80, assignee: 'Сардор Р.' }
+        ]
+      },
+      {
+        sprintId: 3,
+        name: 'Спринт 3',
+        dates: '15.09 — 21.09',
+        isCurrent: true,
+        plan: 40,
+        fact: 16,
+        percent: 40,
+        unit: 'задач',
+        tasks: [
+          { id: 'm3_1', name: 'Аптечные визиты Фергана & Андижан', plan: 25, fact: 12, unit: 'визитов', percent: 48, assignee: 'Тимур М.' },
+          { id: 'm3_2', name: 'Установка фирменных промостоек B2B', plan: 15, fact: 4, unit: 'штук', percent: 27, assignee: 'Сардор Р.' }
+        ]
+      },
+      {
+        sprintId: 4,
+        name: 'Спринт 4',
+        dates: '22.09 — 30.09',
+        plan: 35,
+        fact: 29,
+        percent: 83,
+        unit: 'визитов',
+        tasks: [
+          { id: 'm4_1', name: 'Контрольный аудит выкладки и мерч', plan: 25, fact: 21, unit: 'точек', percent: 84, assignee: 'Тимур М.' },
+          { id: 'm4_2', name: 'Итоговые сверки с дистрибьюторами', plan: 10, fact: 8, unit: 'отчетов', percent: 80, assignee: 'Лола Т.' }
+        ]
+      }
     ]
   },
   {
     id: 3,
     project: 'Энтеросгель',
+    category: 'Энтеросорбенты & Детокс',
+    manager: 'Наргиза К.',
     month: 'Сентябрь 2026',
+    overallPlan: 160,
+    overallFact: 148,
     overallProgress: 92,
-    items: [
-      { name: 'Фармкружки по сетям 36.6', plan: 30, fact: 28, unit: 'кружков', percent: 93, status: 'Done' },
-      { name: 'Мерчендайзинг витрин первой линии', plan: 50, fact: 45, unit: 'точек', percent: 90, status: 'Done' },
+    unit: 'визитов',
+    sprints: [
+      {
+        sprintId: 1,
+        name: 'Спринт 1',
+        dates: '01.09 — 07.09',
+        plan: 40,
+        fact: 40,
+        percent: 100,
+        unit: 'визитов',
+        tasks: [
+          { id: 'e1_1', name: 'Фармкружки по сетям Ташкента', plan: 20, fact: 20, unit: 'кружков', percent: 100, assignee: 'Наргиза К.' },
+          { id: 'e1_2', name: 'Визиты к гастроэнтерологам и педиатрам', plan: 20, fact: 20, unit: 'визитов', percent: 100, assignee: 'Азиз Т.' }
+        ]
+      },
+      {
+        sprintId: 2,
+        name: 'Спринт 2',
+        dates: '08.09 — 14.09',
+        plan: 40,
+        fact: 38,
+        percent: 95,
+        unit: 'визитов',
+        tasks: [
+          { id: 'e2_1', name: 'Фармкружки региональные сети', plan: 20, fact: 19, unit: 'кружков', percent: 95, assignee: 'Наргиза К.' },
+          { id: 'e2_2', name: 'Визиты к инфекционистам клиник', plan: 20, fact: 19, unit: 'визитов', percent: 95, assignee: 'Азиз Т.' }
+        ]
+      },
+      {
+        sprintId: 3,
+        name: 'Спринт 3',
+        dates: '15.09 — 21.09',
+        isCurrent: true,
+        plan: 40,
+        fact: 36,
+        percent: 90,
+        unit: 'визитов',
+        tasks: [
+          { id: 'e3_1', name: 'Обучение провизоров первой линии', plan: 20, fact: 18, unit: 'аптек', percent: 90, assignee: 'Наргиза К.' },
+          { id: 'e3_2', name: 'Аудит товарных остатков в рознице', plan: 20, fact: 18, unit: 'точек', percent: 90, assignee: 'Азиз Т.' }
+        ]
+      },
+      {
+        sprintId: 4,
+        name: 'Спринт 4',
+        dates: '22.09 — 30.09',
+        plan: 40,
+        fact: 34,
+        percent: 85,
+        unit: 'визитов',
+        tasks: [
+          { id: 'e4_1', name: 'Сезонный мониторинг спроса', plan: 20, fact: 18, unit: 'отчетов', percent: 90, assignee: 'Наргиза К.' },
+          { id: 'e4_2', name: 'Контроль наличия в дежурных аптеках', plan: 20, fact: 16, unit: 'визитов', percent: 80, assignee: 'Азиз Т.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 4,
+    project: 'Фитосепт',
+    category: 'Антисептики & ЛОР',
+    manager: 'Сардор Р.',
+    month: 'Сентябрь 2026',
+    overallPlan: 110,
+    overallFact: 94,
+    overallProgress: 85,
+    unit: 'визитов',
+    sprints: [
+      {
+        sprintId: 1,
+        name: 'Спринт 1',
+        dates: '01.09 — 07.09',
+        plan: 28,
+        fact: 28,
+        percent: 100,
+        unit: 'визитов',
+        tasks: [
+          { id: 'f1_1', name: 'Визиты к ЛОР-врачам Ташкент', plan: 18, fact: 18, unit: 'визитов', percent: 100, assignee: 'Сардор Р.' },
+          { id: 'f1_2', name: 'Мерчендайзинг первой полки', plan: 10, fact: 10, unit: 'точек', percent: 100, assignee: 'Азамат Ю.' }
+        ]
+      },
+      {
+        sprintId: 2,
+        name: 'Спринт 2',
+        dates: '08.09 — 14.09',
+        plan: 28,
+        fact: 25,
+        percent: 89,
+        unit: 'визитов',
+        tasks: [
+          { id: 'f2_1', name: 'Визиты к терапевтам поликлиник', plan: 18, fact: 16, unit: 'визитов', percent: 89, assignee: 'Сардор Р.' },
+          { id: 'f2_2', name: 'Распространение методических материалов', plan: 10, fact: 9, unit: 'комплектов', percent: 90, assignee: 'Азамат Ю.' }
+        ]
+      },
+      {
+        sprintId: 3,
+        name: 'Спринт 3',
+        dates: '15.09 — 21.09',
+        isCurrent: true,
+        plan: 28,
+        fact: 23,
+        percent: 82,
+        unit: 'визитов',
+        tasks: [
+          { id: 'f3_1', name: 'Аптечные кружки по противопростудным', plan: 18, fact: 15, unit: 'кружков', percent: 83, assignee: 'Сардор Р.' },
+          { id: 'f3_2', name: 'Контроль цен и промо-акций в сетях', plan: 10, fact: 8, unit: 'точек', percent: 80, assignee: 'Азамат Ю.' }
+        ]
+      },
+      {
+        sprintId: 4,
+        name: 'Спринт 4',
+        dates: '22.09 — 30.09',
+        plan: 26,
+        fact: 18,
+        percent: 69,
+        unit: 'визитов',
+        tasks: [
+          { id: 'f4_1', name: 'Итоговые визиты к ключевым врачам', plan: 16, fact: 11, unit: 'визитов', percent: 69, assignee: 'Сардор Р.' },
+          { id: 'f4_2', name: 'Сверка планов с зав. аптеками', plan: 10, fact: 7, unit: 'визитов', percent: 70, assignee: 'Азамат Ю.' }
+        ]
+      }
     ]
   }
 ]
@@ -287,6 +559,9 @@ export default function Reports() {
   const [selectedChartWeek, setSelectedChartWeek] = useState<number>(2) // Default to W3
   const [uploadFeedback, setUploadFeedback] = useState<string | null>(null)
   const [isLoadingRnp, setIsLoadingRnp] = useState<boolean>(false)
+  const [sprintViewMode, setSprintViewMode] = useState<'matrix' | 'timeline'>('matrix')
+  const [activeSprintId, setActiveSprintId] = useState<number>(3) // Sprint 3 is current
+  const [selectedSprintProjectName, setSelectedSprintProjectName] = useState<string>('Extragel')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Fetch RNP items from backend PostgreSQL database
@@ -418,6 +693,56 @@ export default function Reports() {
     if (selectedProject === 'ALL') return operationalReportData
     return operationalReportData.filter(p => p.project.toLowerCase() === selectedProject.toLowerCase())
   }, [selectedProject])
+
+  // Operational Sprints Aggregates
+  const operationalStats = useMemo(() => {
+    const totalPlan = filteredPlans.reduce((acc, p) => acc + p.overallPlan, 0)
+    const totalFact = filteredPlans.reduce((acc, p) => acc + p.overallFact, 0)
+    const totalPercent = Math.round((totalFact / (totalPlan || 1)) * 100)
+
+    // Current Sprint (Sprint 3)
+    const sprint3Plan = filteredPlans.reduce((acc, p) => acc + (p.sprints.find(s => s.sprintId === 3)?.plan || 0), 0)
+    const sprint3Fact = filteredPlans.reduce((acc, p) => acc + (p.sprints.find(s => s.sprintId === 3)?.fact || 0), 0)
+    const sprint3Percent = Math.round((sprint3Fact / (sprint3Plan || 1)) * 100)
+
+    // Project Health distribution
+    const greenCount = filteredPlans.filter(p => p.overallProgress >= 75).length
+    const yellowCount = filteredPlans.filter(p => p.overallProgress >= 35 && p.overallProgress < 75).length
+    const redCount = filteredPlans.filter(p => p.overallProgress < 35).length
+
+    // Critical attention tasks (<35% in any sprint)
+    const criticalTasks: { project: string; task: SprintTask; sprintName: string }[] = []
+    filteredPlans.forEach(p => {
+      p.sprints.forEach(s => {
+        s.tasks.forEach(t => {
+          if (t.percent < 35) {
+            criticalTasks.push({ project: p.project, task: t, sprintName: s.name })
+          }
+        })
+      })
+    })
+
+    return {
+      totalPlan,
+      totalFact,
+      totalPercent,
+      sprint3Plan,
+      sprint3Fact,
+      sprint3Percent,
+      greenCount,
+      yellowCount,
+      redCount,
+      criticalTasks
+    }
+  }, [filteredPlans])
+
+  const currentProjectData = useMemo(() => {
+    return filteredPlans.find(p => p.project.toLowerCase() === selectedSprintProjectName.toLowerCase()) || filteredPlans[0]
+  }, [filteredPlans, selectedSprintProjectName])
+
+  const currentSprintData = useMemo(() => {
+    return currentProjectData?.sprints.find(s => s.sprintId === activeSprintId) || currentProjectData?.sprints[2] || currentProjectData?.sprints[0]
+  }, [currentProjectData, activeSprintId])
 
   const filteredRnp = useMemo(() => {
     return rnpData.filter(item => {
@@ -1174,133 +1499,594 @@ export default function Reports() {
         </div>
       )}
 
-      {/* TAB 2: SPRINTS & OPERATIONAL PLANS */}
+      {/* TAB 2: SPRINTS & OPERATIONAL PLANS - ALL-IN-ONE COMMAND BOARD */}
       {activeReportTab === 'plans' && (
         <div className="space-y-6 animate-fade-in">
-          <div className="bg-white dark:bg-[#181b20] p-6 lg:p-7 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
-            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mb-1">
-              План / Факт спринтов по проектам
-            </h2>
-            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-6">
-              Текущий статус выполнения операционных задач и спринтов команды
-            </p>
+          {/* TOP EXECUTIVE BAR & VIEW SWITCHER */}
+          <div className="bg-white dark:bg-[#181b20] p-5 sm:p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+                <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  Пульт управления спринтами и планом
+                </h2>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-[#222734] text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-[#313849]">
+                  {selectedMonth}
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
+                Сквозной оперативный контроль выполнения всех 4 спринтов и месячных целей по проектам на 1 экране
+              </p>
+            </div>
 
-            <div className="space-y-6">
-              {filteredPlans.map(proj => {
-                const projConfig = getPlanFactProgressConfig(proj.overallProgress)
+            {/* View Mode Toggle: Matrix vs Timeline */}
+            <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262b36] self-start md:self-center">
+              <button
+                type="button"
+                onClick={() => setSprintViewMode('matrix')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                  sprintViewMode === 'matrix'
+                    ? 'bg-white dark:bg-[#1f242e] text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Table className="w-3.5 h-3.5" />
+                <span>Спринт-матрица</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSprintViewMode('timeline')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                  sprintViewMode === 'timeline'
+                    ? 'bg-white dark:bg-[#1f242e] text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Kanban className="w-3.5 h-3.5" />
+                <span>Таймлайн спринтов</span>
+              </button>
+            </div>
+          </div>
+
+          {/* LEVEL 1: TOP 4 KPI CHIPS */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* KPI 1: Overall Month Plan / Fact */}
+            {(() => {
+              const monthCfg = getPlanFactProgressConfig(operationalStats.totalPercent)
+              return (
+                <div className="bg-white dark:bg-[#181b20] p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-[#272b36] shadow-xs flex flex-col justify-between">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Общий план месяца
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-lg text-xs font-black border ${monthCfg.lightBg} ${monthCfg.text} ${monthCfg.border}`}>
+                      {operationalStats.totalPercent}%
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className={`text-2xl sm:text-3xl font-black tracking-tight ${monthCfg.text}`}>
+                      {operationalStats.totalFact}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-400">
+                      / {operationalStats.totalPlan} ед.
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 dark:bg-[#101216] h-2 rounded-full overflow-hidden border border-slate-200/60 dark:border-[#242834]">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${monthCfg.bg}`}
+                      style={{ width: `${Math.min(operationalStats.totalPercent, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* KPI 2: Current Sprint 3 in Focus */}
+            {(() => {
+              const sprintCfg = getPlanFactProgressConfig(operationalStats.sprint3Percent)
+              return (
+                <div className="bg-white dark:bg-[#181b20] p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-[#272b36] shadow-xs flex flex-col justify-between relative overflow-hidden">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        Спринт 3 (15–21 сен)
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+                      В работе
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className={`text-2xl sm:text-3xl font-black tracking-tight ${sprintCfg.text}`}>
+                      {operationalStats.sprint3Fact}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-400">
+                      / {operationalStats.sprint3Plan} ед. ({operationalStats.sprint3Percent}%)
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 dark:bg-[#101216] h-2 rounded-full overflow-hidden border border-slate-200/60 dark:border-[#242834]">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${sprintCfg.bg}`}
+                      style={{ width: `${Math.min(operationalStats.sprint3Percent, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* KPI 3: Health Breakdown */}
+            <div className="bg-white dark:bg-[#181b20] p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-[#272b36] shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Здоровье проектов
+                </span>
+                <span className="text-xs font-bold text-slate-400">
+                  {filteredPlans.length} бр.
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 py-1">
+                <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50">
+                  <span className="text-base font-black text-emerald-600 dark:text-emerald-400">
+                    {operationalStats.greenCount}
+                  </span>
+                  <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400/80">
+                    &ge;75%
+                  </span>
+                </div>
+                <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/50">
+                  <span className="text-base font-black text-amber-600 dark:text-amber-400">
+                    {operationalStats.yellowCount}
+                  </span>
+                  <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400/80">
+                    35–74%
+                  </span>
+                </div>
+                <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200/70 dark:border-rose-900/50">
+                  <span className="text-base font-black text-rose-600 dark:text-rose-400">
+                    {operationalStats.redCount}
+                  </span>
+                  <span className="text-[10px] font-bold text-rose-700 dark:text-rose-400/80">
+                    &lt;35%
+                  </span>
+                </div>
+              </div>
+              <div className="text-[11px] font-semibold text-slate-400 text-center mt-1">
+                Зеленый / Желтый / Красный
+              </div>
+            </div>
+
+            {/* KPI 4: Risk / Attention Zone */}
+            <div className="bg-white dark:bg-[#181b20] p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-[#272b36] shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Зона внимания
+                </span>
+                <AlertTriangle className={`w-4 h-4 ${operationalStats.criticalTasks.length > 0 ? 'text-rose-500' : 'text-emerald-500'}`} />
+              </div>
+              {operationalStats.criticalTasks.length > 0 ? (
+                <div>
+                  <div className="flex items-baseline gap-1.5 mb-1">
+                    <span className="text-2xl font-black text-rose-600 dark:text-rose-400">
+                      {operationalStats.criticalTasks.length}
+                    </span>
+                    <span className="text-xs font-bold text-rose-500">
+                      задачи требуют контроля (&lt;35%)
+                    </span>
+                  </div>
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 line-clamp-2">
+                    {operationalStats.criticalTasks[0].project}: {operationalStats.criticalTasks[0].task.name} ({operationalStats.criticalTasks[0].task.percent}%)
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-black text-sm mb-1">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Критических сбоев нет
+                  </div>
+                  <p className="text-xs text-slate-400 font-medium">Все спринтерские задачи выше порога 35%</p>
+                </div>
+              )}
+              <div className="text-[11px] font-semibold text-slate-400 mt-2">
+                Оперативный статус по всем точкам
+              </div>
+            </div>
+          </div>
+
+          {/* LEVEL 2: MAIN BOARD (SPRINT MATRIX OR TIMELINE) */}
+          {sprintViewMode === 'matrix' ? (
+            /* SPRINT MATRIX TABLE */
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-xs overflow-hidden">
+              <div className="p-4 sm:p-5 border-b border-slate-200/80 dark:border-[#272b36] flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/70 dark:bg-[#14171d]">
+                <div>
+                  <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+                    Сводная матрица спринтов (Все бренды &times; Спринты 1–4)
+                  </h3>
+                  <p className="text-xs font-medium text-slate-400">
+                    Нажмите на любую ячейку спринта или проект для мгновенного просмотра задач внизу
+                  </p>
+                </div>
+                <div className="text-xs font-bold text-slate-400 flex items-center gap-3">
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" /> &ge;75%
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" /> 35–74%
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-rose-500" /> &lt;35%
+                  </span>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[900px]">
+                  <thead>
+                    <tr className="border-b border-slate-200/80 dark:border-[#242934] bg-slate-100/60 dark:bg-[#121419] text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      <th className="py-3 px-4 w-[20%]">Проект и куратор</th>
+                      <th className="py-3 px-3 w-[16%]">Спринт 1 <span className="font-semibold text-slate-400 block text-[10px]">01–07 сен</span></th>
+                      <th className="py-3 px-3 w-[16%]">Спринт 2 <span className="font-semibold text-slate-400 block text-[10px]">08–14 сен</span></th>
+                      <th className="py-3 px-3 w-[18%] bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-x border-emerald-200/60 dark:border-emerald-900/40">
+                        <div className="flex items-center justify-between">
+                          <span>Спринт 3</span>
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500 text-white uppercase tracking-normal">Текущий</span>
+                        </div>
+                        <span className="font-semibold text-emerald-600/80 dark:text-emerald-400/80 block text-[10px]">15–21 сен</span>
+                      </th>
+                      <th className="py-3 px-3 w-[16%]">Спринт 4 <span className="font-semibold text-slate-400 block text-[10px]">22–30 сен</span></th>
+                      <th className="py-3 px-4 w-[14%] text-right">Итого за месяц</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-[#202530]">
+                    {filteredPlans.map(proj => {
+                      const isProjSelected = selectedSprintProjectName.toLowerCase() === proj.project.toLowerCase()
+                      const projMonthCfg = getPlanFactProgressConfig(proj.overallProgress)
+
+                      return (
+                        <tr 
+                          key={proj.id}
+                          className={`transition-colors ${
+                            isProjSelected 
+                              ? 'bg-slate-50 dark:bg-[#1a1f29]' 
+                              : 'hover:bg-slate-50/60 dark:hover:bg-[#161a22]'
+                          }`}
+                        >
+                          {/* Project Name Cell */}
+                          <td className="py-3.5 px-4">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedSprintProjectName(proj.project)
+                              }}
+                              className="text-left group flex items-start gap-2.5"
+                            >
+                              <div className={`w-3 h-3 rounded-full mt-1 shrink-0 ${projMonthCfg.bg}`} />
+                              <div>
+                                <div className="text-sm font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                                  {proj.project}
+                                  {isProjSelected && (
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                  )}
+                                </div>
+                                <div className="text-xs text-slate-400 font-medium">
+                                  {proj.category}
+                                </div>
+                                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
+                                  Отв: {proj.manager}
+                                </div>
+                              </div>
+                            </button>
+                          </td>
+
+                          {/* Sprints 1 to 4 */}
+                          {proj.sprints.map(s => {
+                            const isCellActive = isProjSelected && activeSprintId === s.sprintId
+                            const sCfg = getPlanFactProgressConfig(s.percent)
+                            const isCurrentCol = s.sprintId === 3
+
+                            return (
+                              <td 
+                                key={s.sprintId}
+                                className={`py-2 px-2.5 ${
+                                  isCurrentCol ? 'bg-emerald-50/30 dark:bg-emerald-950/10 border-x border-emerald-100/60 dark:border-emerald-900/30' : ''
+                                }`}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedSprintProjectName(proj.project)
+                                    setActiveSprintId(s.sprintId)
+                                  }}
+                                  className={`w-full text-left p-2.5 rounded-xl border transition-all ${
+                                    isCellActive
+                                      ? 'bg-white dark:bg-[#1c222c] border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs'
+                                      : 'bg-white/60 dark:bg-[#15181f]/60 border-slate-200/80 dark:border-[#272c38] hover:border-slate-300 dark:hover:border-[#384050]'
+                                  }`}
+                                >
+                                  {/* Progress & % row */}
+                                  <div className="flex items-center justify-between gap-1 mb-1.5">
+                                    <span className={`text-xs font-black tracking-tight ${sCfg.text}`}>
+                                      {s.percent}%
+                                    </span>
+                                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${sCfg.lightBg} ${sCfg.text} ${sCfg.border}`}>
+                                      {sCfg.label}
+                                    </span>
+                                  </div>
+
+                                  {/* Plan / Fact prominent text */}
+                                  <div className="text-xs font-black text-slate-800 dark:text-slate-200 mb-1.5">
+                                    <span className={sCfg.text}>{s.fact}</span>
+                                    <span className="text-slate-400 font-semibold"> / {s.plan} {s.unit}</span>
+                                  </div>
+
+                                  {/* Micro progress bar */}
+                                  <div className="w-full bg-slate-100 dark:bg-[#101216] h-1.5 rounded-full overflow-hidden">
+                                    <div 
+                                      className={`h-full rounded-full transition-all duration-300 ${sCfg.bg}`}
+                                      style={{ width: `${Math.min(s.percent, 100)}%` }}
+                                    />
+                                  </div>
+                                </button>
+                              </td>
+                            )
+                          })}
+
+                          {/* Month Total Column */}
+                          <td className="py-3.5 px-4 text-right">
+                            <div className="inline-block text-right">
+                              <span className={`text-base font-black tracking-tight ${projMonthCfg.text}`}>
+                                {proj.overallProgress}%
+                              </span>
+                              <div className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                {proj.overallFact} / {proj.overallPlan} {proj.unit}
+                              </div>
+                              <span className={`inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-md border ${projMonthCfg.lightBg} ${projMonthCfg.text} ${projMonthCfg.border}`}>
+                                {projMonthCfg.label}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            /* TIMELINE VIEW (4 SPRINT COLUMNS) */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map(sId => {
+                const isCurrent = sId === 3
+                const sName = `Спринт ${sId}`
+                const sDates = sId === 1 ? '01–07 сен' : sId === 2 ? '08–14 сен' : sId === 3 ? '15–21 сен' : '22–30 сен'
+                const sStatus = sId < 3 ? 'Завершен' : sId === 3 ? 'В работе' : 'План'
 
                 return (
                   <div 
-                    key={proj.id} 
-                    className="p-5 sm:p-6 bg-slate-50 dark:bg-[#121418] rounded-3xl border border-slate-200 dark:border-[#2b303c]"
+                    key={sId}
+                    className={`bg-white dark:bg-[#181b20] rounded-3xl border p-4 sm:p-5 flex flex-col justify-between ${
+                      isCurrent 
+                        ? 'border-emerald-500/80 shadow-md ring-1 ring-emerald-500/20' 
+                        : 'border-slate-200/90 dark:border-[#2b303c]'
+                    }`}
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3.5 h-3.5 rounded-full ${projConfig.bg} shadow-xs`} />
-                        <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-                          {proj.project}
-                        </h3>
-                        <span className="text-sm font-semibold text-slate-400">({proj.month})</span>
-                      </div>
-
-                      <div className="flex items-center gap-3.5">
-                        <span className={`text-sm sm:text-base font-black ${projConfig.text}`}>
-                          Выполнение: {proj.overallProgress}%
-                        </span>
-                        <div className="w-36 sm:w-44 bg-slate-200 dark:bg-[#20242e] h-3 rounded-full overflow-hidden p-0.5 border border-slate-300/40 dark:border-[#2c3140]">
-                          <div 
-                            className={`h-full rounded-full transition-all duration-500 ${projConfig.bg}`} 
-                            style={{ width: `${Math.min(proj.overallProgress, 100)}%` }} 
-                          />
+                    <div>
+                      {/* Sprint Header */}
+                      <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-100 dark:border-[#222732]">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-sm font-black text-slate-900 dark:text-white">
+                              {sName}
+                            </h4>
+                            {isCurrent && (
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                            )}
+                          </div>
+                          <span className="text-xs text-slate-400 font-semibold">{sDates}</span>
                         </div>
+                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${
+                          isCurrent 
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                            : sId < 3
+                            ? 'bg-slate-100 dark:bg-[#20242e] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-[#2a303e]'
+                            : 'bg-slate-50 dark:bg-[#15171e] text-slate-400 border-slate-200 dark:border-[#222530]'
+                        }`}>
+                          {sStatus}
+                        </span>
                       </div>
-                    </div>
 
-                    {/* Items list - Prominent Plan vs Fact Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-4">
-                      {proj.items.map((it, idx) => {
-                        const itemConfig = getPlanFactProgressConfig(it.percent)
-                        const isOverTarget = it.fact >= it.plan
-                        const remaining = Math.max(0, it.plan - it.fact)
+                      {/* Project Cards in this sprint */}
+                      <div className="space-y-3">
+                        {filteredPlans.map(p => {
+                          const sprintObj = p.sprints.find(s => s.sprintId === sId)
+                          if (!sprintObj) return null
+                          const sCfg = getPlanFactProgressConfig(sprintObj.percent)
+                          const isSelected = selectedSprintProjectName.toLowerCase() === p.project.toLowerCase() && activeSprintId === sId
 
-                        return (
-                          <div 
-                            key={idx} 
-                            className="bg-white dark:bg-[#181b20] p-5 rounded-2xl border border-slate-200/90 dark:border-[#272b36] shadow-xs hover:shadow-md hover:border-slate-300 dark:hover:border-[#383e4e] transition-all flex flex-col justify-between"
-                          >
-                            <div>
-                              {/* Top row: Status Badge and Percentage */}
-                              <div className="flex items-center justify-between gap-2 mb-3">
-                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold text-xs border ${itemConfig.lightBg} ${itemConfig.text} ${itemConfig.border}`}>
-                                  <span className={`w-1.5 h-1.5 rounded-full ${itemConfig.bg}`} />
-                                  {itemConfig.label}
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedSprintProjectName(p.project)
+                                setActiveSprintId(sId)
+                              }}
+                              className={`w-full text-left p-3 rounded-2xl border transition-all ${
+                                isSelected
+                                  ? 'bg-slate-50 dark:bg-[#1e232e] border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs'
+                                  : 'bg-slate-50/60 dark:bg-[#14161c] border-slate-200/70 dark:border-[#242834] hover:border-slate-300 dark:hover:border-[#323846]'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-1 mb-1">
+                                <span className="text-xs font-black text-slate-900 dark:text-white">
+                                  {p.project}
                                 </span>
-                                <span className={`text-lg font-black tracking-tight ${itemConfig.text}`}>
-                                  {it.percent}%
+                                <span className={`text-xs font-black ${sCfg.text}`}>
+                                  {sprintObj.percent}%
                                 </span>
                               </div>
-
-                              {/* Task Title */}
-                              <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mb-4 line-clamp-2 min-h-[44px] leading-snug">
-                                {it.name}
-                              </h4>
-
-                              {/* Prominent Plan vs Fact Dual Box */}
-                              <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50/90 dark:bg-[#101216] border border-slate-100 dark:border-[#20242f] mb-4">
-                                <div>
-                                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-1">
-                                    План
-                                  </span>
-                                  <div className="flex items-baseline gap-1.5">
-                                    <span className="text-2xl font-black text-slate-800 dark:text-slate-200 tracking-tight">
-                                      {it.plan}
-                                    </span>
-                                    <span className="text-xs font-semibold text-slate-400">
-                                      {it.unit}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                <div className="border-l border-slate-200/80 dark:border-[#242834] pl-3.5">
-                                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-1">
-                                    Факт
-                                  </span>
-                                  <div className="flex items-baseline gap-1.5">
-                                    <span className={`text-2xl font-black tracking-tight ${itemConfig.text}`}>
-                                      {it.fact}
-                                    </span>
-                                    <span className="text-xs font-semibold text-slate-400">
-                                      {it.unit}
-                                    </span>
-                                  </div>
-                                </div>
+                              <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-2">
+                                Факт: <span className={sCfg.text}>{sprintObj.fact}</span> / {sprintObj.plan} {sprintObj.unit}
                               </div>
-                            </div>
-
-                            {/* Visual Progress Bar & Progress Details */}
-                            <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-[#20242f]">
-                              <div className="w-full bg-slate-100 dark:bg-[#101216] h-2.5 rounded-full overflow-hidden border border-slate-200/60 dark:border-[#242834]">
+                              <div className="w-full bg-slate-200/70 dark:bg-[#101216] h-1.5 rounded-full overflow-hidden">
                                 <div 
-                                  className={`h-full rounded-full transition-all duration-500 ${itemConfig.bg}`}
-                                  style={{ width: `${Math.min(it.percent, 100)}%` }}
+                                  className={`h-full rounded-full transition-all duration-300 ${sCfg.bg}`}
+                                  style={{ width: `${Math.min(sprintObj.percent, 100)}%` }}
                                 />
                               </div>
-                              <div className="flex justify-between items-center text-xs font-semibold text-slate-500 dark:text-slate-400">
-                                <span>Прогресс: {it.percent}%</span>
-                                <span className={isOverTarget ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}>
-                                  {isOverTarget ? '✓ План выполнен' : `Осталось: ${remaining} ${it.unit}`}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      })}
+                            </button>
+                          )
+                        })}
+                      </div>
                     </div>
                   </div>
                 )
               })}
             </div>
-          </div>
+          )}
+
+          {/* LEVEL 3: GRANULAR TASK INSPECTION (SPRINT DEEP-DIVE ON THE SAME PAGE) */}
+          {currentProjectData && currentSprintData && (
+            <div className="bg-white dark:bg-[#181b20] p-5 sm:p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-xs">
+              {/* Header with Project and Sprint Switchers */}
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-[#242934] mb-5">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      Детализация задач спринта
+                    </span>
+                    <span className="text-slate-300 dark:text-slate-600">&bull;</span>
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      {currentProjectData.project}
+                    </span>
+                    <span className="text-slate-300 dark:text-slate-600">&bull;</span>
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                      {currentSprintData.name} ({currentSprintData.dates})
+                    </span>
+                    {currentSprintData.isCurrent && (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-500 text-white uppercase tracking-normal">
+                        Текущий в работе
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                    Задачи проекта &laquo;{currentProjectData.project}&raquo; ({currentProjectData.category})
+                  </h3>
+                </div>
+
+                {/* Interactive Sprint Switcher Pills */}
+                <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262b36]">
+                  {currentProjectData.sprints.map(s => {
+                    const isSActive = s.sprintId === activeSprintId
+                    const sCfg = getPlanFactProgressConfig(s.percent)
+
+                    return (
+                      <button
+                        key={s.sprintId}
+                        type="button"
+                        onClick={() => setActiveSprintId(s.sprintId)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                          isSActive
+                            ? 'bg-white dark:bg-[#1f242e] text-slate-900 dark:text-white shadow-xs'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${sCfg.bg}`} />
+                        <span>{s.name}</span>
+                        <span className={`text-[10px] font-black ${sCfg.text}`}>({s.percent}%)</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Task Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {currentSprintData.tasks.map((task, idx) => {
+                  const tCfg = getPlanFactProgressConfig(task.percent)
+                  const isDone = task.fact >= task.plan
+                  const remaining = Math.max(0, task.plan - task.fact)
+
+                  return (
+                    <div 
+                      key={task.id || idx}
+                      className="bg-slate-50/80 dark:bg-[#14161c] p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-[#262b36] flex flex-col justify-between shadow-xs hover:border-slate-300 dark:hover:border-[#343a48] transition-all"
+                    >
+                      <div>
+                        {/* Top: Status & % */}
+                        <div className="flex items-center justify-between gap-2 mb-2.5">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold border ${tCfg.lightBg} ${tCfg.text} ${tCfg.border}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${tCfg.bg}`} />
+                            {tCfg.label}
+                          </span>
+                          <span className={`text-base font-black tracking-tight ${tCfg.text}`}>
+                            {task.percent}%
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2 line-clamp-2 leading-snug">
+                          {task.name}
+                        </h4>
+
+                        {/* Assignee */}
+                        <div className="text-[11px] font-semibold text-slate-400 mb-3">
+                          Ответственный: <span className="text-slate-600 dark:text-slate-300 font-bold">{task.assignee}</span>
+                        </div>
+
+                        {/* Plan vs Fact Dual Box */}
+                        <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-white dark:bg-[#1a1e26] border border-slate-200/70 dark:border-[#242834] mb-3">
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
+                              План
+                            </span>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-xl font-black text-slate-800 dark:text-slate-200">
+                                {task.plan}
+                              </span>
+                              <span className="text-[11px] font-semibold text-slate-400">
+                                {task.unit}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="border-l border-slate-100 dark:border-[#282d3a] pl-2.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
+                              Факт
+                            </span>
+                            <div className="flex items-baseline gap-1">
+                              <span className={`text-xl font-black tracking-tight ${tCfg.text}`}>
+                                {task.fact}
+                              </span>
+                              <span className="text-[11px] font-semibold text-slate-400">
+                                {task.unit}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Progress bar + status note */}
+                      <div className="space-y-1.5 pt-2 border-t border-slate-200/60 dark:border-[#222734]">
+                        <div className="w-full bg-slate-200/70 dark:bg-[#101216] h-2 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-400 ${tCfg.bg}`}
+                            style={{ width: `${Math.min(task.percent, 100)}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between items-center text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                          <span>Выполнено: {task.percent}%</span>
+                          <span className={isDone ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}>
+                            {isDone ? '✓ План закрыт' : `Осталось: ${remaining} ${task.unit}`}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
