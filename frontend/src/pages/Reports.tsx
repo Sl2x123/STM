@@ -560,8 +560,6 @@ export default function Reports() {
   const [uploadFeedback, setUploadFeedback] = useState<string | null>(null)
   const [isLoadingRnp, setIsLoadingRnp] = useState<boolean>(false)
   const [sprintViewMode, setSprintViewMode] = useState<'matrix' | 'timeline'>('matrix')
-  const [activeSprintId, setActiveSprintId] = useState<number>(3) // Sprint 3 is current
-  const [selectedSprintProjectName, setSelectedSprintProjectName] = useState<string>('Extragel')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Fetch RNP items from backend PostgreSQL database
@@ -694,7 +692,7 @@ export default function Reports() {
     return operationalReportData.filter(p => p.project.toLowerCase() === selectedProject.toLowerCase())
   }, [selectedProject])
 
-  // Operational Sprints Aggregates
+  // Operational Sprints Aggregates - pure percentage closure
   const operationalStats = useMemo(() => {
     const totalPlan = filteredPlans.reduce((acc, p) => acc + p.overallPlan, 0)
     const totalFact = filteredPlans.reduce((acc, p) => acc + p.overallFact, 0)
@@ -710,39 +708,25 @@ export default function Reports() {
     const yellowCount = filteredPlans.filter(p => p.overallProgress >= 35 && p.overallProgress < 75).length
     const redCount = filteredPlans.filter(p => p.overallProgress < 35).length
 
-    // Critical attention tasks (<35% in any sprint)
-    const criticalTasks: { project: string; task: SprintTask; sprintName: string }[] = []
+    // Attention sprints (<75% in any sprint)
+    const attentionSprints: { project: string; sprintName: string; percent: number }[] = []
     filteredPlans.forEach(p => {
       p.sprints.forEach(s => {
-        s.tasks.forEach(t => {
-          if (t.percent < 35) {
-            criticalTasks.push({ project: p.project, task: t, sprintName: s.name })
-          }
-        })
+        if (s.percent < 75) {
+          attentionSprints.push({ project: p.project, sprintName: s.name, percent: s.percent })
+        }
       })
     })
 
     return {
-      totalPlan,
-      totalFact,
       totalPercent,
-      sprint3Plan,
-      sprint3Fact,
       sprint3Percent,
       greenCount,
       yellowCount,
       redCount,
-      criticalTasks
+      attentionSprints
     }
   }, [filteredPlans])
-
-  const currentProjectData = useMemo(() => {
-    return filteredPlans.find(p => p.project.toLowerCase() === selectedSprintProjectName.toLowerCase()) || filteredPlans[0]
-  }, [filteredPlans, selectedSprintProjectName])
-
-  const currentSprintData = useMemo(() => {
-    return currentProjectData?.sprints.find(s => s.sprintId === activeSprintId) || currentProjectData?.sprints[2] || currentProjectData?.sprints[0]
-  }, [currentProjectData, activeSprintId])
 
   const filteredRnp = useMemo(() => {
     return rnpData.filter(item => {
@@ -975,7 +959,7 @@ export default function Reports() {
           }`}
         >
           <Target className="w-5 h-5" />
-          <span>План / Факт спринтов</span>
+          <span>Спринты проектов</span>
         </button>
 
         <button
@@ -1499,23 +1483,23 @@ export default function Reports() {
         </div>
       )}
 
-      {/* TAB 2: SPRINTS & OPERATIONAL PLANS - ALL-IN-ONE COMMAND BOARD */}
+      {/* TAB 2: SPRINTS & OPERATIONAL PROGRESS - CLEAN & MINIMAL 1-PAGE VIEW */}
       {activeReportTab === 'plans' && (
-        <div className="space-y-6 animate-fade-in">
+        <div className="space-y-5 animate-fade-in">
           {/* TOP EXECUTIVE BAR & VIEW SWITCHER */}
-          <div className="bg-white dark:bg-[#181b20] p-5 sm:p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-[#181b20] p-5 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2.5">
                 <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
                 <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                  Пульт управления спринтами и планом
+                  Закрытие спринтов и планов по проектам
                 </h2>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-[#222734] text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-[#313849]">
                   {selectedMonth}
                 </span>
               </div>
               <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
-                Сквозной оперативный контроль выполнения всех 4 спринтов и месячных целей по проектам на 1 экране
+                Оперативный мониторинг процента выполнения всех 4 спринтов и общего плана месяца
               </p>
             </div>
 
@@ -1531,7 +1515,7 @@ export default function Reports() {
                 }`}
               >
                 <Table className="w-3.5 h-3.5" />
-                <span>Спринт-матрица</span>
+                <span>Матрица спринтов</span>
               </button>
               <button
                 type="button"
@@ -1548,9 +1532,9 @@ export default function Reports() {
             </div>
           </div>
 
-          {/* LEVEL 1: TOP 4 KPI CHIPS */}
+          {/* LEVEL 1: TOP 4 KPI CHIPS - PURE PERCENTAGES & HEALTH */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* KPI 1: Overall Month Plan / Fact */}
+            {/* KPI 1: Overall Month Plan Closure */}
             {(() => {
               const monthCfg = getPlanFactProgressConfig(operationalStats.totalPercent)
               return (
@@ -1560,15 +1544,15 @@ export default function Reports() {
                       Общий план месяца
                     </span>
                     <span className={`px-2 py-0.5 rounded-lg text-xs font-black border ${monthCfg.lightBg} ${monthCfg.text} ${monthCfg.border}`}>
-                      {operationalStats.totalPercent}%
+                      {monthCfg.label}
                     </span>
                   </div>
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className={`text-2xl sm:text-3xl font-black tracking-tight ${monthCfg.text}`}>
-                      {operationalStats.totalFact}
+                    <span className={`text-3xl font-black tracking-tight ${monthCfg.text}`}>
+                      {operationalStats.totalPercent}%
                     </span>
                     <span className="text-xs font-semibold text-slate-400">
-                      / {operationalStats.totalPlan} ед.
+                      закрыто
                     </span>
                   </div>
                   <div className="w-full bg-slate-100 dark:bg-[#101216] h-2 rounded-full overflow-hidden border border-slate-200/60 dark:border-[#242834]">
@@ -1581,11 +1565,11 @@ export default function Reports() {
               )
             })()}
 
-            {/* KPI 2: Current Sprint 3 in Focus */}
+            {/* KPI 2: Current Sprint 3 Closure */}
             {(() => {
               const sprintCfg = getPlanFactProgressConfig(operationalStats.sprint3Percent)
               return (
-                <div className="bg-white dark:bg-[#181b20] p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-[#272b36] shadow-xs flex flex-col justify-between relative overflow-hidden">
+                <div className="bg-white dark:bg-[#181b20] p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-[#272b36] shadow-xs flex flex-col justify-between">
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
@@ -1598,11 +1582,11 @@ export default function Reports() {
                     </span>
                   </div>
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className={`text-2xl sm:text-3xl font-black tracking-tight ${sprintCfg.text}`}>
-                      {operationalStats.sprint3Fact}
+                    <span className={`text-3xl font-black tracking-tight ${sprintCfg.text}`}>
+                      {operationalStats.sprint3Percent}%
                     </span>
                     <span className="text-xs font-semibold text-slate-400">
-                      / {operationalStats.sprint3Plan} ед. ({operationalStats.sprint3Percent}%)
+                      закрыто
                     </span>
                   </div>
                   <div className="w-full bg-slate-100 dark:bg-[#101216] h-2 rounded-full overflow-hidden border border-slate-200/60 dark:border-[#242834]">
@@ -1656,117 +1640,109 @@ export default function Reports() {
               </div>
             </div>
 
-            {/* KPI 4: Risk / Attention Zone */}
+            {/* KPI 4: Attention Zone / Sprint Status */}
             <div className="bg-white dark:bg-[#181b20] p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-[#272b36] shadow-xs flex flex-col justify-between">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Зона внимания
                 </span>
-                <AlertTriangle className={`w-4 h-4 ${operationalStats.criticalTasks.length > 0 ? 'text-rose-500' : 'text-emerald-500'}`} />
+                <AlertTriangle className={`w-4 h-4 ${operationalStats.attentionSprints.length > 0 ? 'text-amber-500' : 'text-emerald-500'}`} />
               </div>
-              {operationalStats.criticalTasks.length > 0 ? (
+              {operationalStats.attentionSprints.length > 0 ? (
                 <div>
                   <div className="flex items-baseline gap-1.5 mb-1">
-                    <span className="text-2xl font-black text-rose-600 dark:text-rose-400">
-                      {operationalStats.criticalTasks.length}
+                    <span className="text-2xl font-black text-amber-600 dark:text-amber-400">
+                      {operationalStats.attentionSprints.length}
                     </span>
-                    <span className="text-xs font-bold text-rose-500">
-                      задачи требуют контроля (&lt;35%)
+                    <span className="text-xs font-bold text-amber-500">
+                      спринта в процессе (&lt;75%)
                     </span>
                   </div>
                   <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 line-clamp-2">
-                    {operationalStats.criticalTasks[0].project}: {operationalStats.criticalTasks[0].task.name} ({operationalStats.criticalTasks[0].task.percent}%)
+                    {operationalStats.attentionSprints[0].project}: {operationalStats.attentionSprints[0].sprintName} закрыт на {operationalStats.attentionSprints[0].percent}%
                   </p>
                 </div>
               ) : (
                 <div>
                   <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-black text-sm mb-1">
                     <CheckCircle2 className="w-4 h-4" />
-                    Критических сбоев нет
+                    Все спринты закрыты
                   </div>
-                  <p className="text-xs text-slate-400 font-medium">Все спринтерские задачи выше порога 35%</p>
+                  <p className="text-xs text-slate-400 font-medium">Все показатели выше целевых 75%</p>
                 </div>
               )}
               <div className="text-[11px] font-semibold text-slate-400 mt-2">
-                Оперативный статус по всем точкам
+                Оперативный статус контроля
               </div>
             </div>
           </div>
 
-          {/* LEVEL 2: MAIN BOARD (SPRINT MATRIX OR TIMELINE) */}
+          {/* MAIN SPRINT BOARD: PURE CLOSURE PERCENTAGES */}
           {sprintViewMode === 'matrix' ? (
             /* SPRINT MATRIX TABLE */
             <div className="bg-white dark:bg-[#181b20] rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-xs overflow-hidden">
               <div className="p-4 sm:p-5 border-b border-slate-200/80 dark:border-[#272b36] flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/70 dark:bg-[#14171d]">
                 <div>
                   <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white">
-                    Сводная матрица спринтов (Все бренды &times; Спринты 1–4)
+                    Сводная матрица закрытия спринтов и планов
                   </h3>
                   <p className="text-xs font-medium text-slate-400">
-                    Нажмите на любую ячейку спринта или проект для мгновенного просмотра задач внизу
+                    На сколько закрыт каждый спринт (1–4) и общий план месяца по проектам
                   </p>
                 </div>
                 <div className="text-xs font-bold text-slate-400 flex items-center gap-3">
                   <span className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" /> &ge;75%
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" /> &ge;75% Выполнен
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-amber-500" /> 35–74%
+                    <span className="w-2 h-2 rounded-full bg-amber-500" /> 35–74% В процессе
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-rose-500" /> &lt;35%
+                    <span className="w-2 h-2 rounded-full bg-rose-500" /> &lt;35% Отставание
                   </span>
                 </div>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[900px]">
+                <table className="w-full text-left border-collapse min-w-[850px]">
                   <thead>
                     <tr className="border-b border-slate-200/80 dark:border-[#242934] bg-slate-100/60 dark:bg-[#121419] text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      <th className="py-3 px-4 w-[20%]">Проект и куратор</th>
-                      <th className="py-3 px-3 w-[16%]">Спринт 1 <span className="font-semibold text-slate-400 block text-[10px]">01–07 сен</span></th>
-                      <th className="py-3 px-3 w-[16%]">Спринт 2 <span className="font-semibold text-slate-400 block text-[10px]">08–14 сен</span></th>
-                      <th className="py-3 px-3 w-[18%] bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-x border-emerald-200/60 dark:border-emerald-900/40">
+                      <th className="py-3.5 px-5 w-[22%]">Проект и куратор</th>
+                      <th className="py-3.5 px-4 w-[16%]">
+                        Спринт 1 <span className="font-semibold text-slate-400 block text-[10px] normal-case">01–07 сен</span>
+                      </th>
+                      <th className="py-3.5 px-4 w-[16%]">
+                        Спринт 2 <span className="font-semibold text-slate-400 block text-[10px] normal-case">08–14 сен</span>
+                      </th>
+                      <th className="py-3.5 px-4 w-[18%] bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-x border-emerald-200/60 dark:border-emerald-900/40">
                         <div className="flex items-center justify-between">
                           <span>Спринт 3</span>
                           <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500 text-white uppercase tracking-normal">Текущий</span>
                         </div>
-                        <span className="font-semibold text-emerald-600/80 dark:text-emerald-400/80 block text-[10px]">15–21 сен</span>
+                        <span className="font-semibold text-emerald-600/80 dark:text-emerald-400/80 block text-[10px] normal-case">15–21 сен</span>
                       </th>
-                      <th className="py-3 px-3 w-[16%]">Спринт 4 <span className="font-semibold text-slate-400 block text-[10px]">22–30 сен</span></th>
-                      <th className="py-3 px-4 w-[14%] text-right">Итого за месяц</th>
+                      <th className="py-3.5 px-4 w-[16%]">
+                        Спринт 4 <span className="font-semibold text-slate-400 block text-[10px] normal-case">22–30 сен</span>
+                      </th>
+                      <th className="py-3.5 px-5 w-[16%] text-right">Общий план месяца</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-[#202530]">
                     {filteredPlans.map(proj => {
-                      const isProjSelected = selectedSprintProjectName.toLowerCase() === proj.project.toLowerCase()
                       const projMonthCfg = getPlanFactProgressConfig(proj.overallProgress)
 
                       return (
                         <tr 
                           key={proj.id}
-                          className={`transition-colors ${
-                            isProjSelected 
-                              ? 'bg-slate-50 dark:bg-[#1a1f29]' 
-                              : 'hover:bg-slate-50/60 dark:hover:bg-[#161a22]'
-                          }`}
+                          className="hover:bg-slate-50/60 dark:hover:bg-[#161a22] transition-colors"
                         >
                           {/* Project Name Cell */}
-                          <td className="py-3.5 px-4">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedSprintProjectName(proj.project)
-                              }}
-                              className="text-left group flex items-start gap-2.5"
-                            >
+                          <td className="py-4 px-5">
+                            <div className="flex items-start gap-2.5">
                               <div className={`w-3 h-3 rounded-full mt-1 shrink-0 ${projMonthCfg.bg}`} />
                               <div>
-                                <div className="text-sm font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                                <div className="text-sm font-black text-slate-900 dark:text-white">
                                   {proj.project}
-                                  {isProjSelected && (
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                  )}
                                 </div>
                                 <div className="text-xs text-slate-400 font-medium">
                                   {proj.category}
@@ -1775,72 +1751,57 @@ export default function Reports() {
                                   Отв: {proj.manager}
                                 </div>
                               </div>
-                            </button>
+                            </div>
                           </td>
 
                           {/* Sprints 1 to 4 */}
                           {proj.sprints.map(s => {
-                            const isCellActive = isProjSelected && activeSprintId === s.sprintId
                             const sCfg = getPlanFactProgressConfig(s.percent)
                             const isCurrentCol = s.sprintId === 3
 
                             return (
                               <td 
                                 key={s.sprintId}
-                                className={`py-2 px-2.5 ${
+                                className={`py-3 px-3.5 ${
                                   isCurrentCol ? 'bg-emerald-50/30 dark:bg-emerald-950/10 border-x border-emerald-100/60 dark:border-emerald-900/30' : ''
                                 }`}
                               >
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedSprintProjectName(proj.project)
-                                    setActiveSprintId(s.sprintId)
-                                  }}
-                                  className={`w-full text-left p-2.5 rounded-xl border transition-all ${
-                                    isCellActive
-                                      ? 'bg-white dark:bg-[#1c222c] border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs'
-                                      : 'bg-white/60 dark:bg-[#15181f]/60 border-slate-200/80 dark:border-[#272c38] hover:border-slate-300 dark:hover:border-[#384050]'
-                                  }`}
-                                >
-                                  {/* Progress & % row */}
-                                  <div className="flex items-center justify-between gap-1 mb-1.5">
-                                    <span className={`text-xs font-black tracking-tight ${sCfg.text}`}>
+                                <div className="p-3 rounded-2xl bg-white/80 dark:bg-[#15181f]/80 border border-slate-200/80 dark:border-[#272c38]">
+                                  {/* Percentage & Status Badge */}
+                                  <div className="flex items-center justify-between gap-1 mb-2">
+                                    <span className={`text-base font-black tracking-tight ${sCfg.text}`}>
                                       {s.percent}%
                                     </span>
-                                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${sCfg.lightBg} ${sCfg.text} ${sCfg.border}`}>
+                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${sCfg.lightBg} ${sCfg.text} ${sCfg.border}`}>
                                       {sCfg.label}
                                     </span>
                                   </div>
 
-                                  {/* Plan / Fact prominent text */}
-                                  <div className="text-xs font-black text-slate-800 dark:text-slate-200 mb-1.5">
-                                    <span className={sCfg.text}>{s.fact}</span>
-                                    <span className="text-slate-400 font-semibold"> / {s.plan} {s.unit}</span>
-                                  </div>
-
-                                  {/* Micro progress bar */}
-                                  <div className="w-full bg-slate-100 dark:bg-[#101216] h-1.5 rounded-full overflow-hidden">
+                                  {/* Progress bar */}
+                                  <div className="w-full bg-slate-100 dark:bg-[#101216] h-2 rounded-full overflow-hidden border border-slate-200/50 dark:border-[#222734]">
                                     <div 
                                       className={`h-full rounded-full transition-all duration-300 ${sCfg.bg}`}
                                       style={{ width: `${Math.min(s.percent, 100)}%` }}
                                     />
                                   </div>
-                                </button>
+                                </div>
                               </td>
                             )
                           })}
 
                           {/* Month Total Column */}
-                          <td className="py-3.5 px-4 text-right">
+                          <td className="py-4 px-5 text-right">
                             <div className="inline-block text-right">
-                              <span className={`text-base font-black tracking-tight ${projMonthCfg.text}`}>
+                              <span className={`text-lg font-black tracking-tight ${projMonthCfg.text}`}>
                                 {proj.overallProgress}%
                               </span>
-                              <div className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                {proj.overallFact} / {proj.overallPlan} {proj.unit}
+                              <div className="w-28 bg-slate-100 dark:bg-[#101216] h-2 rounded-full overflow-hidden my-1.5 border border-slate-200/50 dark:border-[#222734] ml-auto">
+                                <div 
+                                  className={`h-full rounded-full transition-all duration-300 ${projMonthCfg.bg}`}
+                                  style={{ width: `${Math.min(proj.overallProgress, 100)}%` }}
+                                />
                               </div>
-                              <span className={`inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-md border ${projMonthCfg.lightBg} ${projMonthCfg.text} ${projMonthCfg.border}`}>
+                              <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-md border ${projMonthCfg.lightBg} ${projMonthCfg.text} ${projMonthCfg.border}`}>
                                 {projMonthCfg.label}
                               </span>
                             </div>
@@ -1901,40 +1862,32 @@ export default function Reports() {
                           const sprintObj = p.sprints.find(s => s.sprintId === sId)
                           if (!sprintObj) return null
                           const sCfg = getPlanFactProgressConfig(sprintObj.percent)
-                          const isSelected = selectedSprintProjectName.toLowerCase() === p.project.toLowerCase() && activeSprintId === sId
 
                           return (
-                            <button
+                            <div
                               key={p.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedSprintProjectName(p.project)
-                                setActiveSprintId(sId)
-                              }}
-                              className={`w-full text-left p-3 rounded-2xl border transition-all ${
-                                isSelected
-                                  ? 'bg-slate-50 dark:bg-[#1e232e] border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs'
-                                  : 'bg-slate-50/60 dark:bg-[#14161c] border-slate-200/70 dark:border-[#242834] hover:border-slate-300 dark:hover:border-[#323846]'
-                              }`}
+                              className="p-3.5 rounded-2xl border bg-slate-50/60 dark:bg-[#14161c] border-slate-200/70 dark:border-[#242834]"
                             >
-                              <div className="flex items-center justify-between gap-1 mb-1">
+                              <div className="flex items-center justify-between gap-1 mb-2">
                                 <span className="text-xs font-black text-slate-900 dark:text-white">
                                   {p.project}
                                 </span>
-                                <span className={`text-xs font-black ${sCfg.text}`}>
-                                  {sprintObj.percent}%
-                                </span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`text-sm font-black ${sCfg.text}`}>
+                                    {sprintObj.percent}%
+                                  </span>
+                                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${sCfg.lightBg} ${sCfg.text} ${sCfg.border}`}>
+                                    {sCfg.label}
+                                  </span>
+                                </div>
                               </div>
-                              <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-2">
-                                Факт: <span className={sCfg.text}>{sprintObj.fact}</span> / {sprintObj.plan} {sprintObj.unit}
-                              </div>
-                              <div className="w-full bg-slate-200/70 dark:bg-[#101216] h-1.5 rounded-full overflow-hidden">
+                              <div className="w-full bg-slate-200/70 dark:bg-[#101216] h-2 rounded-full overflow-hidden border border-slate-200/50 dark:border-[#222734]">
                                 <div 
                                   className={`h-full rounded-full transition-all duration-300 ${sCfg.bg}`}
                                   style={{ width: `${Math.min(sprintObj.percent, 100)}%` }}
                                 />
                               </div>
-                            </button>
+                            </div>
                           )
                         })}
                       </div>
@@ -1942,149 +1895,6 @@ export default function Reports() {
                   </div>
                 )
               })}
-            </div>
-          )}
-
-          {/* LEVEL 3: GRANULAR TASK INSPECTION (SPRINT DEEP-DIVE ON THE SAME PAGE) */}
-          {currentProjectData && currentSprintData && (
-            <div className="bg-white dark:bg-[#181b20] p-5 sm:p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-xs">
-              {/* Header with Project and Sprint Switchers */}
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-[#242934] mb-5">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      Детализация задач спринта
-                    </span>
-                    <span className="text-slate-300 dark:text-slate-600">&bull;</span>
-                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                      {currentProjectData.project}
-                    </span>
-                    <span className="text-slate-300 dark:text-slate-600">&bull;</span>
-                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
-                      {currentSprintData.name} ({currentSprintData.dates})
-                    </span>
-                    {currentSprintData.isCurrent && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-500 text-white uppercase tracking-normal">
-                        Текущий в работе
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-                    Задачи проекта &laquo;{currentProjectData.project}&raquo; ({currentProjectData.category})
-                  </h3>
-                </div>
-
-                {/* Interactive Sprint Switcher Pills */}
-                <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 dark:bg-[#121418] rounded-2xl border border-slate-200/80 dark:border-[#262b36]">
-                  {currentProjectData.sprints.map(s => {
-                    const isSActive = s.sprintId === activeSprintId
-                    const sCfg = getPlanFactProgressConfig(s.percent)
-
-                    return (
-                      <button
-                        key={s.sprintId}
-                        type="button"
-                        onClick={() => setActiveSprintId(s.sprintId)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                          isSActive
-                            ? 'bg-white dark:bg-[#1f242e] text-slate-900 dark:text-white shadow-xs'
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                        }`}
-                      >
-                        <span className={`w-2 h-2 rounded-full ${sCfg.bg}`} />
-                        <span>{s.name}</span>
-                        <span className={`text-[10px] font-black ${sCfg.text}`}>({s.percent}%)</span>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Task Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {currentSprintData.tasks.map((task, idx) => {
-                  const tCfg = getPlanFactProgressConfig(task.percent)
-                  const isDone = task.fact >= task.plan
-                  const remaining = Math.max(0, task.plan - task.fact)
-
-                  return (
-                    <div 
-                      key={task.id || idx}
-                      className="bg-slate-50/80 dark:bg-[#14161c] p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-[#262b36] flex flex-col justify-between shadow-xs hover:border-slate-300 dark:hover:border-[#343a48] transition-all"
-                    >
-                      <div>
-                        {/* Top: Status & % */}
-                        <div className="flex items-center justify-between gap-2 mb-2.5">
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold border ${tCfg.lightBg} ${tCfg.text} ${tCfg.border}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${tCfg.bg}`} />
-                            {tCfg.label}
-                          </span>
-                          <span className={`text-base font-black tracking-tight ${tCfg.text}`}>
-                            {task.percent}%
-                          </span>
-                        </div>
-
-                        {/* Title */}
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2 line-clamp-2 leading-snug">
-                          {task.name}
-                        </h4>
-
-                        {/* Assignee */}
-                        <div className="text-[11px] font-semibold text-slate-400 mb-3">
-                          Ответственный: <span className="text-slate-600 dark:text-slate-300 font-bold">{task.assignee}</span>
-                        </div>
-
-                        {/* Plan vs Fact Dual Box */}
-                        <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-white dark:bg-[#1a1e26] border border-slate-200/70 dark:border-[#242834] mb-3">
-                          <div>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
-                              План
-                            </span>
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-xl font-black text-slate-800 dark:text-slate-200">
-                                {task.plan}
-                              </span>
-                              <span className="text-[11px] font-semibold text-slate-400">
-                                {task.unit}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="border-l border-slate-100 dark:border-[#282d3a] pl-2.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
-                              Факт
-                            </span>
-                            <div className="flex items-baseline gap-1">
-                              <span className={`text-xl font-black tracking-tight ${tCfg.text}`}>
-                                {task.fact}
-                              </span>
-                              <span className="text-[11px] font-semibold text-slate-400">
-                                {task.unit}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Progress bar + status note */}
-                      <div className="space-y-1.5 pt-2 border-t border-slate-200/60 dark:border-[#222734]">
-                        <div className="w-full bg-slate-200/70 dark:bg-[#101216] h-2 rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full rounded-full transition-all duration-400 ${tCfg.bg}`}
-                            style={{ width: `${Math.min(task.percent, 100)}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between items-center text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                          <span>Выполнено: {task.percent}%</span>
-                          <span className={isDone ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}>
-                            {isDone ? '✓ План закрыт' : `Осталось: ${remaining} ${task.unit}`}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
             </div>
           )}
         </div>
