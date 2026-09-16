@@ -44,6 +44,35 @@ const operationalReportData = [
   }
 ]
 
+// Strict 3-color status helper for Plan vs Fact (<35% Red, 35-74% Yellow, >=75% Green)
+const getPlanFactProgressConfig = (percent: number) => {
+  if (percent < 35) {
+    return {
+      text: 'text-rose-600 dark:text-rose-400',
+      bg: 'bg-rose-500',
+      lightBg: 'bg-rose-50 dark:bg-rose-950/40',
+      border: 'border-rose-200 dark:border-rose-900/60',
+      label: 'Отставание'
+    }
+  }
+  if (percent < 75) {
+    return {
+      text: 'text-amber-600 dark:text-amber-400',
+      bg: 'bg-amber-500',
+      lightBg: 'bg-amber-50 dark:bg-amber-950/40',
+      border: 'border-amber-200 dark:border-amber-900/60',
+      label: 'В процессе'
+    }
+  }
+  return {
+    text: 'text-emerald-600 dark:text-emerald-400',
+    bg: 'bg-emerald-500',
+    lightBg: 'bg-emerald-50 dark:bg-emerald-950/40',
+    border: 'border-emerald-200 dark:border-emerald-900/60',
+    label: 'Выполнено'
+  }
+}
+
 // Influencer Marketing & Bloggers Dataset
 const bloggersReportData = [
   {
@@ -1157,71 +1186,119 @@ export default function Reports() {
             </p>
 
             <div className="space-y-6">
-              {filteredPlans.map(proj => (
-                <div 
-                  key={proj.id} 
-                  className="p-5 sm:p-6 bg-slate-50 dark:bg-[#121418] rounded-3xl border border-slate-200 dark:border-[#2b303c]"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3.5 h-3.5 rounded-full bg-indigo-600" />
-                      <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-                        {proj.project}
-                      </h3>
-                      <span className="text-sm font-semibold text-slate-400">({proj.month})</span>
-                    </div>
+              {filteredPlans.map(proj => {
+                const projConfig = getPlanFactProgressConfig(proj.overallProgress)
 
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                        Выполнение: {proj.overallProgress}%
-                      </span>
-                      <div className="w-32 bg-slate-200 dark:bg-[#2b303c] h-3 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-indigo-600 h-full rounded-full transition-all duration-300" 
-                          style={{ width: `${proj.overallProgress}%` }} 
-                        />
+                return (
+                  <div 
+                    key={proj.id} 
+                    className="p-5 sm:p-6 bg-slate-50 dark:bg-[#121418] rounded-3xl border border-slate-200 dark:border-[#2b303c]"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3.5 h-3.5 rounded-full ${projConfig.bg} shadow-xs`} />
+                        <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                          {proj.project}
+                        </h3>
+                        <span className="text-sm font-semibold text-slate-400">({proj.month})</span>
+                      </div>
+
+                      <div className="flex items-center gap-3.5">
+                        <span className={`text-sm sm:text-base font-black ${projConfig.text}`}>
+                          Выполнение: {proj.overallProgress}%
+                        </span>
+                        <div className="w-36 sm:w-44 bg-slate-200 dark:bg-[#20242e] h-3 rounded-full overflow-hidden p-0.5 border border-slate-300/40 dark:border-[#2c3140]">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-500 ${projConfig.bg}`} 
+                            style={{ width: `${Math.min(proj.overallProgress, 100)}%` }} 
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Items list */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                    {proj.items.map((it, idx) => (
-                      <div 
-                        key={idx} 
-                        className="bg-white dark:bg-[#181b20] p-4 rounded-2xl border border-slate-200/90 dark:border-[#2b303c] shadow-xs flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between text-xs mb-2">
-                            <span className={`px-2.5 py-1 rounded-lg font-bold text-xs ${
-                              it.status === 'Done'
-                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                                : it.status === 'In Progress'
-                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
-                                : 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-                            }`}>
-                              {it.status === 'Done' ? 'Выполнено' : it.status === 'In Progress' ? 'В процессе' : 'Отставание'}
-                            </span>
-                            <span className="font-black text-sm text-slate-900 dark:text-white">
-                              {it.percent}%
-                            </span>
+                    {/* Items list - Prominent Plan vs Fact Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-4">
+                      {proj.items.map((it, idx) => {
+                        const itemConfig = getPlanFactProgressConfig(it.percent)
+                        const isOverTarget = it.fact >= it.plan
+                        const remaining = Math.max(0, it.plan - it.fact)
+
+                        return (
+                          <div 
+                            key={idx} 
+                            className="bg-white dark:bg-[#181b20] p-5 rounded-2xl border border-slate-200/90 dark:border-[#272b36] shadow-xs hover:shadow-md hover:border-slate-300 dark:hover:border-[#383e4e] transition-all flex flex-col justify-between"
+                          >
+                            <div>
+                              {/* Top row: Status Badge and Percentage */}
+                              <div className="flex items-center justify-between gap-2 mb-3">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold text-xs border ${itemConfig.lightBg} ${itemConfig.text} ${itemConfig.border}`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${itemConfig.bg}`} />
+                                  {itemConfig.label}
+                                </span>
+                                <span className={`text-lg font-black tracking-tight ${itemConfig.text}`}>
+                                  {it.percent}%
+                                </span>
+                              </div>
+
+                              {/* Task Title */}
+                              <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mb-4 line-clamp-2 min-h-[44px] leading-snug">
+                                {it.name}
+                              </h4>
+
+                              {/* Prominent Plan vs Fact Dual Box */}
+                              <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50/90 dark:bg-[#101216] border border-slate-100 dark:border-[#20242f] mb-4">
+                                <div>
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-1">
+                                    План
+                                  </span>
+                                  <div className="flex items-baseline gap-1.5">
+                                    <span className="text-2xl font-black text-slate-800 dark:text-slate-200 tracking-tight">
+                                      {it.plan}
+                                    </span>
+                                    <span className="text-xs font-semibold text-slate-400">
+                                      {it.unit}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="border-l border-slate-200/80 dark:border-[#242834] pl-3.5">
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-1">
+                                    Факт
+                                  </span>
+                                  <div className="flex items-baseline gap-1.5">
+                                    <span className={`text-2xl font-black tracking-tight ${itemConfig.text}`}>
+                                      {it.fact}
+                                    </span>
+                                    <span className="text-xs font-semibold text-slate-400">
+                                      {it.unit}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Visual Progress Bar & Progress Details */}
+                            <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-[#20242f]">
+                              <div className="w-full bg-slate-100 dark:bg-[#101216] h-2.5 rounded-full overflow-hidden border border-slate-200/60 dark:border-[#242834]">
+                                <div 
+                                  className={`h-full rounded-full transition-all duration-500 ${itemConfig.bg}`}
+                                  style={{ width: `${Math.min(it.percent, 100)}%` }}
+                                />
+                              </div>
+                              <div className="flex justify-between items-center text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                <span>Прогресс: {it.percent}%</span>
+                                <span className={isOverTarget ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}>
+                                  {isOverTarget ? '✓ План выполнен' : `Осталось: ${remaining} ${it.unit}`}
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                          <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-1">
-                            {it.name}
-                          </h4>
-                        </div>
-
-                        <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-[#262a35] flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-                          <span>План: {it.plan} {it.unit}</span>
-                          <span className="font-bold text-slate-800 dark:text-slate-200">
-                            Факт: {it.fact} {it.unit}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>
