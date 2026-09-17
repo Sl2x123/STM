@@ -306,20 +306,67 @@ export default function Layout() {
                 </div>
                 <div className="ml-2.5 text-left hidden sm:block">
                   <div className="font-bold text-gray-800 dark:text-gray-200 text-xs leading-tight">{userData.full_name || 'Азамат'}</div>
-                  <div className="text-[10px] text-gray-400 font-medium">{userData.role === 'admin' ? 'Администратор' : 'Менеджер'}</div>
+                  <div className="text-[10px] text-gray-400 font-medium">
+                    {userData.role === 'admin' ? 'Администратор' : userData.role === 'manager' ? 'Менеджер проектов' : 'Сотрудник'}
+                  </div>
                 </div>
                 <ChevronDown size={15} className={`ml-2 text-gray-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#181b20] rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-black/50 border border-gray-100 dark:border-[#262932] py-2 z-50">
+                <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-[#181b20] rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-black/50 border border-gray-100 dark:border-[#262932] py-2 z-50">
                   <div className="px-4 py-2.5 border-b border-gray-100 dark:border-[#262932]">
                     <p className="text-xs font-bold text-gray-900 dark:text-white">{userData.full_name}</p>
                     <p className="text-[11px] text-gray-400 font-mono mt-0.5">{userData.email}</p>
                     <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-[#0052cc]/20 text-[#0052cc] dark:text-[#93c5fd]">
                       <Shield size={10} />
-                      {userData.role === 'admin' ? 'Роль: Администратор' : 'Роль: Менеджер'}
+                      {userData.role === 'admin' ? 'Роль: Администратор' : userData.role === 'manager' ? 'Роль: Менеджер' : 'Роль: Сотрудник'}
                     </span>
+                  </div>
+
+                  {/* Instant Role Switcher for Testing */}
+                  <div className="px-4 py-2 bg-gray-50/70 dark:bg-[#14161c] border-b border-gray-100 dark:border-[#262932]">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                      Тестовая роль:
+                    </div>
+                    <div className="grid grid-cols-3 gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          localStorage.setItem('user_data', JSON.stringify({ full_name: 'Азамат (Администратор)', email: 'admin@extragel.uz', role: 'admin' }))
+                          window.location.reload()
+                        }}
+                        className={`px-1.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition-colors text-center ${
+                          userData.role === 'admin' ? 'bg-[#0052cc] text-white' : 'bg-gray-200/70 dark:bg-[#202530] text-gray-600 dark:text-gray-300 hover:bg-gray-300'
+                        }`}
+                      >
+                        Admin
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          localStorage.setItem('user_data', JSON.stringify({ full_name: 'Фаррух (Менеджер проектов)', email: 'manager@extragel.uz', role: 'manager' }))
+                          window.location.reload()
+                        }}
+                        className={`px-1.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition-colors text-center ${
+                          userData.role === 'manager' ? 'bg-emerald-600 text-white' : 'bg-gray-200/70 dark:bg-[#202530] text-gray-600 dark:text-gray-300 hover:bg-gray-300'
+                        }`}
+                      >
+                        Manager
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          localStorage.setItem('user_data', JSON.stringify({ full_name: 'Дильноза (Сотрудник)', email: 'employee@extragel.uz', role: 'employee' }))
+                          window.location.reload()
+                        }}
+                        className={`px-1.5 py-1 rounded-md text-[10px] font-bold cursor-pointer transition-colors text-center ${
+                          userData.role === 'employee' ? 'bg-amber-600 text-white' : 'bg-gray-200/70 dark:bg-[#202530] text-gray-600 dark:text-gray-300 hover:bg-gray-300'
+                        }`}
+                      >
+                        Employee
+                      </button>
+                    </div>
                   </div>
 
                   <div className="py-1">

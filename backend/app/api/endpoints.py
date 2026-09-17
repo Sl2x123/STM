@@ -45,15 +45,23 @@ def login(login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
     user = crud.authenticate_user(db, email=login_data.email, password=login_data.password)
     if not user:
         # Auto-provision or allow demo accounts for smooth development
-        if login_data.email in ["admin@extragel.uz", "admin@pms.uz", "azamat@extragel.uz"]:
+        accounts_map = {
+            "admin@extragel.uz": {"name": "Азамат (Администратор)", "role": "admin"},
+            "admin@pms.uz": {"name": "Азамат (Администратор)", "role": "admin"},
+            "azamat@extragel.uz": {"name": "Азамат (Администратор)", "role": "admin"},
+            "manager@extragel.uz": {"name": "Фаррух (Менеджер проектов)", "role": "manager"},
+            "employee@extragel.uz": {"name": "Дильноза (Сотрудник)", "role": "employee"},
+        }
+        if login_data.email in accounts_map:
+            acc = accounts_map[login_data.email]
             existing = crud.get_user_by_email(db, login_data.email)
             if existing:
                 user = existing
             else:
                 user = crud.create_user(db, schemas.UserCreate(
                     email=login_data.email,
-                    full_name="Азамат (Администратор)",
-                    role="admin",
+                    full_name=acc["name"],
+                    role=acc["role"],
                     password=login_data.password
                 ))
         else:
@@ -276,6 +284,28 @@ def read_sprints_overview(db: Session = Depends(get_db)):
 @router.get("/search/")
 def unified_search(q: str = "", db: Session = Depends(get_db)):
     return crud.search_all(db=db, query_str=q)
+
+# Telegram Notifications & Summary Delivery
+from app.services.telegram_bot import send_telegram_raw, send_sprint_summary_to_telegram
+
+@router.get("/telegram/status")
+def get_telegram_status():
+    has_token = bool(settings.TELEGRAM_BOT_TOKEN)
+    has_chat = bool(settings.TELEGRAM_CHAT_ID)
+    return {
+        "configured": has_token and has_chat,
+        "has_token": has_token,
+        "has_chat": has_chat
+    }
+
+@router.post("/telegram/send-summary")
+def trigger_sprint_summary_telegram(chat_id: Optional[str] = None, db: Session = Depends(get_db)):
+    return send_sprint_summary_to_telegram(db=db, chat_id=chat_id)
+
+@router.post("/telegram/test")
+def test_telegram_message(message: str = "🔔 Тестовое уведомление из PMS системы!", chat_id: Optional[str] = None):
+    return send_telegram_raw(text=message, chat_id=chat_id)
+
 
 
 

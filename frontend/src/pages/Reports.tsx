@@ -5,7 +5,7 @@ import {
   Layers, Sparkles, Activity, 
   Award, Search, Stethoscope, ShoppingBag, Briefcase, Loader2,
   DollarSign, Users, Eye, X, ExternalLink,
-  Table, Kanban, AlertTriangle
+  Table, Kanban, AlertTriangle, Printer, Send
 } from 'lucide-react'
 import { initialRnpData, RnpItem } from '../data/rnpData'
 import { api } from '../lib/api'
@@ -793,27 +793,87 @@ export default function Reports() {
     return filteredBloggers.reduce((acc, b) => acc + (b.promoSales || 0), 0)
   }, [filteredBloggers])
 
-  // Export to CSV
+  // Export to CSV / Excel based on current active tab
   const handleExportCSV = () => {
-    const headers = ['Секция', 'Роль', 'Ответственный', 'Показатель', 'План Месяц', 'Факт Месяц', '% Выполнения', 'Прогноз']
-    const rows = filteredRnp.map(item => [
-      `"${item.sectionName || ''}"`,
-      `"${item.role || ''}"`,
-      `"${item.person || ''}"`,
-      `"${item.indicator || ''}"`,
-      item.planMonth,
-      item.factMonth,
-      `${item.percentMonth}%`,
-      item.forecast
-    ])
+    let headers: string[] = []
+    let rows: (string | number)[][] = []
+    let filename = `Отчет_${selectedMonth.replace(/\s/g, '_')}.csv`
+
+    if (activeReportTab === 'plans') {
+      filename = `Спринты_проектов_${selectedMonth.replace(/\s/g, '_')}.csv`
+      headers = ['Проект', 'Менеджер', 'Спринт 1 (%)', 'Спринт 2 (%)', 'Спринт 3 (%)', 'Спринт 4 (%)', 'Итог месяца (%)']
+      rows = filteredPlans.map(p => [
+        `"${p.project}"`,
+        `"${p.manager}"`,
+        p.sprints.find(s => s.sprintId === 1)?.percent || 0,
+        p.sprints.find(s => s.sprintId === 2)?.percent || 0,
+        p.sprints.find(s => s.sprintId === 3)?.percent || 0,
+        p.sprints.find(s => s.sprintId === 4)?.percent || 0,
+        p.overallProgress
+      ])
+    } else if (activeReportTab === 'bloggers') {
+      filename = `Маркетинг_Блогеры_${selectedMonth.replace(/\s/g, '_')}.csv`
+      headers = ['Блогер', 'Никнейм', 'Проект', 'Платформа', 'Категория', 'Формат', 'Подписчики', 'Охват', 'Просмотры', 'Стоимость', 'Промо-заказы', 'Выручка', 'ROI']
+      rows = filteredBloggers.map(b => [
+        `"${b.blogger}"`,
+        `"${b.handle}"`,
+        `"${b.project}"`,
+        `"${b.platform}"`,
+        `"${b.category}"`,
+        `"${b.format}"`,
+        `"${b.followers}"`,
+        `"${b.reach}"`,
+        b.views,
+        `"${b.price}"`,
+        b.promoSales,
+        `"${b.revenue}"`,
+        `"${b.roi}"`
+      ])
+    } else {
+      headers = ['Секция', 'Роль', 'Ответственный', 'Показатель', 'План Месяц', 'Факт Месяц', '% Выполнения', 'Прогноз']
+      rows = filteredRnp.map(item => [
+        `"${item.sectionName || ''}"`,
+        `"${item.role || ''}"`,
+        `"${item.person || ''}"`,
+        `"${item.indicator || ''}"`,
+        item.planMonth,
+        item.factMonth,
+        `${item.percentMonth}%`,
+        item.forecast
+      ])
+    }
+
     const csvContent = 'data:text/csv;charset=utf-8,﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
     const encodedUri = encodeURI(csvContent)
     const link = document.createElement('a')
     link.setAttribute('href', encodedUri)
-    link.setAttribute('download', `Отчет_${selectedMonth.replace(/\s/g, '_')}.csv`)
+    link.setAttribute('download', filename)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  // Send Live Summary to Telegram
+  const [telegramSending, setTelegramSending] = useState(false)
+  const [telegramFeedback, setTelegramFeedback] = useState<string | null>(null)
+
+  const handleSendTelegram = async () => {
+    setTelegramSending(true)
+    try {
+      const res = await api.post('/telegram/send-summary')
+      if (res.data?.status === 'success') {
+        setTelegramFeedback('Отчет успешно отправлен в Telegram канал!')
+      } else if (res.data?.status === 'simulation') {
+        setTelegramFeedback('Сводка сформирована! (Для боевой отправки укажите TELEGRAM_BOT_TOKEN в .env)')
+      } else {
+        setTelegramFeedback(res.data?.message || 'Сводка сформирована')
+      }
+    } catch (err: any) {
+      setTelegramFeedback('Не удалось отправить сводку в Telegram')
+    } finally {
+      setTelegramSending(false)
+      setTimeout(() => setTelegramFeedback(null), 6000)
+    }
   }
 
   // Handle CSV Import
@@ -953,6 +1013,27 @@ export default function Reports() {
             <span>Экспорт .CSV</span>
           </button>
 
+          {/* Print / PDF Button */}
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-2 px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-[#252a36] dark:hover:bg-[#2e3444] text-slate-800 dark:text-slate-200 rounded-xl text-sm font-bold transition cursor-pointer"
+            title="Печать или экспорт в PDF"
+          >
+            <Printer className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+            <span className="hidden sm:inline">PDF / Печать</span>
+          </button>
+
+          {/* Telegram Send Button */}
+          <button
+            onClick={handleSendTelegram}
+            disabled={telegramSending}
+            className="flex items-center gap-2 px-3.5 py-2.5 bg-[#0088cc] hover:bg-[#0077b5] text-white rounded-xl text-sm font-bold transition shadow-xs cursor-pointer disabled:opacity-50"
+            title="Отправить сводку спринтов в Telegram"
+          >
+            <Send className="w-4 h-4" />
+            <span className="hidden sm:inline">{telegramSending ? 'Отправка...' : 'Telegram'}</span>
+          </button>
+
           {/* Import CSV Button */}
           <button
             onClick={() => fileInputRef.current?.click()}
@@ -964,6 +1045,14 @@ export default function Reports() {
           </button>
         </div>
       </div>
+
+      {/* Telegram Feedback Toast */}
+      {telegramFeedback && (
+        <div className="p-4 bg-sky-50 dark:bg-sky-950/60 border border-sky-300 dark:border-sky-800 text-sky-900 dark:text-sky-200 rounded-2xl text-sm font-semibold flex items-center gap-3 animate-fade-in shadow-xs">
+          <Send className="w-5 h-5 text-sky-500 shrink-0" />
+          <span>{telegramFeedback}</span>
+        </div>
+      )}
 
       {/* Upload Feedback Toast */}
       {uploadFeedback && (

@@ -152,7 +152,7 @@ export default function Login() {
           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center mb-3">
             Быстрый вход для тестирования:
           </p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => fillDemoAccount('admin@extragel.uz', 'password')}
@@ -160,9 +160,9 @@ export default function Login() {
             >
               <div className="font-bold text-gray-800 flex items-center gap-1">
                 <ShieldCheck size={13} className="text-[#4f46e5]" />
-                Азамат (Admin)
+                Admin
               </div>
-              <div className="text-[10px] text-gray-400 font-mono mt-0.5">admin@extragel.uz</div>
+              <div className="text-[10px] text-gray-400 font-mono mt-0.5 truncate">admin@...</div>
             </button>
 
             <button
@@ -172,9 +172,21 @@ export default function Login() {
             >
               <div className="font-bold text-gray-800 flex items-center gap-1">
                 <CheckCircle2 size={13} className="text-emerald-600" />
-                Менеджер
+                Manager
               </div>
-              <div className="text-[10px] text-gray-400 font-mono mt-0.5">manager@extragel.uz</div>
+              <div className="text-[10px] text-gray-400 font-mono mt-0.5 truncate">manager@...</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => fillDemoAccount('employee@extragel.uz', 'password')}
+              className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 text-left border border-gray-200/80 transition-colors cursor-pointer text-xs"
+            >
+              <div className="font-bold text-gray-800 flex items-center gap-1">
+                <ShieldCheck size={13} className="text-amber-500" />
+                Employee
+              </div>
+              <div className="text-[10px] text-gray-400 font-mono mt-0.5 truncate">employee@...</div>
             </button>
           </div>
         </div>
