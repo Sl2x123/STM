@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { 
   Users, Ticket, MapPin, LineChart, TrendingUp, 
   ArrowRight, Search, ChevronDown, LucideIcon
 } from 'lucide-react'
+import { api } from '../lib/api'
 
 // Cubic Bezier Spline calculation for mathematically continuous smooth waves
 function getSmoothSplinePath(points: Array<{ x: number; y: number }>): string {
@@ -79,12 +80,12 @@ function MetricKpiCard({ value, label, icon: Icon, percent, growth }: MetricCard
 // 2. REVENUE / EXECUTION DUAL-SPLINE CHART (Exact match to Reference "Revenue")
 // =========================================================================
 
-function SplineWaveChart({ selectedPeriod }: { selectedPeriod: string }) {
+function SplineWaveChart({ selectedPeriod, serverMonthlyData }: { selectedPeriod: string; serverMonthlyData?: any[] }) {
   const [periodType, setPeriodType] = useState<'monthly' | 'weekly'>('monthly')
   const [hoverIndex, setHoverIndex] = useState<number>(5) // default to Jun (index 5)
 
   // Monthly points matching the undulating wave geometry of the reference screenshot
-  const monthlyData = [
+  const defaultMonthlyData = [
     { month: 'Jan', fact: 15, plan: 18, factY: 125, planY: 105, x: 45 },
     { month: 'Feb', fact: 12, plan: 20, factY: 140, planY: 75, x: 120 },
     { month: 'Mar', fact: 23, plan: 11, factY: 55, planY: 145, x: 195 },
@@ -93,6 +94,8 @@ function SplineWaveChart({ selectedPeriod }: { selectedPeriod: string }) {
     { month: 'Jun', fact: 24, plan: 17, factY: 50, planY: 110, x: 420 },
     { month: 'Jul', fact: 21, plan: 19, factY: 70, planY: 95, x: 495 },
   ]
+
+  const monthlyData = (serverMonthlyData && serverMonthlyData.length > 0) ? serverMonthlyData : defaultMonthlyData
 
   const factPoints = monthlyData.map(d => ({ x: d.x, y: d.factY }))
   const planPoints = monthlyData.map(d => ({ x: d.x, y: d.planY }))
@@ -615,6 +618,21 @@ function LatestBookingTable() {
 
 export default function Dashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Июнь 2026')
+  const [stats, setStats] = useState<any>(null)
+
+  useEffect(() => {
+    let isMounted = true
+    api.get('/dashboard/stats')
+      .then(res => {
+        if (isMounted && res.data) {
+          setStats(res.data)
+        }
+      })
+      .catch(err => {
+        console.warn('Dashboard stats fallback:', err)
+      })
+    return () => { isMounted = false }
+  }, [selectedPeriod])
 
   return (
     <div className="max-w-[1440px] mx-auto font-sans pb-16 space-y-6 text-slate-800 dark:text-slate-100 transition-colors duration-200">
@@ -650,41 +668,41 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 2. Top 4 Metric KPI Cards (Exact Match to Reference Images 1, 2 & 3) */}
+      {/* 2. Top 4 Metric KPI Cards (Live from PostgreSQL Server) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricKpiCard
-          value="500k"
-          label="Total user (Визиты врачи & аптеки)"
+          value={stats ? `${stats.total_projects}` : '4'}
+          label="Активных проектов в БД"
           icon={Users}
-          percent={55}
-          growth={55}
+          percent={stats ? Math.min(100, stats.total_projects * 25) : 80}
+          growth={15}
         />
         <MetricKpiCard
-          value="250"
-          label="Today Booking (Рецепты Энтеросгель)"
+          value={stats ? `$${stats.total_budget?.toLocaleString()}` : '$5,780'}
+          label="Бюджет интеграций (Факт)"
           icon={Ticket}
-          percent={75}
-          growth={75}
+          percent={stats ? Math.round((stats.total_spent_bloggers / (stats.total_budget || 1)) * 100) : 48}
+          growth={24}
         />
         <MetricKpiCard
-          value="300"
-          label="Available Spaces (Охват точек & клиник)"
+          value={stats ? `${stats.total_bloggers + stats.total_companies}` : '12'}
+          label="Блогеров и контрагентов"
           icon={MapPin}
-          percent={80}
-          growth={80}
+          percent={stats ? Math.round((stats.total_bloggers / ((stats.total_bloggers + stats.total_companies) || 1)) * 100) : 50}
+          growth={35}
         />
         <MetricKpiCard
-          value="350"
-          label="Revenue day Ratio (Коэффициент выручки)"
+          value={stats ? `${stats.rnp_completion_rate}%` : '75%'}
+          label="Выполнение плана РНП"
           icon={LineChart}
-          percent={75}
-          growth={75}
+          percent={stats ? stats.rnp_completion_rate : 75}
+          growth={stats ? stats.rnp_completion_rate : 75}
         />
       </div>
 
       {/* 3. Middle Section: Revenue Spline Chart + Booking Summary Bar Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SplineWaveChart selectedPeriod={selectedPeriod} />
+        <SplineWaveChart selectedPeriod={selectedPeriod} serverMonthlyData={stats?.monthly_chart} />
         <GroupedThreeBarChart />
       </div>
 

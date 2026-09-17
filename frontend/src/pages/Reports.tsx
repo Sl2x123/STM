@@ -673,8 +673,45 @@ export default function Reports() {
     return () => { isMounted = false }
   }, [])
 
+  // Fetch live Sprints Overview from PostgreSQL
+  const [livePlans, setLivePlans] = useState<ProjectOperationalPlan[]>([])
+
+  useEffect(() => {
+    let isMounted = true
+    api.get('/reports/sprints-overview')
+      .then(res => {
+        if (isMounted && Array.isArray(res.data) && res.data.length > 0) {
+          const mapped: ProjectOperationalPlan[] = res.data.map((item: any) => ({
+            id: Number(item.id) || 1,
+            project: item.project,
+            category: 'Проект компании',
+            manager: item.owner || 'Азамат К.',
+            month: 'Сентябрь 2026',
+            overallPlan: 100,
+            overallFact: item.overallProgress,
+            overallProgress: item.overallProgress,
+            unit: '%',
+            sprints: (item.sprints || []).map((s: any) => ({
+              sprintId: s.id,
+              name: s.name,
+              dates: s.dates,
+              plan: s.tasksTotal || 20,
+              fact: s.tasksDone || Math.round((s.tasksTotal || 20) * (s.percent / 100)),
+              percent: s.percent,
+              unit: 'задач',
+              tasks: []
+            }))
+          }))
+          setLivePlans(mapped)
+        }
+      })
+      .catch(() => {})
+    return () => { isMounted = false }
+  }, [])
+
   const effectiveBloggers = liveBloggers.length > 0 ? liveBloggers : bloggersReportData
   const effectiveCompanies = liveCompanies.length > 0 ? liveCompanies : companiesReportData
+  const effectivePlans = livePlans.length > 0 ? livePlans : operationalReportData
 
   // Filtered datasets based on selectedProject
   const filteredBloggers = useMemo(() => {
@@ -688,9 +725,9 @@ export default function Reports() {
   }, [effectiveCompanies, selectedProject])
 
   const filteredPlans = useMemo(() => {
-    if (selectedProject === 'ALL') return operationalReportData
-    return operationalReportData.filter(p => p.project.toLowerCase() === selectedProject.toLowerCase())
-  }, [selectedProject])
+    if (selectedProject === 'ALL') return effectivePlans
+    return effectivePlans.filter(p => p.project.toLowerCase() === selectedProject.toLowerCase())
+  }, [effectivePlans, selectedProject])
 
   // Operational Sprints Aggregates - pure percentage closure
   const operationalStats = useMemo(() => {
