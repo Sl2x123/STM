@@ -1,0 +1,68 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: pms_prod_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pms_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pms_password}
+      POSTGRES_DB: ${POSTGRES_DB:-pms_db}
+    volumes:
+      - pms_prod_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pms_user} -d ${POSTGRES_DB:-pms_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pms_network
+
+  backend:
+    build:
+      context: ./backend
+    container_name: pms_prod_backend
+    restart: always
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://pms_user:pms_password@db:5432/pms_db}
+      SECRET_KEY: ${SECRET_KEY:-super_secret_key_change_me_in_production}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - pms_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: pms_prod_frontend
+    restart: always
+    networks:
+      - pms_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: pms_prod_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot_etc:/etc/letsencrypt:ro
+      - certbot_var:/var/www/certbot:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - pms_network
+
+volumes:
+  pms_prod_pgdata:
+  certbot_etc:
+  certbot_var:
+
+networks:
+  pms_network:
+    driver: bridge

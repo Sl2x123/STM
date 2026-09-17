@@ -1,8 +1,14 @@
 /// <reference types="vite/client" />
 import axios from 'axios'
 
-const rawBaseUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000'
-const baseURL = rawBaseUrl.endsWith('/api/v1') ? rawBaseUrl : `${rawBaseUrl.replace(/\/$/, '')}/api/v1`
+const envApiUrl = (import.meta as any).env?.VITE_API_URL
+const rawBaseUrl = envApiUrl !== undefined && envApiUrl !== ''
+  ? envApiUrl 
+  : (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8000' : '')
+
+const baseURL = rawBaseUrl.endsWith('/api/v1') 
+  ? rawBaseUrl 
+  : `${rawBaseUrl.replace(/\/$/, '')}/api/v1`
 
 export const api = axios.create({
   baseURL,
