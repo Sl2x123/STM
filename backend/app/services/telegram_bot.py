@@ -88,3 +88,4 @@ def send_sprint_summary_to_telegram(db: Session, chat_id: Optional[str] = None) 
 
     message_text = "\n".join(lines)
     return send_telegram_raw(message_text, chat_id=chat_id)
+

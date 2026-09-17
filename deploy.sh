@@ -34,3 +34,4 @@ docker compose -f docker-compose.prod.yml ps
 
 echo "🎉 [PMS] Production deployment completed successfully!"
 echo "🌐 Frontend & API are live on port 80 (HTTP) and 443 (HTTPS)."
+

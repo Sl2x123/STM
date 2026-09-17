@@ -27,3 +27,4 @@ echo "✅ Backup successfully created: ${BACKUP_FILE} (${SIZE})"
 # Auto-cleanup backups older than 14 days
 find "$BACKUP_DIR" -type f -name "pms_backup_*.sql.gz" -mtime +14 -delete 2>/dev/null || true
 echo "🧹 Old backups (>14 days) cleaned up."
+
