@@ -143,13 +143,27 @@ def run_tests():
     code, search_res = request("GET", "/api/v1/search/?q=Extragel")
     check("Search (GET /search/?q=Extragel) status 200", code == 200 and isinstance(search_res, list))
 
-    # 9. Telegram Bot Endpoints
-    print("\n👉 9. Telegram Bot Integration")
+    # 9. Telegram Integration (Temporarily Disabled per user request)
+    print("\n👉 9. Telegram Integration (Cleanly Disabled Mode)")
     code, tg_status = request("GET", "/api/v1/telegram/status")
-    check("Telegram status (GET /telegram/status) status 200", code == 200 and "configured" in tg_status)
+    check("Telegram status (GET /telegram/status) status 200 and disabled", code == 200 and tg_status.get("status") == "disabled")
 
     code, tg_summary = request("POST", "/api/v1/telegram/send-summary")
-    check("Telegram send-summary (POST /telegram/send-summary) status 200", code == 200 and "preview" in tg_summary)
+    check("Telegram send-summary (POST /telegram/send-summary) returns disabled message", code == 200 and tg_summary.get("status") == "disabled")
+
+    # 10. Meta: Facebook Ads & Instagram Ecosystem
+    print("\n👉 10. Meta Facebook & Instagram Integration")
+    code, meta_overview = request("GET", "/api/v1/meta/overview")
+    check("Meta overview (GET /meta/overview) status 200", code == 200 and isinstance(meta_overview, dict))
+    check("Meta overview contains summary KPIs", "summary" in meta_overview and "total_spend" in meta_overview["summary"])
+    check("Meta overview contains active campaigns list", "campaigns" in meta_overview and len(meta_overview["campaigns"]) >= 1)
+    check("Meta overview contains Uzbekistan benchmarks", "benchmarks_uz" in meta_overview and "ig_active_users_uz" in meta_overview["benchmarks_uz"])
+    check("Meta overview contains FB & IG platform split", "platforms" in meta_overview and "instagram" in meta_overview["platforms"])
+
+    code, ig_lookup = request("GET", "/api/v1/instagram/lookup?handle=shaxzoda__muxammedova")
+    check("Instagram lookup (GET /instagram/lookup) status 200", code == 200 and isinstance(ig_lookup, dict))
+    check("Instagram lookup contains followers and ER", "followers" in ig_lookup and "engagement_rate" in ig_lookup)
+    check("Instagram lookup contains estimated reel cost", "estimated_cost_per_reel" in ig_lookup)
 
     # Summary
     print("\n============================================================")

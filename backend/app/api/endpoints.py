@@ -285,26 +285,48 @@ def read_sprints_overview(db: Session = Depends(get_db)):
 def unified_search(q: str = "", db: Session = Depends(get_db)):
     return crud.search_all(db=db, query_str=q)
 
-# Telegram Notifications & Summary Delivery
+# Telegram Notifications (Temporarily Disabled by User Request)
+TELEGRAM_ENABLED = False
+
 from app.services.telegram_bot import send_telegram_raw, send_sprint_summary_to_telegram
 
 @router.get("/telegram/status")
 def get_telegram_status():
-    has_token = bool(settings.TELEGRAM_BOT_TOKEN)
-    has_chat = bool(settings.TELEGRAM_CHAT_ID)
     return {
-        "configured": has_token and has_chat,
-        "has_token": has_token,
-        "has_chat": has_chat
+        "enabled": TELEGRAM_ENABLED,
+        "status": "disabled",
+        "message": "Интеграция с Telegram временно отключена по настройкам системы"
     }
 
 @router.post("/telegram/send-summary")
 def trigger_sprint_summary_telegram(chat_id: Optional[str] = None, db: Session = Depends(get_db)):
+    if not TELEGRAM_ENABLED:
+        return {
+            "status": "disabled",
+            "message": "Интеграция с Telegram временно отключена",
+            "configured": False
+        }
     return send_sprint_summary_to_telegram(db=db, chat_id=chat_id)
 
 @router.post("/telegram/test")
 def test_telegram_message(message: str = "🔔 Тестовое уведомление из PMS системы!", chat_id: Optional[str] = None):
+    if not TELEGRAM_ENABLED:
+        return {
+            "status": "disabled",
+            "message": "Интеграция с Telegram временно отключена"
+        }
     return send_telegram_raw(text=message, chat_id=chat_id)
+
+# Meta (Facebook & Instagram) Ecosystem Overview & Ads Benchmark
+from app.services.instagram import get_meta_ecosystem_overview
+
+@router.get("/meta/overview")
+def read_meta_overview(db: Session = Depends(get_db)):
+    """
+    Returns consolidated Meta (Facebook & Instagram) advertising and influencer metrics.
+    """
+    return get_meta_ecosystem_overview(db=db)
+
 
 
 

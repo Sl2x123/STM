@@ -2081,7 +2081,7 @@ export default function ProjectView() {
             </div>
 
             {/* Card: Provided Materials & Items (Prominent full space) */}
-            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-indigo-100 dark:border-[#262932] shadow-sm bg-gradient-to-b from-indigo-50/20 to-white dark:from-[#181b20] dark:to-[#181b20]">
+            <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-slate-200 dark:border-[#262932] shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                   <Package size={20} className="text-indigo-600 dark:text-indigo-400" /> Предоставленные предметы и промо-материалы
@@ -2312,7 +2312,7 @@ export default function ProjectView() {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-indigo-100 dark:border-[#262932] shadow-sm bg-gradient-to-b from-indigo-50/20 to-white dark:from-[#181b20] dark:to-[#181b20]">
+              <div className="bg-white dark:bg-[#181b20] rounded-3xl p-6 lg:p-8 border border-slate-200 dark:border-[#262932] shadow-sm">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                   <Package size={20} className="text-indigo-600 dark:text-indigo-400" /> Предоставленные предметы / промо-материалы
                 </h2>
@@ -2684,7 +2684,7 @@ export default function ProjectView() {
 
                   {/* Direct Conversions: Profile Visits, Link Clicks, Promo Sales */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="p-4 bg-gradient-to-br from-indigo-50/60 to-purple-50/60 dark:from-[#1e2029] dark:to-[#171922] rounded-2xl border border-indigo-100 dark:border-[#262932]">
+                    <div className="p-4 bg-indigo-50 dark:bg-[#1e2029] rounded-2xl border border-indigo-200 dark:border-[#262932]">
                       <span className="text-xs font-bold uppercase text-indigo-900 dark:text-indigo-300 block mb-1">
                         Переходы в профиль бренда
                       </span>
@@ -2692,7 +2692,7 @@ export default function ProjectView() {
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Клики на @extragel.uz в посте и Stories</p>
                     </div>
 
-                    <div className="p-4 bg-gradient-to-br from-blue-50/60 to-sky-50/60 dark:from-[#17202d] dark:to-[#141a24] rounded-2xl border border-blue-100 dark:border-[#262932]">
+                    <div className="p-4 bg-blue-50 dark:bg-[#17202d] rounded-2xl border border-blue-200 dark:border-[#262932]">
                       <span className="text-xs font-bold uppercase text-blue-900 dark:text-blue-300 block mb-1">
                         Клики по ссылке / стикеру
                       </span>
@@ -2700,7 +2700,7 @@ export default function ProjectView() {
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Переходы на витрину сети аптек</p>
                     </div>
 
-                    <div className="p-4 bg-gradient-to-br from-emerald-50/60 to-teal-50/60 dark:from-[#15241f] dark:to-[#121c18] rounded-2xl border border-emerald-100 dark:border-[#262932]">
+                    <div className="p-4 bg-emerald-50 dark:bg-[#15241f] rounded-2xl border border-emerald-200 dark:border-[#262932]">
                       <span className="text-xs font-bold uppercase text-emerald-900 dark:text-emerald-300 block mb-1">
                         Промокод ({selectedBlogger.name?.split(' ')[0]?.toUpperCase() || 'BLOGGER'})
                       </span>
@@ -2786,7 +2786,7 @@ export default function ProjectView() {
         </div>
 
         {/* Hero Section */}
-        <div className="bg-gradient-to-br from-white via-indigo-50/20 to-purple-50/20 dark:from-[#181b20] dark:via-[#1c1f27] dark:to-[#181b20] rounded-3xl p-8 border border-indigo-100 dark:border-[#262932] shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
+        <div className="bg-white dark:bg-[#181b20] rounded-3xl p-8 border border-slate-200 dark:border-[#262932] shadow-sm mb-8 flex flex-wrap lg:flex-nowrap items-center justify-between gap-6">
           <div className="flex items-center gap-5">
             <div className="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-2xl shadow-lg shadow-indigo-200 shrink-0">
               <Sparkles size={32} />
@@ -2886,7 +2886,7 @@ export default function ProjectView() {
               </div>
 
               {/* Live Preview of Auto-Enriched Data */}
-              <div className="bg-gradient-to-br from-indigo-900/90 to-purple-950 text-white rounded-3xl p-6 lg:p-8 shadow-xl relative overflow-hidden">
+              <div className="bg-[#131722] text-white rounded-3xl p-6 lg:p-8 shadow-xl border border-slate-700/80 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div className="flex items-center justify-between gap-4 mb-6 relative z-10">
