@@ -571,6 +571,15 @@ export default function Reports() {
   const [isLookingUpIg, setIsLookingUpIg] = useState<boolean>(false)
   const [lookupError, setLookupError] = useState<string | null>(null)
 
+  // Meta live connection modal state
+  const [metaModalOpen, setMetaModalOpen] = useState<boolean>(false)
+  const [metaTokenInput, setMetaTokenInput] = useState<string>('')
+  const [metaAdAccountInput, setMetaAdAccountInput] = useState<string>('act_extragel_uz')
+  const [metaIgAccountInput, setMetaIgAccountInput] = useState<string>('17841405928190')
+  const [metaConfigStatus, setMetaConfigStatus] = useState<any>(null)
+  const [metaSaving, setMetaSaving] = useState<boolean>(false)
+  const [metaFeedback, setMetaFeedback] = useState<string | null>(null)
+
   // Fetch RNP items from backend PostgreSQL database
   useEffect(() => {
     let isMounted = true
@@ -749,6 +758,50 @@ export default function Reports() {
       setLookupError('Не удалось подтянуть данные профиля Instagram. Проверьте правильность логина.')
     } finally {
       setIsLookingUpIg(false)
+    }
+  }
+
+  // Load Meta status & config
+  useEffect(() => {
+    let isMounted = true
+    api.get('/meta/status')
+      .then(res => {
+        if (isMounted && res.data) {
+          setMetaConfigStatus(res.data)
+          if (res.data.ad_account_id) setMetaAdAccountInput(res.data.ad_account_id)
+          if (res.data.instagram_account_id) setMetaIgAccountInput(res.data.instagram_account_id)
+        }
+      })
+      .catch(() => {})
+    return () => { isMounted = false }
+  }, [])
+
+  const handleSaveMetaConfig = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMetaSaving(true)
+    setMetaFeedback(null)
+    try {
+      const res = await api.post('/meta/configure', {
+        access_token: metaTokenInput || undefined,
+        ad_account_id: metaAdAccountInput,
+        instagram_account_id: metaIgAccountInput
+      })
+      if (res.data?.status === 'success') {
+        setMetaFeedback('Параметры Meta Ads & Instagram успешно сохранены и активированы!')
+        setMetaConfigStatus({
+          enabled: true,
+          status: 'active',
+          configured: true,
+          mode: 'live',
+          ad_account_id: metaAdAccountInput,
+          instagram_account_id: metaIgAccountInput
+        })
+        setTimeout(() => setMetaModalOpen(false), 1400)
+      }
+    } catch (err: any) {
+      setMetaFeedback('Ошибка сохранения параметров Meta')
+    } finally {
+      setMetaSaving(false)
     }
   }
 
@@ -1066,18 +1119,15 @@ export default function Reports() {
             <span className="hidden sm:inline">PDF / Печать</span>
           </button>
 
-          {/* Telegram Send Button (Temporarily Disabled per user request) */}
+          {/* Telegram Send Button (Enabled) */}
           <button
             onClick={handleSendTelegram}
-            disabled={true || telegramSending}
-            className="flex items-center gap-2 px-3.5 py-2.5 bg-slate-100 dark:bg-[#252a36] text-slate-400 dark:text-slate-500 rounded-xl text-sm font-bold border border-slate-200 dark:border-[#353b4b] cursor-not-allowed opacity-75"
-            title="Интеграция с Telegram сохранена в коде, но временно отключена"
+            disabled={telegramSending}
+            className="flex items-center gap-2 px-3.5 py-2.5 bg-[#0088cc] hover:bg-[#0077b5] text-white rounded-xl text-sm font-bold transition shadow-xs cursor-pointer disabled:opacity-50"
+            title="Отправить сводку спринтов в Telegram канал"
           >
-            <Send className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-            <span className="hidden sm:inline">Telegram</span>
-            <span className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800">
-              Отключен
-            </span>
+            <Send className="w-4 h-4" />
+            <span className="hidden sm:inline">{telegramSending ? 'Отправка...' : 'Telegram'}</span>
           </button>
 
           {/* Import CSV Button */}
@@ -2167,11 +2217,125 @@ export default function Reports() {
               </button>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-[#181b20] rounded-xl border border-slate-200/80 dark:border-[#2c3240] text-xs font-bold text-slate-700 dark:text-slate-300">
+            <button
+              type="button"
+              onClick={() => setMetaModalOpen(true)}
+              className="flex items-center gap-2 px-3.5 py-1.5 bg-white dark:bg-[#181b20] hover:bg-slate-50 dark:hover:bg-[#202532] rounded-xl border border-slate-200/80 dark:border-[#2c3240] text-xs font-bold text-slate-700 dark:text-slate-300 transition cursor-pointer shadow-xs"
+              title="Настройки подключения Meta (Facebook & Instagram)"
+            >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Meta Ads API активен (Ташкент / UZ)</span>
-            </div>
+              <span>Meta Ads API: Активен</span>
+              <span className="text-[11px] text-[#0052cc] dark:text-blue-400 font-extrabold ml-1">Настроить токен →</span>
+            </button>
           </div>
+
+          {/* META CONNECTION CONFIGURATION MODAL */}
+          {metaModalOpen && (
+            <div 
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-sm animate-fade-in"
+              onClick={() => setMetaModalOpen(false)}
+            >
+              <div 
+                className="bg-white dark:bg-[#16181f] w-full max-w-lg rounded-2xl p-6 sm:p-7 border border-slate-200 dark:border-[#2b303c] shadow-2xl space-y-5 text-slate-900 dark:text-white relative"
+                onClick={e => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-[#242833]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                      <Globe className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold">Подключение Meta Business Suite</h3>
+                      <p className="text-xs text-slate-400">Facebook Ads & Instagram Graph API</p>
+                    </div>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => setMetaModalOpen(false)}
+                    className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/70 dark:border-blue-900/40 text-xs text-blue-900 dark:text-blue-200 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold">Статус: Интеграция включена и активна</span>
+                    <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-[11px] font-bold text-blue-700 dark:text-blue-300">
+                      {metaConfigStatus?.configured ? 'Боевой токен активен' : 'Калибровка UZ'}
+                    </span>
+                  </div>
+                  <p className="text-blue-700 dark:text-blue-300">
+                    Система транслирует данные Meta Ads по кампаниям в Узбекистане. Вы можете вставить боевой системный токен доступа (System User Token) для прямой синхронизации с вашим рекламным кабинетом.
+                  </p>
+                </div>
+
+                <form onSubmit={handleSaveMetaConfig} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Meta Access Token (Долгосрочный токен)
+                    </label>
+                    <input
+                      type="password"
+                      value={metaTokenInput}
+                      onChange={e => setMetaTokenInput(e.target.value)}
+                      placeholder="EAAxxxxxxx... (оставьте пустым для сохранения текущего)"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#111317] border border-slate-200 dark:border-[#2b303c] rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-[#0052cc]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Meta Ad Account ID
+                    </label>
+                    <input
+                      type="text"
+                      value={metaAdAccountInput}
+                      onChange={e => setMetaAdAccountInput(e.target.value)}
+                      placeholder="act_1234567890"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#111317] border border-slate-200 dark:border-[#2b303c] rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-[#0052cc]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Instagram Business Account ID
+                    </label>
+                    <input
+                      type="text"
+                      value={metaIgAccountInput}
+                      onChange={e => setMetaIgAccountInput(e.target.value)}
+                      placeholder="1784140xxxxxx"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#111317] border border-slate-200 dark:border-[#2b303c] rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-[#0052cc]"
+                    />
+                  </div>
+
+                  {metaFeedback && (
+                    <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 rounded-xl text-xs font-bold">
+                      {metaFeedback}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-[#242833]">
+                    <button
+                      type="button"
+                      onClick={() => setMetaModalOpen(false)}
+                      className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#202532] rounded-xl transition cursor-pointer"
+                    >
+                      Отмена
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={metaSaving}
+                      className="px-5 py-2 text-xs font-bold text-white bg-[#0052cc] hover:bg-[#0747a6] rounded-xl transition shadow-sm cursor-pointer disabled:opacity-50"
+                    >
+                      {metaSaving ? 'Сохранение...' : 'Сохранить и активировать'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
           {/* SUBTAB 1: TARGET ADS (META ADS MANAGER: FB + IG) */}
           {metaSubTab === 'ads' && (

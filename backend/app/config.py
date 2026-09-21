@@ -7,9 +7,11 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
 
+    META_ENABLED: bool = True
     META_ACCESS_TOKEN: str = ""
     META_APP_ID: str = ""
     META_APP_SECRET: str = ""
+    META_AD_ACCOUNT_ID: str = ""
     INSTAGRAM_ACCOUNT_ID: str = ""
 
     TELEGRAM_BOT_TOKEN: str = ""

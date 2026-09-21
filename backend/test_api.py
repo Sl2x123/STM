@@ -143,16 +143,22 @@ def run_tests():
     code, search_res = request("GET", "/api/v1/search/?q=Extragel")
     check("Search (GET /search/?q=Extragel) status 200", code == 200 and isinstance(search_res, list))
 
-    # 9. Telegram Integration (Temporarily Disabled per user request)
-    print("\n👉 9. Telegram Integration (Cleanly Disabled Mode)")
+    # 9. Telegram Integration (Enabled & Active)
+    print("\n👉 9. Telegram Integration (Enabled & Active)")
     code, tg_status = request("GET", "/api/v1/telegram/status")
-    check("Telegram status (GET /telegram/status) status 200 and disabled", code == 200 and tg_status.get("status") == "disabled")
+    check("Telegram status (GET /telegram/status) status 200 and active", code == 200 and tg_status.get("status") == "active")
 
     code, tg_summary = request("POST", "/api/v1/telegram/send-summary")
-    check("Telegram send-summary (POST /telegram/send-summary) returns disabled message", code == 200 and tg_summary.get("status") == "disabled")
+    check("Telegram send-summary (POST /telegram/send-summary) generates sprint report", code == 200 and ("preview" in tg_summary or tg_summary.get("status") in ["success", "simulation"]))
 
-    # 10. Meta: Facebook Ads & Instagram Ecosystem
-    print("\n👉 10. Meta Facebook & Instagram Integration")
+    # 10. Meta: Facebook Ads & Instagram Ecosystem (Active & Configurable)
+    print("\n👉 10. Meta Facebook & Instagram Integration (Active)")
+    code, meta_status = request("GET", "/api/v1/meta/status")
+    check("Meta status (GET /meta/status) status 200 and active", code == 200 and meta_status.get("status") == "active")
+
+    code, meta_cfg = request("POST", "/api/v1/meta/configure", {"ad_account_id": "act_test_uz", "instagram_account_id": "1784140test"})
+    check("Meta configure (POST /meta/configure) status 200", code == 200 and meta_cfg.get("status") == "success")
+
     code, meta_overview = request("GET", "/api/v1/meta/overview")
     check("Meta overview (GET /meta/overview) status 200", code == 200 and isinstance(meta_overview, dict))
     check("Meta overview contains summary KPIs", "summary" in meta_overview and "total_spend" in meta_overview["summary"])

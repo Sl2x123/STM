@@ -285,17 +285,21 @@ def read_sprints_overview(db: Session = Depends(get_db)):
 def unified_search(q: str = "", db: Session = Depends(get_db)):
     return crud.search_all(db=db, query_str=q)
 
-# Telegram Notifications (Temporarily Disabled by User Request)
-TELEGRAM_ENABLED = False
+from pydantic import BaseModel
+
+# Telegram Notifications (Active)
+TELEGRAM_ENABLED = True
 
 from app.services.telegram_bot import send_telegram_raw, send_sprint_summary_to_telegram
 
 @router.get("/telegram/status")
 def get_telegram_status():
+    is_configured = bool(settings.TELEGRAM_BOT_TOKEN and settings.TELEGRAM_CHAT_ID)
     return {
         "enabled": TELEGRAM_ENABLED,
-        "status": "disabled",
-        "message": "Интеграция с Telegram временно отключена по настройкам системы"
+        "configured": is_configured,
+        "status": "active" if TELEGRAM_ENABLED else "disabled",
+        "message": "Интеграция с Telegram активна и включена" if TELEGRAM_ENABLED else "Интеграция с Telegram временно отключена"
     }
 
 @router.post("/telegram/send-summary")
@@ -317,7 +321,7 @@ def test_telegram_message(message: str = "🔔 Тестовое уведомле
         }
     return send_telegram_raw(text=message, chat_id=chat_id)
 
-# Meta (Facebook & Instagram) Ecosystem Overview & Ads Benchmark
+# Meta (Facebook & Instagram) Ecosystem Overview, Ads Benchmark & Connection
 from app.services.instagram import get_meta_ecosystem_overview
 
 @router.get("/meta/overview")
@@ -326,6 +330,39 @@ def read_meta_overview(db: Session = Depends(get_db)):
     Returns consolidated Meta (Facebook & Instagram) advertising and influencer metrics.
     """
     return get_meta_ecosystem_overview(db=db)
+
+class MetaConfigRequest(BaseModel):
+    access_token: Optional[str] = None
+    ad_account_id: Optional[str] = None
+    instagram_account_id: Optional[str] = None
+
+@router.get("/meta/status")
+def get_meta_status():
+    has_token = bool(settings.META_ACCESS_TOKEN)
+    return {
+        "enabled": True,
+        "status": "active",
+        "configured": has_token,
+        "mode": "live" if has_token else "market_calibration",
+        "ad_account_id": settings.META_AD_ACCOUNT_ID or "act_default_uz",
+        "instagram_account_id": settings.INSTAGRAM_ACCOUNT_ID or "ig_business_uz",
+        "message": "Интеграция с Meta (Facebook & Instagram) активна и включена"
+    }
+
+@router.post("/meta/configure")
+def configure_meta(req: MetaConfigRequest):
+    if req.access_token is not None:
+        settings.META_ACCESS_TOKEN = req.access_token.strip()
+    if req.ad_account_id is not None:
+        settings.META_AD_ACCOUNT_ID = req.ad_account_id.strip()
+    if req.instagram_account_id is not None:
+        settings.INSTAGRAM_ACCOUNT_ID = req.instagram_account_id.strip()
+
+    return {
+        "status": "success",
+        "message": "Параметры Meta успешно сохранены и включены",
+        "configured": bool(settings.META_ACCESS_TOKEN)
+    }
 
 
 
