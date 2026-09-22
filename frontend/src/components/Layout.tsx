@@ -353,20 +353,6 @@ export default function Layout() {
                     </div>
                   </div>
 
-                  <div className="py-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUserMenuOpen(false)
-                        navigate('/reports')
-                      }}
-                      className="w-full px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#222630] flex items-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <UserIcon size={14} className="text-gray-400" />
-                      Мои отчеты и активность
-                    </button>
-                  </div>
-
                   <div className="border-t border-gray-100 dark:border-[#262932] pt-1">
                     <button
                       type="button"
