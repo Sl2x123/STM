@@ -673,10 +673,11 @@ export default function ProjectView() {
     }
     try {
       await api.delete(`/projects/${projectId}`)
+      navigate('/projects')
     } catch (err) {
-      console.warn('Backend delete project fallback:', err)
+      console.error('Backend delete project error:', err)
+      alert('Не удалось удалить проект на сервере. Попробуйте еще раз.')
     }
-    navigate('/projects')
   }
 
   // Active Tab: 'tasks' | 'plans' | 'bloggers' | 'companies' | 'members' | 'settings'
@@ -1128,7 +1129,7 @@ export default function ProjectView() {
       navigate('/projects')
     } catch (err) {
       console.error('Failed to delete project:', err)
-      navigate('/projects')
+      alert('Не удалось удалить проект на сервере. Попробуйте еще раз.')
     }
   }
 

@@ -45,12 +45,12 @@ export default function ProjectsList() {
     async function fetchProjects() {
       try {
         const res = await api.get('/projects/')
-        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-          const mapped = res.data.map((p: any, idx: number) => {
-            const fallback = initialProjects.find(ip => ip.id === p.id) || initialProjects[idx % initialProjects.length]
+        if (res.data && Array.isArray(res.data)) {
+          const mapped = res.data.map((p: any) => {
+            const fallback = initialProjects.find(ip => ip.id === p.id)
             return {
               id: p.id,
-              name: fallback ? fallback.name : p.name,
+              name: p.name || (fallback ? fallback.name : 'Проект'),
               currentPlanName: fallback ? fallback.currentPlanName : 'План на Сентябрь 2026',
               currentPlanPeriod: fallback ? fallback.currentPlanPeriod : 'с 01.09.2026 по 30.09.2026',
               progress: fallback ? fallback.progress : 75,
@@ -110,10 +110,11 @@ export default function ProjectsList() {
     }
     try {
       await api.delete(`/projects/${projectId}`)
+      setProjects(prev => prev.filter(p => p.id !== projectId))
     } catch (err) {
-      console.warn('Backend delete project fallback:', err)
+      console.error('Backend delete project error:', err)
+      alert('Не удалось удалить проект на сервере. Попробуйте еще раз.')
     }
-    setProjects(prev => prev.filter(p => p.id !== projectId))
   }
 
   // Full-Page View for Creating a Project
