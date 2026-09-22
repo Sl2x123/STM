@@ -39,9 +39,19 @@ interface MetricCardProps {
   icon: LucideIcon
   percent: number
   growth: number
+  colorClass?: string
+  barColorClass?: string
 }
 
-function MetricKpiCard({ value, label, icon: Icon, percent, growth }: MetricCardProps) {
+function MetricKpiCard({ 
+  value, 
+  label, 
+  icon: Icon, 
+  percent, 
+  growth,
+  colorClass = 'bg-[#0052cc]',
+  barColorClass = 'bg-[#0052cc]'
+}: MetricCardProps) {
   return (
     <div className="bg-white dark:bg-[#181b20] rounded-2xl p-5 shadow-[0_4px_25px_rgba(0,0,0,0.03)] dark:shadow-none border border-slate-100/90 dark:border-[#262932] hover:shadow-md dark:hover:border-slate-700/60 transition-all duration-200">
       <div className="flex items-start justify-between gap-3">
@@ -53,7 +63,7 @@ function MetricKpiCard({ value, label, icon: Icon, percent, growth }: MetricCard
             {label}
           </span>
         </div>
-        <div className="w-12 h-12 rounded-2xl bg-[#0052cc] text-white flex items-center justify-center shadow-[0_4px_14px_rgba(0,82,204,0.32)] shrink-0">
+        <div className={`w-12 h-12 rounded-2xl ${colorClass} text-white flex items-center justify-center shrink-0`}>
           <Icon size={22} className="stroke-[2.2]" />
         </div>
       </div>
@@ -62,7 +72,7 @@ function MetricKpiCard({ value, label, icon: Icon, percent, growth }: MetricCard
         <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 select-none">0%</span>
         <div className="flex-1 h-1.5 bg-slate-100 dark:bg-[#232730] rounded-full overflow-hidden">
           <div 
-            className="h-full bg-[#0052cc] rounded-full transition-all duration-700 ease-out"
+            className={`h-full ${barColorClass} rounded-full transition-all duration-700 ease-out`}
             style={{ width: `${Math.min(percent, 100)}%` }}
           />
         </div>
@@ -140,17 +150,6 @@ function SplineWaveChart({ selectedPeriod, serverMonthlyData }: { selectedPeriod
       {/* SVG Smooth Spline Chart */}
       <div className="relative w-full overflow-hidden pt-2">
         <svg viewBox="0 0 540 215" className="w-full h-auto overflow-visible">
-          <defs>
-            {/* Luminous soft drop shadow for blue fact spline */}
-            <filter id="blueWaveGlow" x="-20%" y="-20%" width="140%" height="160%">
-              <feDropShadow dx="0" dy="7" stdDeviation="4.5" floodColor="#0052cc" floodOpacity="0.32" />
-            </filter>
-            {/* Luminous soft drop shadow for yellow plan spline */}
-            <filter id="yellowWaveGlow" x="-20%" y="-20%" width="140%" height="160%">
-              <feDropShadow dx="0" dy="7" stdDeviation="4.5" floodColor="#f59e0b" floodOpacity="0.32" />
-            </filter>
-          </defs>
-
           {/* Horizontal Axis Guides */}
           {[
             { label: '25k', y: 35 },
@@ -183,26 +182,24 @@ function SplineWaveChart({ selectedPeriod, serverMonthlyData }: { selectedPeriod
             />
           )}
 
-          {/* Yellow Spline (Expenses / Plan) with Glow */}
+          {/* Yellow/Amber Spline (Expenses / Plan) - Solid pure bright amber */}
           <path
             d={planPath}
             fill="none"
-            stroke="#fbbf24"
-            strokeWidth="3.2"
+            stroke="#f59e0b"
+            strokeWidth="3.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            filter="url(#yellowWaveGlow)"
           />
 
-          {/* Blue Spline (Income / Fact) with Glow */}
+          {/* Blue Spline (Income / Fact) - Solid pure bright royal blue */}
           <path
             d={factPath}
             fill="none"
             stroke="#0052cc"
-            strokeWidth="3.6"
+            strokeWidth="3.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            filter="url(#blueWaveGlow)"
           />
 
           {/* Active Points indicators */}
@@ -211,19 +208,19 @@ function SplineWaveChart({ selectedPeriod, serverMonthlyData }: { selectedPeriod
               <circle
                 cx={activeData.x}
                 cy={activeData.planY}
-                r="5"
-                fill="#fbbf24"
+                r="5.5"
+                fill="#f59e0b"
                 stroke="#ffffff"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 className="transition-all duration-200"
               />
               <circle
                 cx={activeData.x}
                 cy={activeData.factY}
-                r="5.5"
+                r="6"
                 fill="#0052cc"
                 stroke="#ffffff"
-                strokeWidth="2.2"
+                strokeWidth="2.5"
                 className="transition-all duration-200"
               />
             </g>
@@ -310,17 +307,35 @@ function GroupedThreeBarChart() {
     <div className="bg-white dark:bg-[#181b20] rounded-2xl p-6 shadow-[0_4px_25px_rgba(0,0,0,0.03)] dark:shadow-none border border-slate-100/90 dark:border-[#262932] flex flex-col justify-between transition-colors duration-200">
       {/* Header */}
       <div className="flex items-center justify-between gap-3 mb-2">
-        <h3 className="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">Booking Summary</h3>
-        <div className="relative">
-          <select
-            value={summaryMode}
-            onChange={(e) => setSummaryMode(e.target.value as any)}
-            className="appearance-none bg-slate-50 dark:bg-[#20242c] border border-slate-200/90 dark:border-[#2e333e] rounded-lg pl-3 pr-7 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 outline-none cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 focus:ring-1 focus:ring-[#0052cc]"
-          >
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-          <ChevronDown size={13} className="absolute right-2 top-2 text-slate-400 pointer-events-none" />
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">Booking Summary</h3>
+          <div className="relative">
+            <select
+              value={summaryMode}
+              onChange={(e) => setSummaryMode(e.target.value as any)}
+              className="appearance-none bg-slate-50 dark:bg-[#20242c] border border-slate-200/90 dark:border-[#2e333e] rounded-lg pl-3 pr-7 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300 outline-none cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 focus:ring-1 focus:ring-[#0052cc]"
+            >
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+            <ChevronDown size={13} className="absolute right-2 top-2 text-slate-400 pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Legend: Pure Bright Colors */}
+        <div className="flex items-center gap-3 text-xs font-bold">
+          <div className="flex items-center gap-1.5 text-[#06b6d4]">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#06b6d4] inline-block" />
+            <span>База</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[#f59e0b]">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] inline-block" />
+            <span>План</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[#0052cc] dark:text-[#3b82f6]">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#0052cc] dark:bg-[#3b82f6] inline-block" />
+            <span>Факт</span>
+          </div>
         </div>
       </div>
 
@@ -342,7 +357,7 @@ function GroupedThreeBarChart() {
             </g>
           ))}
 
-          {/* Top reference line at 25k (in reference screenshot) */}
+          {/* Top reference line at 25k */}
           <line x1="45" y1="35" x2="495" y2="35" className="stroke-slate-100 dark:stroke-[#222630]" strokeWidth="1.5" />
           {/* Bottom baseline */}
           <line x1="45" y1="175" x2="495" y2="175" className="stroke-slate-100 dark:stroke-[#222630]" strokeWidth="1.5" />
@@ -367,7 +382,7 @@ function GroupedThreeBarChart() {
                 onMouseEnter={() => setActiveGroup(idx)}
                 onMouseLeave={() => setActiveGroup(null)}
               >
-                {/* Bar 1: Light Gray (Base) */}
+                {/* Bar 1: Pure Bright Cyan (Base) */}
                 <rect
                   x={xCenter - barW - barGap - barW / 2}
                   y={baselineY - hBase}
@@ -375,10 +390,10 @@ function GroupedThreeBarChart() {
                   height={hBase}
                   rx="4"
                   ry="4"
-                  className="fill-[#f1f5f9] dark:fill-[#222630] transition-all hover:opacity-80"
+                  className="fill-[#06b6d4] transition-all hover:opacity-90"
                 />
 
-                {/* Bar 2: Medium Slate (Plan) */}
+                {/* Bar 2: Pure Bright Amber (Plan) */}
                 <rect
                   x={xCenter - barW / 2}
                   y={baselineY - hPlan}
@@ -386,10 +401,10 @@ function GroupedThreeBarChart() {
                   height={hPlan}
                   rx="4"
                   ry="4"
-                  className="fill-[#cbd5e1] dark:fill-[#3a4252] transition-all hover:opacity-80"
+                  className="fill-[#f59e0b] transition-all hover:opacity-90"
                 />
 
-                {/* Bar 3: Solid Royal Blue (Fact) */}
+                {/* Bar 3: Pure Bright Royal Blue (Fact) */}
                 <rect
                   x={xCenter + barW / 2 + barGap}
                   y={baselineY - hFact}
@@ -404,20 +419,20 @@ function GroupedThreeBarChart() {
                 {isHovered && (
                   <g>
                     <rect
-                      x={xCenter - 45}
+                      x={xCenter - 65}
                       y={baselineY - Math.max(hBase, hPlan, hFact) - 34}
-                      width="90"
+                      width="130"
                       height="26"
                       rx="6"
-                      className="fill-slate-900/90 dark:fill-white/90"
+                      className="fill-slate-900/95 dark:fill-slate-800/95 shadow-sm"
                     />
                     <text
                       x={xCenter}
                       y={baselineY - Math.max(hBase, hPlan, hFact) - 17}
                       textAnchor="middle"
-                      className="text-[10px] font-bold fill-white dark:fill-slate-900"
+                      className="text-[10px] font-bold fill-white"
                     >
-                      {g.fact}k fact / {g.plan}k plan
+                      {g.fact}k факт · {g.plan}k план
                     </text>
                   </g>
                 )}
@@ -462,7 +477,7 @@ function LatestBookingTable() {
       fact: '956',
       percent: '85%',
       status: 'Выполнено',
-      statusColor: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/50'
+      statusColor: 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/60 dark:text-emerald-200 dark:border-emerald-600'
     },
     {
       no: 2,
@@ -474,7 +489,7 @@ function LatestBookingTable() {
       fact: '588',
       percent: '87%',
       status: 'Выполнено',
-      statusColor: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/50'
+      statusColor: 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/60 dark:text-emerald-200 dark:border-emerald-600'
     },
     {
       no: 3,
@@ -486,7 +501,7 @@ function LatestBookingTable() {
       fact: '4,627',
       percent: '27%',
       status: 'В работе',
-      statusColor: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/50'
+      statusColor: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/60 dark:text-amber-200 dark:border-amber-600'
     },
     {
       no: 4,
@@ -498,7 +513,7 @@ function LatestBookingTable() {
       fact: '783',
       percent: '91%',
       status: 'Выполнено',
-      statusColor: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/50'
+      statusColor: 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/60 dark:text-emerald-200 dark:border-emerald-600'
     },
     {
       no: 5,
@@ -510,7 +525,7 @@ function LatestBookingTable() {
       fact: '50',
       percent: '100%',
       status: 'Передано',
-      statusColor: 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/50'
+      statusColor: 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/60 dark:text-blue-200 dark:border-blue-600'
     },
     {
       no: 6,
@@ -522,7 +537,7 @@ function LatestBookingTable() {
       fact: '286.1M сум',
       percent: '71%',
       status: 'В графике',
-      statusColor: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800/50'
+      statusColor: 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/60 dark:text-purple-200 dark:border-purple-600'
     },
     {
       no: 7,
@@ -534,7 +549,7 @@ function LatestBookingTable() {
       fact: '180K охват',
       percent: '100%',
       status: 'Вышел пост',
-      statusColor: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/50'
+      statusColor: 'bg-teal-100 text-teal-800 border-teal-300 dark:bg-teal-900/60 dark:text-teal-200 dark:border-teal-600'
     }
   ]
 
@@ -676,6 +691,8 @@ export default function Dashboard() {
           icon={Users}
           percent={stats ? Math.min(100, stats.total_projects * 25) : 80}
           growth={15}
+          colorClass="bg-[#0052cc]"
+          barColorClass="bg-[#0052cc]"
         />
         <MetricKpiCard
           value={stats ? `$${stats.total_budget?.toLocaleString()}` : '$5,780'}
@@ -683,6 +700,8 @@ export default function Dashboard() {
           icon={Ticket}
           percent={stats ? Math.round((stats.total_spent_bloggers / (stats.total_budget || 1)) * 100) : 48}
           growth={24}
+          colorClass="bg-[#10b981]"
+          barColorClass="bg-[#10b981]"
         />
         <MetricKpiCard
           value={stats ? `${stats.total_bloggers + stats.total_companies}` : '12'}
@@ -690,6 +709,8 @@ export default function Dashboard() {
           icon={MapPin}
           percent={stats ? Math.round((stats.total_bloggers / ((stats.total_bloggers + stats.total_companies) || 1)) * 100) : 50}
           growth={35}
+          colorClass="bg-[#8b5cf6]"
+          barColorClass="bg-[#8b5cf6]"
         />
         <MetricKpiCard
           value={stats ? `${stats.rnp_completion_rate}%` : '75%'}
@@ -697,6 +718,8 @@ export default function Dashboard() {
           icon={LineChart}
           percent={stats ? stats.rnp_completion_rate : 75}
           growth={stats ? stats.rnp_completion_rate : 75}
+          colorClass="bg-[#f59e0b]"
+          barColorClass="bg-[#f59e0b]"
         />
       </div>
 
