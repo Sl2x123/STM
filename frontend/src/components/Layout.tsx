@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { 
-  Menu, Search, Bell, LayoutDashboard, FolderKanban, FileText, Zap, ChevronDown, LogOut, User as UserIcon, Moon, Sun,
+  Menu, Search, Bell, LayoutDashboard, FolderKanban, FileText, ChevronDown, LogOut, User as UserIcon, Moon, Sun,
   Building2, CheckCircle2, X, Sparkles, Shield
 } from 'lucide-react'
 
@@ -155,22 +155,6 @@ export default function Layout() {
                 <FileText size={20} className="mr-4 opacity-80" />
                 <span className="font-medium text-[15px]">Reports</span>
               </Link>
-            </div>
-          </div>
-          
-          {/* Bottom Banner */}
-          <div className="px-4 mb-6">
-            <div className="bg-[#233044] rounded-2xl p-5 relative overflow-hidden">
-              <div className="bg-white/10 w-8 h-8 rounded-lg flex items-center justify-center mb-3">
-                <Zap size={16} className="text-white" />
-              </div>
-              <h4 className="text-white font-bold text-sm mb-1">Больше<br/>возможностей</h4>
-              <p className="text-[11px] text-[#8b9bb4] mb-4 leading-relaxed">
-                Создавайте, управляйте<br/>и достигайте целей<br/>быстрее.
-              </p>
-              <button className="w-full py-2 bg-[#818cf8] hover:bg-[#6366f1] text-white text-sm font-medium rounded-lg transition-colors">
-                Узнать больше
-              </button>
             </div>
           </div>
         </div>
