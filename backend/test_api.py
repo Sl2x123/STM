@@ -165,6 +165,7 @@ def run_tests():
     check("Meta overview contains active campaigns list", "campaigns" in meta_overview and len(meta_overview["campaigns"]) >= 1)
     check("Meta overview contains Uzbekistan benchmarks", "benchmarks_uz" in meta_overview and "ig_active_users_uz" in meta_overview["benchmarks_uz"])
     check("Meta overview contains FB & IG platform split", "platforms" in meta_overview and "instagram" in meta_overview["platforms"])
+    check("Meta overview contains regional targeting for Uzbekistan & oblasts", "regional_targeting" in meta_overview and len(meta_overview["regional_targeting"]["regions"]) >= 5)
 
     code, ig_lookup = request("GET", "/api/v1/instagram/lookup?handle=shaxzoda__muxammedova")
     check("Instagram lookup (GET /instagram/lookup) status 200", code == 200 and isinstance(ig_lookup, dict))
