@@ -2498,7 +2498,7 @@ export default function Reports() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-[#121418] border border-slate-200/70 dark:border-[#252a36] mb-3">
+                  <div className="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-[#121418] border border-slate-200/70 dark:border-[#252a36]">
                     <div>
                       <span className="text-[11px] font-semibold text-slate-400 block">Расход</span>
                       <span className="text-lg font-black text-slate-900 dark:text-white">
@@ -2516,10 +2516,6 @@ export default function Reports() {
                       <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">3.9x</span>
                     </div>
                   </div>
-
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Основной драйвер для молодой аудитории 18–32 лет. Лучшие результаты в вертикальных Reels с демонстрацией распаковки.
-                  </p>
                 </div>
 
                 {/* Facebook Ads Card */}
@@ -2539,7 +2535,7 @@ export default function Reports() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-[#121418] border border-slate-200/70 dark:border-[#252a36] mb-3">
+                  <div className="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-[#121418] border border-slate-200/70 dark:border-[#252a36]">
                     <div>
                       <span className="text-[11px] font-semibold text-slate-400 block">Расход</span>
                       <span className="text-lg font-black text-slate-900 dark:text-white">
@@ -2557,10 +2553,6 @@ export default function Reports() {
                       <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">3.2x</span>
                     </div>
                   </div>
-
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Высокая конверсия среди платежеспособной взрослой ЦА (30–55 лет), врачей и фармацевтов в тематических сообществах.
-                  </p>
                 </div>
               </div>
 
@@ -2571,9 +2563,6 @@ export default function Reports() {
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                       Активные рекламные кампании в Meta Ads Manager
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Реальные метрики трансляций в лентах и Reels за {selectedMonth}
-                    </p>
                   </div>
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-[#222632] px-3 py-1.5 rounded-xl self-start sm:self-auto">
                     4 активные кампании
@@ -2788,7 +2777,7 @@ export default function Reports() {
               <div className="bg-white dark:bg-[#181b20] p-6 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
                   <div>
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                         <MapPin size={18} />
                       </div>
@@ -2797,9 +2786,6 @@ export default function Reports() {
                       </h3>
                       <StatusBadge status="Активно" size="sm" />
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Реальные метрики распределения рекламных бюджетов, охвата и конверсий по ключевым регионам Республики Узбекистан
-                    </p>
                   </div>
 
                   {/* Filter Pills */}
@@ -2886,7 +2872,7 @@ export default function Reports() {
                 </div>
 
                 {/* Table of Regions */}
-                <div className="overflow-x-auto mb-6">
+                <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse min-w-[850px]">
                     <thead>
                       <tr className="border-b border-slate-200 dark:border-[#272c38] text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">
@@ -2961,57 +2947,6 @@ export default function Reports() {
                       ))}
                     </tbody>
                   </table>
-                </div>
-
-                {/* Regional Share Summary Visual Bars */}
-                <div className="bg-slate-50 dark:bg-[#121418] p-5 rounded-2xl border border-slate-200/70 dark:border-[#252a36]">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
-                    <Layers size={14} className="text-blue-500" />
-                    Распределение охвата по территории Республики Узбекистан
-                  </h4>
-                  <div className="w-full h-3.5 rounded-full overflow-hidden flex bg-slate-200 dark:bg-[#202530] mb-3">
-                    {regionalData.regions.map((r: any, idx: number) => {
-                      const colors = [
-                        'bg-blue-600',
-                        'bg-indigo-500',
-                        'bg-emerald-500',
-                        'bg-amber-500',
-                        'bg-purple-500',
-                        'bg-pink-500',
-                        'bg-teal-500'
-                      ]
-                      return (
-                        <div
-                          key={r.id}
-                          className={`${colors[idx % colors.length]} h-full transition-all`}
-                          style={{ width: `${r.share_percent}%` }}
-                          title={`${r.name}: ${r.share_percent}% ($${r.spend})`}
-                        />
-                      )
-                    })}
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
-                    {regionalData.regions.map((r: any, idx: number) => {
-                      const dotColors = [
-                        'bg-blue-600',
-                        'bg-indigo-500',
-                        'bg-emerald-500',
-                        'bg-amber-500',
-                        'bg-purple-500',
-                        'bg-pink-500',
-                        'bg-teal-500'
-                      ]
-                      return (
-                        <div key={r.id} className="flex items-center gap-1.5">
-                          <span className={`w-2.5 h-2.5 rounded-full ${dotColors[idx % dotColors.length]}`} />
-                          <span className="font-semibold text-slate-700 dark:text-slate-300">{r.name.split(' (')[0]}:</span>
-                          <span className="font-extrabold text-slate-900 dark:text-white">{r.share_percent}%</span>
-                          <span className="text-slate-400 font-mono">(${r.spend})</span>
-                        </div>
-                      )
-                    })}
-                  </div>
                 </div>
               </div>
             </div>
