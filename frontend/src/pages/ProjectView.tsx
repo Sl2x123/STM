@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
+import StatusBadge from '../components/StatusBadge'
 import { 
   ChevronRight, ChevronDown, Plus, Search, ArrowLeft, ChevronLeft,
-  Calendar, CheckCircle2, Circle, LayoutList, Grip, X, Trash2, 
+  Calendar, CheckCircle2, LayoutList, Grip, X, Trash2, 
   Check, Sparkles, SlidersHorizontal, CalendarDays,
   ExternalLink, User, Users, Eye, DollarSign, Share2,
   Building2, MapPin, Package, Phone, Zap, RefreshCw, Heart, MessageCircle, Bookmark, TrendingUp,
@@ -1443,8 +1444,9 @@ export default function ProjectView() {
       return nodes.map(node => {
         if (node.id === nodeId) {
           nextStatus = 
-            node.status === 'Not Done' ? 'In Progress' :
-            node.status === 'In Progress' ? 'Done' : 'Not Done'
+            node.status === 'Not Done' ? 'In Process' :
+            (node.status === 'In Process' || node.status === 'In Progress') ? 'Done' :
+            node.status === 'Done' ? 'Rejected' : 'Not Done'
           return { ...node, status: nextStatus }
         }
         if (node.children) return { ...node, children: updateNodeStatus(node.children) }
@@ -1684,36 +1686,12 @@ export default function ProjectView() {
   }
 
   const renderStatus = (status: string, nodeId: string) => {
-    if (status === 'Done') {
-      return (
-        <div 
-          onClick={(e) => cycleTaskStatus(nodeId, e)}
-          title="Нажмите, чтобы сменить статус"
-          className="flex items-center text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 px-3 py-1 rounded-full text-xs font-semibold w-max transition-colors cursor-pointer"
-        >
-          <CheckCircle2 size={14} className="mr-1.5" /> Done
-        </div>
-      )
-    }
-    if (status === 'In Progress') {
-      return (
-        <div 
-          onClick={(e) => cycleTaskStatus(nodeId, e)}
-          title="Нажмите, чтобы сменить статус"
-          className="flex items-center text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-3 py-1 rounded-full text-xs font-semibold w-max transition-colors cursor-pointer"
-        >
-          <Circle size={14} className="mr-1.5" /> In Progress
-        </div>
-      )
-    }
     return (
-      <div 
+      <StatusBadge
+        status={status}
         onClick={(e) => cycleTaskStatus(nodeId, e)}
         title="Нажмите, чтобы сменить статус"
-        className="flex items-center text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#20242c] hover:bg-gray-200 dark:hover:bg-[#282d38] px-3 py-1 rounded-full text-xs font-semibold w-max transition-colors cursor-pointer"
-      >
-        <Circle size={14} className="mr-1.5" /> Not Done
-      </div>
+      />
     )
   }
 
@@ -1996,17 +1974,7 @@ export default function ProjectView() {
                 <span className="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
                   {selectedCompany.category}
                 </span>
-                <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${
-                  selectedCompany.status === 'Завершено'
-                    ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                    : selectedCompany.status === 'Предоставлено'
-                    ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
-                    : selectedCompany.status === 'В процессе'
-                    ? 'bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
-                    : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                }`}>
-                  {selectedCompany.status}
-                </span>
+                <StatusBadge status={selectedCompany.status} />
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium">
                 <MapPin size={16} className="text-gray-400 shrink-0" />
@@ -3170,9 +3138,10 @@ export default function ProjectView() {
                 onChange={(e) => setSelectedDetailItem({ ...selectedDetailItem, status: e.target.value })}
                 className="bg-gray-50 dark:bg-[#121418] border border-gray-200 dark:border-[#2b303c] rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 dark:text-white outline-none focus:bg-white dark:focus:bg-[#181b20] cursor-pointer"
               >
-                <option value="Not Done">⚪ Не начато</option>
-                <option value="In Progress">🔵 В процессе</option>
-                <option value="Done">🟢 Выполнено</option>
+                <option value="Not Done">⚪ Not Done (Не начато)</option>
+                <option value="In Process">🔵 In Process (В процессе)</option>
+                <option value="Done">🟢 Done (Выполнено)</option>
+                <option value="Rejected">🔴 Rejected (Отклонено)</option>
               </select>
             </div>
           </div>
@@ -4285,30 +4254,18 @@ export default function ProjectView() {
                                                 )}
                                               </div>
 
-                                              {/* Status Dropdown on the Right */}
-                                              <div className="w-44 flex justify-end">
-                                                <select
-                                                  value={task.status || 'Not Done'}
-                                                  onChange={(e) => updateSprintTaskStatus(month.id, sprint.id, task.id, e.target.value)}
-                                                  className={`text-xs font-bold px-3 py-1.5 rounded-lg border outline-none cursor-pointer transition-all ${
-                                                    task.status === 'Done'
-                                                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60 focus:ring-1 focus:ring-emerald-500'
-                                                      : task.status === 'In Progress'
-                                                      ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800/60 focus:ring-1 focus:ring-blue-500'
-                                                      : 'bg-gray-50 dark:bg-[#202530] text-gray-600 dark:text-gray-400 border-gray-200 dark:border-[#2b303c] focus:ring-1 focus:ring-gray-400'
-                                                  }`}
-                                                  title="Выберите статус"
-                                                >
-                                                  <option value="Not Done" className="bg-white dark:bg-[#181b20] text-gray-700 dark:text-gray-300">
-                                                    ⚪ Не начато
-                                                  </option>
-                                                  <option value="In Progress" className="bg-white dark:bg-[#181b20] text-blue-600 dark:text-blue-400">
-                                                    🔵 В процессе
-                                                  </option>
-                                                  <option value="Done" className="bg-white dark:bg-[#181b20] text-emerald-600 dark:text-emerald-400">
-                                                    🟢 Выполнено
-                                                  </option>
-                                                </select>
+                                              {/* Status on the Right */}
+                                              <div className="w-44 flex justify-end items-center">
+                                                <StatusBadge
+                                                  status={task.status || 'Not Done'}
+                                                  onClick={() => {
+                                                    const statuses = ['Not Done', 'In Process', 'Done', 'Rejected']
+                                                    const cur = task.status === 'In Progress' ? 'In Process' : (task.status || 'Not Done')
+                                                    const nextIdx = (statuses.indexOf(cur) + 1) % statuses.length
+                                                    updateSprintTaskStatus(month.id, sprint.id, task.id, statuses[nextIdx])
+                                                  }}
+                                                  title="Нажмите, чтобы переключить статус"
+                                                />
                                               </div>
 
                                               {/* Delete Task */}
@@ -4614,18 +4571,16 @@ export default function ProjectView() {
 
           {/* Alternative View: Kanban Board */}
           {viewMode === 'board' && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {['Not Done', 'In Progress', 'Done'].map(status => {
-                const columnTasks = allTasks.filter(i => i.status === status && (typeFilter === 'ALL' || i.type === typeFilter))
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {['Not Done', 'In Process', 'Done', 'Rejected'].map(status => {
+                const columnTasks = allTasks.filter(i => (i.status === status || (status === 'In Process' && i.status === 'In Progress')) && (typeFilter === 'ALL' || i.type === typeFilter))
                 return (
                   <div key={status} className="bg-gray-100/70 dark:bg-[#14171d] rounded-2xl p-4 flex flex-col min-h-[400px] border border-transparent dark:border-[#262932]">
-                    <div className="flex justify-between items-center mb-4 px-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-gray-800 dark:text-white">{status}</span>
-                        <span className="text-xs bg-white dark:bg-[#20242c] text-gray-500 dark:text-gray-300 font-bold px-2 py-0.5 rounded-full shadow-sm">
-                          {columnTasks.length}
-                        </span>
-                      </div>
+                    <div className="flex justify-between items-center mb-4 px-1">
+                      <StatusBadge status={status} />
+                      <span className="text-xs bg-white dark:bg-[#20242c] text-gray-500 dark:text-gray-300 font-bold px-2 py-0.5 rounded-full shadow-xs">
+                        {columnTasks.length}
+                      </span>
                     </div>
 
                     <div className="space-y-3 flex-1 overflow-y-auto">
@@ -5008,10 +4963,6 @@ export default function ProjectView() {
               </div>
             ) : (
               filteredCompanies.map((company) => {
-                const isCompleted = company.status === 'Завершено'
-                const isProvided = company.status === 'Предоставлено'
-                const isInProgress = company.status === 'В процессе'
-
                 return (
                   <div
                     key={company.id}
@@ -5074,26 +5025,14 @@ export default function ProjectView() {
                       </div>
 
                       {/* Interactive Status Badge */}
-                      <button
-                        type="button"
+                      <StatusBadge
+                        status={company.status}
                         onClick={(e) => {
                           e.stopPropagation()
                           cycleCompanyStatus(company.id, e)
                         }}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors flex items-center gap-1.5 cursor-pointer ${
-                          isCompleted
-                            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
-                            : isProvided
-                            ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60'
-                            : isInProgress
-                            ? 'bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/60'
-                            : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60'
-                        }`}
                         title="Нажмите для быстрой смены статуса"
-                      >
-                        {isCompleted && <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />}
-                        {company.status}
-                      </button>
+                      />
 
                       {/* More Details Action Button */}
                       <button

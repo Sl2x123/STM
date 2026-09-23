@@ -5,6 +5,7 @@ import {
   ArrowRight, Search, ChevronDown, LucideIcon
 } from 'lucide-react'
 import { api } from '../lib/api'
+import StatusBadge from '../components/StatusBadge'
 
 // Cubic Bezier Spline calculation for mathematically continuous smooth waves
 function getSmoothSplinePath(points: Array<{ x: number; y: number }>): string {
@@ -616,9 +617,7 @@ function LatestBookingTable() {
                 <td className="py-3.5 px-4 text-right font-semibold text-slate-600 dark:text-slate-300 tabular-nums">{r.plan}</td>
                 <td className="py-3.5 px-4 text-right font-extrabold text-slate-900 dark:text-white tabular-nums">{r.fact}</td>
                 <td className="py-3.5 px-4 text-center">
-                  <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-bold border ${r.statusColor}`}>
-                    {r.status}
-                  </span>
+                  <StatusBadge status={r.status} />
                 </td>
               </tr>
             ))}

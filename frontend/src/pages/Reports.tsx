@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { initialRnpData, RnpItem } from '../data/rnpData'
 import { api } from '../lib/api'
+import StatusBadge from '../components/StatusBadge'
 
 // Operational Sprints & Task Plan / Fact Dataset
 export interface SprintTask {
@@ -2554,10 +2555,7 @@ export default function Reports() {
                             </span>
                           </td>
                           <td className="py-3 px-3">
-                            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                              Активна
-                            </span>
+                            <StatusBadge status="Активно" size="sm" />
                           </td>
                         </tr>
                       ))}
@@ -3139,9 +3137,7 @@ export default function Reports() {
                         </h4>
                         <p className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{c.location}</p>
                       </div>
-                      <span className="text-xs font-black px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 shrink-0 border border-indigo-200 dark:border-indigo-800">
-                        {c.status}
-                      </span>
+                      <StatusBadge status={c.status} />
                     </div>
 
                     <div className="text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-[#181b20] p-4 rounded-2xl border border-slate-200/80 dark:border-[#2b303c] my-3 leading-relaxed">
