@@ -567,7 +567,6 @@ function LatestBookingTable() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
           <h3 className="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">Latest Booking</h3>
-          <p className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">Операционная сводка ключевых активностей и выполнения РНП</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -658,9 +657,6 @@ export default function Dashboard() {
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
             Dashboard
           </h1>
-          <p className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">
-            Сводная аналитика выполнения планов, визитов и активности
-          </p>
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">

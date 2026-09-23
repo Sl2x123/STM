@@ -1003,10 +1003,6 @@ export default function Reports() {
     return filteredBloggers.reduce((acc, b) => acc + (b.priceNum || 0), 0)
   }, [filteredBloggers])
 
-  const totalPromoOrders = useMemo(() => {
-    return filteredBloggers.reduce((acc, b) => acc + (b.promoSales || 0), 0)
-  }, [filteredBloggers])
-
   // Export to CSV / Excel based on current active tab
   const handleExportCSV = () => {
     let headers: string[] = []
@@ -1180,9 +1176,6 @@ export default function Reports() {
                 <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
               )}
             </div>
-            <p className="text-sm sm:text-base font-semibold text-slate-500 dark:text-slate-400 mt-1">
-              Наглядная динамика выполнения планов, спринтов, визитов и блогосферы
-            </p>
           </div>
         </div>
 
@@ -1358,12 +1351,9 @@ export default function Reports() {
                 <span className="text-sm text-slate-400 font-semibold">из 100% цели</span>
               </div>
               {/* Progress bar */}
-              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden mb-2.5">
+              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden">
                 <div className="bg-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: '88.4%' }} />
               </div>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                Опережение целевого графика на 3 дня
-              </p>
             </div>
 
             {/* KPI 2: Field Visits (Doctors & Pharmacies) */}
@@ -1379,12 +1369,9 @@ export default function Reports() {
                 <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">385</span>
                 <span className="text-sm text-slate-400 font-semibold">/ 410 план</span>
               </div>
-              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden mb-2.5">
+              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden">
                 <div className="bg-blue-500 h-full rounded-full transition-all duration-500" style={{ width: '93.9%' }} />
               </div>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                93.9% выполнения полевого плана визитов
-              </p>
             </div>
 
             {/* KPI 3: Marketing & Influencer Reach */}
@@ -1402,12 +1389,9 @@ export default function Reports() {
                 </span>
                 <span className="text-sm text-slate-400 font-semibold">просмотров</span>
               </div>
-              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden mb-2.5">
+              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden">
                 <div className="bg-purple-500 h-full rounded-full transition-all duration-500" style={{ width: '91%' }} />
               </div>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                {totalPromoOrders} прямых заказов по промокодам
-              </p>
             </div>
 
             {/* KPI 4: Sprints & Task Completion */}
@@ -1423,12 +1407,9 @@ export default function Reports() {
                 <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">42</span>
                 <span className="text-sm text-slate-400 font-semibold">/ 48 задач</span>
               </div>
-              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden mb-2.5">
+              <div className="w-full bg-slate-100 dark:bg-[#262932] h-3 rounded-full overflow-hidden">
                 <div className="bg-amber-500 h-full rounded-full transition-all duration-500" style={{ width: '87.5%' }} />
               </div>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                87.5% задач закрыто вовремя
-              </p>
             </div>
           </div>
 
@@ -1442,9 +1423,6 @@ export default function Reports() {
                     Интерактивный график
                   </span>
                 </h2>
-                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mt-1">
-                  Сравнение запланированного темпа и фактического результата по 5 неделям месяца
-                </p>
               </div>
 
               {/* Chart Legend */}
@@ -1824,9 +1802,6 @@ export default function Reports() {
                   {selectedMonth}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
-                Оперативный мониторинг процента выполнения всех 4 спринтов и общего плана месяца
-              </p>
             </div>
 
             {/* View Mode Toggle: Matrix vs Timeline */}
@@ -1994,9 +1969,6 @@ export default function Reports() {
                   <p className="text-xs text-slate-400 font-medium">Все показатели выше целевых 75%</p>
                 </div>
               )}
-              <div className="text-[11px] font-medium text-slate-400 mt-2">
-                Оперативный статус контроля
-              </div>
             </div>
           </div>
 
@@ -2009,9 +1981,6 @@ export default function Reports() {
                   <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                     Сводная матрица закрытия спринтов и планов
                   </h3>
-                  <p className="text-xs font-medium text-slate-400">
-                    На сколько закрыт каждый спринт (1–4) и общий план месяца по проектам
-                  </p>
                 </div>
                 <div className="text-xs font-medium text-slate-400 flex items-center gap-3">
                   <span className="flex items-center gap-1">
@@ -2235,9 +2204,6 @@ export default function Reports() {
               <div className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                 ${((metaOverview?.summary?.total_spend || 3280) + totalBloggerSpend).toLocaleString()}
               </div>
-              <p className="text-xs font-semibold text-slate-400 mt-2">
-                Meta Ads: ${(metaOverview?.summary?.total_spend || 3280).toLocaleString()} • Блогеры: ${totalBloggerSpend.toLocaleString()}
-              </p>
             </div>
 
             {/* Card 2: Reach */}
@@ -2252,9 +2218,6 @@ export default function Reports() {
               <div className="text-3xl lg:text-4xl font-black text-blue-600 dark:text-blue-400 tracking-tight">
                 1.37M
               </div>
-              <p className="text-xs font-semibold text-slate-400 mt-2">
-                {((metaOverview?.summary?.total_reach || 920000) / 1000).toFixed(0)}K Ads • 455K Инфлюенсеры
-              </p>
             </div>
 
             {/* Card 3: Views & Clicks */}
@@ -2269,9 +2232,6 @@ export default function Reports() {
               <div className="text-3xl lg:text-4xl font-black text-teal-600 dark:text-teal-400 tracking-tight">
                 {((metaOverview?.summary?.total_clicks || 38400) / 1000).toFixed(1)}K
               </div>
-              <p className="text-xs font-semibold text-slate-400 mt-2">
-                CTR: {metaOverview?.summary?.avg_ctr || '2.09'}% • {(totalBloggerReach / 1000).toFixed(0)}K просмотров
-              </p>
             </div>
 
             {/* Card 4: Blended ROAS */}
@@ -2286,9 +2246,6 @@ export default function Reports() {
               <div className="text-3xl lg:text-4xl font-black text-purple-600 dark:text-purple-400 tracking-tight">
                 {metaOverview?.summary?.blended_roas || '3.65'}x
               </div>
-              <p className="text-xs font-semibold text-slate-400 mt-2">
-                {totalPromoOrders} прямых заказов в аптеках
-              </p>
             </div>
           </div>
 
@@ -2310,15 +2267,8 @@ export default function Reports() {
                 }`}>
                   <Target size={20} />
                 </div>
-                <div>
-                  <div className="text-sm sm:text-base font-extrabold leading-tight">
-                    Таргет-реклама
-                  </div>
-                  <div className={`text-[11px] font-medium leading-tight mt-0.5 ${
-                    metaSubTab === 'ads' ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'
-                  }`}>
-                    Кампании, показы и области
-                  </div>
+                <div className="text-sm sm:text-base font-extrabold leading-tight">
+                  Таргет-реклама
                 </div>
               </button>
 
@@ -2337,20 +2287,13 @@ export default function Reports() {
                 }`}>
                   <Users size={20} />
                 </div>
-                <div>
-                  <div className="text-sm sm:text-base font-extrabold leading-tight flex items-center gap-2">
-                    <span>Блогеры & Инфлюенсеры</span>
-                    <span className={`text-[11px] font-black px-2 py-0.5 rounded-full ${
-                      metaSubTab === 'influencers' ? 'bg-white text-blue-700' : 'bg-slate-100 dark:bg-[#28303f] text-slate-600 dark:text-slate-300'
-                    }`}>
-                      {filteredBloggers.length}
-                    </span>
-                  </div>
-                  <div className={`text-[11px] font-medium leading-tight mt-0.5 ${
-                    metaSubTab === 'influencers' ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'
+                <div className="text-sm sm:text-base font-extrabold leading-tight flex items-center gap-2">
+                  <span>Блогеры & Инфлюенсеры</span>
+                  <span className={`text-[11px] font-black px-2 py-0.5 rounded-full ${
+                    metaSubTab === 'influencers' ? 'bg-white text-blue-700' : 'bg-slate-100 dark:bg-[#28303f] text-slate-600 dark:text-slate-300'
                   }`}>
-                    Посты, охват и интеграции
-                  </div>
+                    {filteredBloggers.length}
+                  </span>
                 </div>
               </button>
             </div>
@@ -2490,7 +2433,6 @@ export default function Reports() {
                       </div>
                       <div>
                         <h3 className="text-base font-bold text-slate-900 dark:text-white">Instagram Ads (Meta)</h3>
-                        <p className="text-xs text-slate-400">Reels, Stories, Explore Feed</p>
                       </div>
                     </div>
                     <span className="px-2.5 py-1 rounded-full bg-pink-100 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300 text-xs font-extrabold">
@@ -2527,7 +2469,6 @@ export default function Reports() {
                       </div>
                       <div>
                         <h3 className="text-base font-bold text-slate-900 dark:text-white">Facebook Ads (Meta)</h3>
-                        <p className="text-xs text-slate-400">Feed Video, Groups & B2B Community</p>
                       </div>
                     </div>
                     <span className="px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-extrabold">
@@ -2649,7 +2590,7 @@ export default function Reports() {
                         <tr key={c.id} className="hover:bg-slate-50/70 dark:hover:bg-[#1a1d24] transition-colors">
                           <td className="py-3 px-3">
                             <div className="font-bold text-slate-900 dark:text-white">{c.name}</div>
-                            <span className="text-xs text-slate-400 font-semibold">{c.project} • {c.format}</span>
+                            <span className="text-xs text-slate-400 font-semibold">{c.project}</span>
                           </td>
                           <td className="py-3 px-3">
                             <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
@@ -2666,8 +2607,8 @@ export default function Reports() {
                             ${c.spend.toLocaleString()}
                           </td>
                           <td className="py-3 px-3">
-                            <div className="font-semibold text-slate-800 dark:text-slate-200">{(c.impressions / 1000).toFixed(0)}K показов</div>
-                            <div className="text-xs text-slate-400">{(c.reach / 1000).toFixed(0)}K охват</div>
+                            <div className="font-semibold text-slate-800 dark:text-slate-200">{(c.impressions / 1000).toFixed(0)}K</div>
+                            <div className="text-xs text-slate-400">{(c.reach / 1000).toFixed(0)}K</div>
                           </td>
                           <td className="py-3 px-3">
                             <div className="font-bold text-blue-600 dark:text-blue-400">{c.clicks.toLocaleString()}</div>
@@ -2826,9 +2767,6 @@ export default function Reports() {
                     <div className="text-2xl font-black text-slate-900 dark:text-white">
                       {(regionalData.active_campaign_reach / 1000).toLocaleString()}K
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-1">
-                      12.0% от всей аудитории Meta в Узбекистане ({regionalData.total_potential_reach})
-                    </div>
                   </div>
 
                   <div className="bg-slate-50/80 dark:bg-[#121418] p-4 rounded-2xl border border-slate-200/70 dark:border-[#262932]">
@@ -2838,9 +2776,6 @@ export default function Reports() {
                     </div>
                     <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
                       {(regionalData.active_campaign_impressions / 1000).toLocaleString()}K
-                    </div>
-                    <div className="text-[11px] text-slate-400 mt-1">
-                      Частота: {(regionalData.active_campaign_impressions / regionalData.active_campaign_reach).toFixed(2)} на пользователя
                     </div>
                   </div>
 
@@ -2852,9 +2787,6 @@ export default function Reports() {
                     <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
                       ${regionalData.total_spend.toLocaleString()}
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-1">
-                      Средний CPM: {regionalData.avg_cpm} • Средний ROAS: {regionalData.avg_roas}
-                    </div>
                   </div>
 
                   <div className="bg-slate-50/80 dark:bg-[#121418] p-4 rounded-2xl border border-slate-200/70 dark:border-[#262932]">
@@ -2864,9 +2796,6 @@ export default function Reports() {
                     </div>
                     <div className="text-2xl font-black text-amber-600 dark:text-amber-400">
                       {regionalData.total_clicks.toLocaleString()}
-                    </div>
-                    <div className="text-[11px] text-slate-400 mt-1">
-                      Средний CTR: {regionalData.avg_ctr} (выше фарм-бенчмарка 1.8%)
                     </div>
                   </div>
                 </div>
@@ -2884,7 +2813,6 @@ export default function Reports() {
                         <th className="py-3 px-3">Клики (CTR)</th>
                         <th className="py-3 px-3">CPM / CPC</th>
                         <th className="py-3 px-3">ROAS</th>
-                        <th className="py-3 px-3">Фокус таргета</th>
                         <th className="py-3 px-3 text-center">Статус</th>
                       </tr>
                     </thead>
@@ -2896,7 +2824,6 @@ export default function Reports() {
                               <MapPin size={14} className="text-blue-500 shrink-0" />
                               <span>{reg.name}</span>
                             </div>
-                            <span className="text-[11px] text-slate-400 font-medium ml-5">{reg.region_type}</span>
                           </td>
                           <td className="py-3.5 px-3 min-w-[140px]">
                             <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
@@ -2933,11 +2860,6 @@ export default function Reports() {
                           <td className="py-3.5 px-3">
                             <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 font-extrabold text-xs">
                               {reg.roas}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-3 max-w-[200px]">
-                            <span className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
-                              {reg.target_audience}
                             </span>
                           </td>
                           <td className="py-3.5 px-3 text-center">
@@ -3217,12 +3139,9 @@ export default function Reports() {
       {activeReportTab === 'companies' && (
         <div className="space-y-6 animate-fade-in">
           <div className="bg-white dark:bg-[#181b20] p-6 lg:p-7 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
-            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mb-1">
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mb-5">
               Партнёрские заведения, Отели и B2B локации
             </h2>
-            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-6">
-              Спецпроекты, дистрибуция брендированных материалов и тейбл-тентов
-            </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {filteredCompanies.map(c => (
