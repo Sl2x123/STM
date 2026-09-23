@@ -566,11 +566,7 @@ export default function Reports() {
 
   // Meta (Facebook & Instagram) ecosystem state
   const [metaOverview, setMetaOverview] = useState<any>(null)
-  const [metaSubTab, setMetaSubTab] = useState<'ads' | 'influencers' | 'lookup'>('ads')
-  const [igLookupHandle, setIgLookupHandle] = useState<string>('shaxzoda__muxammedova')
-  const [igLookupResult, setIgLookupResult] = useState<any>(null)
-  const [isLookingUpIg, setIsLookingUpIg] = useState<boolean>(false)
-  const [lookupError, setLookupError] = useState<string | null>(null)
+  const [metaSubTab, setMetaSubTab] = useState<'ads' | 'influencers'>('ads')
   const [targetRegionFilter, setTargetRegionFilter] = useState<string>('ALL')
 
   // Uzbekistan & Regional targeting dataset
@@ -881,24 +877,7 @@ export default function Reports() {
     return () => { isMounted = false }
   }, [])
 
-  // Handle Instagram handle lookup & estimation
-  const handleLookupInstagram = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
-    const handleToQuery = igLookupHandle.trim().replace(/^@/, '')
-    if (!handleToQuery) return
-    setIsLookingUpIg(true)
-    setLookupError(null)
-    try {
-      const res = await api.get('/instagram/lookup', { params: { handle: handleToQuery } })
-      if (res.data) {
-        setIgLookupResult(res.data)
-      }
-    } catch (err: any) {
-      setLookupError('Не удалось подтянуть данные профиля Instagram. Проверьте правильность логина.')
-    } finally {
-      setIsLookingUpIg(false)
-    }
-  }
+
 
   // Load Meta status & config
   useEffect(() => {
@@ -2315,7 +2294,7 @@ export default function Reports() {
 
           {/* Sub-Navigation for Meta Ecosystem */}
           <div className="p-3 bg-slate-100/90 dark:bg-[#12151c] rounded-3xl border border-slate-200/90 dark:border-[#262c3a] shadow-xs flex flex-wrap items-center justify-between gap-3">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 flex-1 min-w-[300px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1 min-w-[300px]">
               {/* Tab 1: Meta Ads & Targeting */}
               <button
                 type="button"
@@ -2371,33 +2350,6 @@ export default function Reports() {
                     metaSubTab === 'influencers' ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'
                   }`}>
                     Посты, охват и интеграции
-                  </div>
-                </div>
-              </button>
-
-              {/* Tab 3: Blogger Check & Live Analysis */}
-              <button
-                type="button"
-                onClick={() => setMetaSubTab('lookup')}
-                className={`flex items-center gap-3 p-3.5 sm:px-5 sm:py-3.5 rounded-2xl transition-all cursor-pointer text-left ${
-                  metaSubTab === 'lookup'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 ring-2 ring-blue-400/30'
-                    : 'bg-white dark:bg-[#1a1e27] hover:bg-slate-50 dark:hover:bg-[#222834] text-slate-800 dark:text-slate-100 border border-slate-200/90 dark:border-[#2c3444] shadow-xs'
-                }`}
-              >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  metaSubTab === 'lookup' ? 'bg-white/20 text-white' : 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400'
-                }`}>
-                  <Search size={20} />
-                </div>
-                <div>
-                  <div className="text-sm sm:text-base font-extrabold leading-tight">
-                    Проверка блогеров
-                  </div>
-                  <div className={`text-[11px] font-medium leading-tight mt-0.5 ${
-                    metaSubTab === 'lookup' ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'
-                  }`}>
-                    Анализ профиля и ER по нику
                   </div>
                 </div>
               </button>
@@ -3111,207 +3063,7 @@ export default function Reports() {
             </div>
           )}
 
-          {/* SUBTAB 3: LIVE INSTAGRAM PROFILE LOOKUP & ESTIMATION */}
-          {metaSubTab === 'lookup' && (
-            <div className="space-y-6 animate-fade-in">
-              <div className="bg-white dark:bg-[#181b20] p-6 lg:p-8 rounded-3xl border border-slate-200/90 dark:border-[#2b303c] shadow-sm">
-                <div className="max-w-2xl mb-6">
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
-                    Live Анализ и Калькулятор профиля Instagram
-                  </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Укажите никнейм инфлюенсера для автоматической оценки аудитории, расчетной стоимости интеграции в Узбекистане и прогноза окупаемости для ваших брендов.
-                  </p>
-                </div>
 
-                {/* Search Form */}
-                <form onSubmit={handleLookupInstagram} className="flex flex-col sm:flex-row gap-3 mb-4">
-                  <div className="relative flex-1">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">@</span>
-                    <input
-                      type="text"
-                      value={igLookupHandle}
-                      onChange={(e) => setIgLookupHandle(e.target.value)}
-                      placeholder="shaxzoda__muxammedova"
-                      className="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-[#121418] border border-slate-200 dark:border-[#2b303c] rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#0052cc]"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isLookingUpIg}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0052cc] hover:bg-[#0747a6] text-white rounded-2xl text-sm font-bold transition shadow-sm cursor-pointer disabled:opacity-60"
-                  >
-                    {isLookingUpIg ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Анализ...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Search className="w-4 h-4" />
-                        <span>Проанализировать</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-
-                {/* Quick Selection Chips */}
-                <div className="flex flex-wrap items-center gap-2 mb-6 text-xs">
-                  <span className="text-slate-400 font-semibold">Быстрый выбор:</span>
-                  {[
-                    'shaxzoda__muxammedova',
-                    'munisarizaeva',
-                    'azizamirzaeva',
-                    'feruza_normatova',
-                    'zarinanizomiddinova'
-                  ].map(handle => (
-                    <button
-                      key={handle}
-                      type="button"
-                      onClick={() => {
-                        setIgLookupHandle(handle)
-                        api.get('/instagram/lookup', { params: { handle } })
-                          .then(res => setIgLookupResult(res.data))
-                          .catch(() => {})
-                      }}
-                      className="px-3 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-[#222632] dark:hover:bg-[#2a3040] text-slate-700 dark:text-slate-300 rounded-lg font-semibold transition cursor-pointer"
-                    >
-                      @{handle}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Error Banner */}
-                {lookupError && (
-                  <div className="p-4 bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 rounded-2xl text-sm font-semibold mb-6">
-                    {lookupError}
-                  </div>
-                )}
-
-                {/* Analysis Result Card */}
-                {igLookupResult && (
-                  <div className="p-6 bg-slate-50 dark:bg-[#121418] rounded-2xl border border-slate-200 dark:border-[#252a36] space-y-6">
-                    {/* Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-[#252a36]">
-                      <div className="flex items-center gap-3.5">
-                        <div className="w-12 h-12 rounded-2xl bg-[#0052cc] text-white flex items-center justify-center font-black text-lg shadow-sm">
-                          {igLookupResult.handle?.slice(0, 2).toUpperCase() || 'IG'}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-lg font-black text-slate-900 dark:text-white">
-                              {igLookupResult.name}
-                            </h4>
-                            {igLookupResult.is_verified && (
-                              <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 text-[10px] font-extrabold">
-                                Verified
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-xs font-semibold text-slate-400">
-                            @{igLookupResult.handle} • {igLookupResult.category}
-                          </span>
-                        </div>
-                      </div>
-
-                      <a
-                        href={`https://www.instagram.com/${igLookupResult.handle}/`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-[#1c202a] hover:bg-slate-100 dark:hover:bg-[#252b3a] border border-slate-200 dark:border-[#2f3545] rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 transition cursor-pointer self-start sm:self-auto"
-                      >
-                        <span>Открыть в Instagram</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    </div>
-
-                    {/* 4 Core Metrics */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      <div className="p-4 rounded-xl bg-white dark:bg-[#181b20] border border-slate-200/80 dark:border-[#2b303c]">
-                        <span className="text-xs text-slate-400 font-semibold block mb-1">Подписчики</span>
-                        <span className="text-2xl font-black text-slate-900 dark:text-white">
-                          {igLookupResult.followers}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-bold block mt-0.5 uppercase">
-                          {igLookupResult.tier}
-                        </span>
-                      </div>
-
-                      <div className="p-4 rounded-xl bg-white dark:bg-[#181b20] border border-slate-200/80 dark:border-[#2b303c]">
-                        <span className="text-xs text-slate-400 font-semibold block mb-1">Вовлечение (ER)</span>
-                        <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                          {igLookupResult.engagement_rate}
-                        </span>
-                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block mt-0.5">
-                          Высокий интерес
-                        </span>
-                      </div>
-
-                      <div className="p-4 rounded-xl bg-white dark:bg-[#181b20] border border-slate-200/80 dark:border-[#2b303c]">
-                        <span className="text-xs text-slate-400 font-semibold block mb-1">Просмотры Reels</span>
-                        <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
-                          {igLookupResult.avg_views_reels}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-bold block mt-0.5">
-                          В среднем на ролик
-                        </span>
-                      </div>
-
-                      <div className="p-4 rounded-xl bg-white dark:bg-[#181b20] border border-slate-200/80 dark:border-[#2b303c]">
-                        <span className="text-xs text-slate-400 font-semibold block mb-1">Точность модели</span>
-                        <span className="text-2xl font-black text-purple-600 dark:text-purple-400">
-                          {Math.round((igLookupResult.confidence || 0.95) * 100)}%
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-bold block mt-0.5">
-                          Meta Graph Benchmark
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Pricing Estimates */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-white dark:bg-[#181b20] border border-slate-200/80 dark:border-[#2b303c]">
-                      <div>
-                        <span className="text-xs text-slate-400 font-semibold block mb-0.5">Расчетная цена за Reels</span>
-                        <span className="text-xl font-black text-slate-900 dark:text-white">
-                          ${igLookupResult.estimated_cost_per_reel}
-                        </span>
-                        <span className="text-[11px] text-slate-400 block mt-0.5">1 ролик с закреплением</span>
-                      </div>
-                      <div>
-                        <span className="text-xs text-slate-400 font-semibold block mb-0.5">Расчетная цена за Stories</span>
-                        <span className="text-xl font-black text-slate-900 dark:text-white">
-                          ${igLookupResult.estimated_cost_per_story}
-                        </span>
-                        <span className="text-[11px] text-slate-400 block mt-0.5">Серия из 3 историй + стикер</span>
-                      </div>
-                      <div>
-                        <span className="text-xs text-slate-400 font-semibold block mb-0.5">Рекомендуемый фокус</span>
-                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 block mt-1">
-                          Reels + промокод со скидкой
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Audience Breakdown */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                      <div className="p-3 bg-white dark:bg-[#181b20] rounded-xl border border-slate-200/70 dark:border-[#252a36]">
-                        <span className="text-slate-400 font-semibold block mb-1">География аудитории</span>
-                        <span className="font-bold text-slate-800 dark:text-slate-200">{igLookupResult.top_geo}</span>
-                      </div>
-                      <div className="p-3 bg-white dark:bg-[#181b20] rounded-xl border border-slate-200/70 dark:border-[#252a36]">
-                        <span className="text-slate-400 font-semibold block mb-1">Возрастная структура</span>
-                        <span className="font-bold text-slate-800 dark:text-slate-200">{igLookupResult.audience_age}</span>
-                      </div>
-                      <div className="p-3 bg-white dark:bg-[#181b20] rounded-xl border border-slate-200/70 dark:border-[#252a36]">
-                        <span className="text-slate-400 font-semibold block mb-1">Гендерное соотношение</span>
-                        <span className="font-bold text-slate-800 dark:text-slate-200">{igLookupResult.audience_gender}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* BLOGGER DETAILS MODAL (PROFESSIONAL SAAS STANDARD) */}
           {selectedBloggerModal && (
