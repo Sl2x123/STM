@@ -2271,7 +2271,7 @@ export default function Reports() {
                 </div>
               </div>
               <div className="text-3xl lg:text-4xl font-black text-blue-600 dark:text-blue-400 tracking-tight">
-                1.37M чел
+                1.37M
               </div>
               <p className="text-xs font-semibold text-slate-400 mt-2">
                 {((metaOverview?.summary?.total_reach || 920000) / 1000).toFixed(0)}K Ads • 455K Инфлюенсеры
@@ -2288,7 +2288,7 @@ export default function Reports() {
                 </div>
               </div>
               <div className="text-3xl lg:text-4xl font-black text-teal-600 dark:text-teal-400 tracking-tight">
-                {((metaOverview?.summary?.total_clicks || 38400) / 1000).toFixed(1)}K кликов
+                {((metaOverview?.summary?.total_clicks || 38400) / 1000).toFixed(1)}K
               </div>
               <p className="text-xs font-semibold text-slate-400 mt-2">
                 CTR: {metaOverview?.summary?.avg_ctr || '2.09'}% • {(totalBloggerReach / 1000).toFixed(0)}K просмотров
