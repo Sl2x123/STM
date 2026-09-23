@@ -2314,57 +2314,105 @@ export default function Reports() {
           </div>
 
           {/* Sub-Navigation for Meta Ecosystem */}
-          <div className="flex flex-wrap items-center justify-between gap-4 p-2 bg-slate-100 dark:bg-[#121418] rounded-2xl border border-slate-200 dark:border-[#282d38]">
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="p-3 bg-slate-100/90 dark:bg-[#12151c] rounded-3xl border border-slate-200/90 dark:border-[#262c3a] shadow-xs flex flex-wrap items-center justify-between gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 flex-1 min-w-[300px]">
+              {/* Tab 1: Meta Ads & Targeting */}
               <button
                 type="button"
                 onClick={() => setMetaSubTab('ads')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer ${
+                className={`flex items-center gap-3 p-3.5 sm:px-5 sm:py-3.5 rounded-2xl transition-all cursor-pointer text-left ${
                   metaSubTab === 'ads'
-                    ? 'bg-[#0052cc] text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 ring-2 ring-blue-400/30'
+                    : 'bg-white dark:bg-[#1a1e27] hover:bg-slate-50 dark:hover:bg-[#222834] text-slate-800 dark:text-slate-100 border border-slate-200/90 dark:border-[#2c3444] shadow-xs'
                 }`}
               >
-                <Target className="w-4 h-4" />
-                <span>Таргетированная реклама Meta Ads (FB & IG)</span>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                  metaSubTab === 'ads' ? 'bg-white/20 text-white' : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400'
+                }`}>
+                  <Target size={20} />
+                </div>
+                <div>
+                  <div className="text-sm sm:text-base font-extrabold leading-tight">
+                    Таргет-реклама
+                  </div>
+                  <div className={`text-[11px] font-medium leading-tight mt-0.5 ${
+                    metaSubTab === 'ads' ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'
+                  }`}>
+                    Кампании, показы и области
+                  </div>
+                </div>
               </button>
 
+              {/* Tab 2: Influencers & Bloggers */}
               <button
                 type="button"
                 onClick={() => setMetaSubTab('influencers')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer ${
+                className={`flex items-center gap-3 p-3.5 sm:px-5 sm:py-3.5 rounded-2xl transition-all cursor-pointer text-left ${
                   metaSubTab === 'influencers'
-                    ? 'bg-[#0052cc] text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 ring-2 ring-blue-400/30'
+                    : 'bg-white dark:bg-[#1a1e27] hover:bg-slate-50 dark:hover:bg-[#222834] text-slate-800 dark:text-slate-100 border border-slate-200/90 dark:border-[#2c3444] shadow-xs'
                 }`}
               >
-                <Users className="w-4 h-4" />
-                <span>Инфлюенсеры Instagram ({filteredBloggers.length})</span>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                  metaSubTab === 'influencers' ? 'bg-white/20 text-white' : 'bg-pink-50 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400'
+                }`}>
+                  <Users size={20} />
+                </div>
+                <div>
+                  <div className="text-sm sm:text-base font-extrabold leading-tight flex items-center gap-2">
+                    <span>Блогеры & Инфлюенсеры</span>
+                    <span className={`text-[11px] font-black px-2 py-0.5 rounded-full ${
+                      metaSubTab === 'influencers' ? 'bg-white text-blue-700' : 'bg-slate-100 dark:bg-[#28303f] text-slate-600 dark:text-slate-300'
+                    }`}>
+                      {filteredBloggers.length}
+                    </span>
+                  </div>
+                  <div className={`text-[11px] font-medium leading-tight mt-0.5 ${
+                    metaSubTab === 'influencers' ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'
+                  }`}>
+                    Посты, охват и интеграции
+                  </div>
+                </div>
               </button>
 
+              {/* Tab 3: Blogger Check & Live Analysis */}
               <button
                 type="button"
                 onClick={() => setMetaSubTab('lookup')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer ${
+                className={`flex items-center gap-3 p-3.5 sm:px-5 sm:py-3.5 rounded-2xl transition-all cursor-pointer text-left ${
                   metaSubTab === 'lookup'
-                    ? 'bg-[#0052cc] text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 ring-2 ring-blue-400/30'
+                    : 'bg-white dark:bg-[#1a1e27] hover:bg-slate-50 dark:hover:bg-[#222834] text-slate-800 dark:text-slate-100 border border-slate-200/90 dark:border-[#2c3444] shadow-xs'
                 }`}
               >
-                <Search className="w-4 h-4" />
-                <span>Live Анализ профиля Instagram</span>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                  metaSubTab === 'lookup' ? 'bg-white/20 text-white' : 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400'
+                }`}>
+                  <Search size={20} />
+                </div>
+                <div>
+                  <div className="text-sm sm:text-base font-extrabold leading-tight">
+                    Проверка блогеров
+                  </div>
+                  <div className={`text-[11px] font-medium leading-tight mt-0.5 ${
+                    metaSubTab === 'lookup' ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'
+                  }`}>
+                    Анализ профиля и ER по нику
+                  </div>
+                </div>
               </button>
             </div>
 
+            {/* Meta API Status & Configure Button */}
             <button
               type="button"
               onClick={() => setMetaModalOpen(true)}
-              className="flex items-center gap-2 px-3.5 py-1.5 bg-white dark:bg-[#181b20] hover:bg-slate-50 dark:hover:bg-[#202532] rounded-xl border border-slate-200/80 dark:border-[#2c3240] text-xs font-bold text-slate-700 dark:text-slate-300 transition cursor-pointer shadow-xs"
+              className="flex items-center gap-2.5 px-4 py-3 bg-white dark:bg-[#1a1e27] hover:bg-slate-50 dark:hover:bg-[#222834] rounded-2xl border border-slate-200/90 dark:border-[#2c3444] text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 transition-all cursor-pointer shadow-xs shrink-0 self-stretch sm:self-auto justify-center"
               title="Настройки подключения Meta (Facebook & Instagram)"
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Meta Ads API: Активен</span>
-              <span className="text-[11px] text-[#0052cc] dark:text-blue-400 font-extrabold ml-1">Настроить токен →</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
+              <span>Meta Ads API: <strong className="text-emerald-600 dark:text-emerald-400">Активен</strong></span>
+              <span className="text-xs text-blue-600 dark:text-blue-400 font-extrabold ml-1 border-l border-slate-200 dark:border-[#2c3444] pl-2.5">Настройки токена →</span>
             </button>
           </div>
 
